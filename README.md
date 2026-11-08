@@ -20,9 +20,8 @@ Tasks and the food log are stored on the phone only.
 
 | Path | What it is |
 | --- | --- |
-| `web/index.html` | The whole app interface (HTML, CSS and JavaScript). It also runs on its own in a browser, where alarms ring only while the page is open. |
-| `android/` | The Android app (Java, no extra libraries). It shows `web/index.html` and handles alarms natively. |
-| `android/app/src/main/assets/index.html` | The copy of `web/index.html` that goes into the app. Copy the file over after changing it. |
+| `android/` | The Android app (Java, no extra libraries). |
+| `android/app/src/main/assets/index.html` | The app's screens: tasks, calories and settings (HTML, CSS and JavaScript). |
 | `apk/Daybell.apk` | A signed build, ready to install. |
 
 How the Android side works:
