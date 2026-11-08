@@ -4,6 +4,7 @@ A personal Android app for planning your day and tracking what you eat.
 
 - **Tasks:** add tasks with a date and time, set a reminder (at the time, or 5 to 60 minutes before), and repeat daily, on weekdays or weekly. A ring shows what percentage of the day's tasks are done, with a bar for each day of the week.
 - **Alarms:** ring through Android's own alarm system, so they work when the app is closed, the screen is locked or the phone has restarted. A full-screen alarm offers **Mark as done**, **Snooze 5 min** and **Dismiss**. Sound, a spoken reminder ("Reminder. Call the bank. In 5 minutes.") and vibration can each be turned on or off in Settings.
+- **Appearance:** pick System, Light or Dark in Settings. The alarm screen and system bars follow it too.
 - **Calories:** set a daily goal and log food by meal. The page shows how much of the goal you've used, how much is left, and a week view. Foods you've logged before can be added again with one tap.
 
 ## Install

@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -46,7 +45,7 @@ public class AlarmActivity extends Activity {
     }
 
     private void build(Intent in) {
-        boolean dark = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        boolean dark = Store.isDark(this);
         int bg = dark ? 0xFF0E1412 : 0xFFF2F4F0;
         int ink = dark ? 0xFFE6EEE9 : 0xFF17201B;
         int muted = dark ? 0xFF93A39A : 0xFF5C6A62;

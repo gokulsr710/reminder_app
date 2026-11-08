@@ -29,32 +29,48 @@ import org.json.JSONObject;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private FrameLayout root;
+
+    /** Colours the system bars and the page background for the chosen theme. */
+    private void applyBars() {
+        boolean dark = Store.isDark(this);
+        int bg = dark ? 0xFF0E1412 : 0xFFF2F4F0;
+        int bar = dark ? 0xFF17201C : 0xFFFFFFFF;
+        root.setBackgroundColor(bg);
+        web.setBackgroundColor(bg);
+        getWindow().setStatusBarColor(bg);
+        getWindow().setNavigationBarColor(bar);
+        if (Build.VERSION.SDK_INT >= 30) {
+            WindowInsetsController c = getWindow().getInsetsController();
+            if (c != null) {
+                int light = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                c.setSystemBarsAppearance(dark ? 0 : light, light);
+            }
+        } else {
+            int flags = getWindow().getDecorView().getSystemUiVisibility();
+            int light = android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            getWindow().getDecorView().setSystemUiVisibility(dark ? flags & ~light : flags | light);
+        }
+    }
+
+    @Override public void onConfigurationChanged(Configuration c) {
+        super.onConfigurationChanged(c);
+        applyBars();
+    }
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
         AlarmService.ensureChannels(this);
 
-        boolean dark = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-        int bg = dark ? 0xFF0E1412 : 0xFFF2F4F0;
-        int bar = dark ? 0xFF17201C : 0xFFFFFFFF;
-
-        FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(bg);
+        root = new FrameLayout(this);
         web = new WebView(this);
-        web.setBackgroundColor(bg);
         root.addView(web, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
 
-        getWindow().setStatusBarColor(bg);
-        getWindow().setNavigationBarColor(bar);
+        applyBars();
         if (Build.VERSION.SDK_INT >= 30) {
             getWindow().setDecorFitsSystemWindows(false);
-            WindowInsetsController c = getWindow().getInsetsController();
-            if (c != null) {
-                int light = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
-                c.setSystemBarsAppearance(dark ? 0 : light, light);
-            }
             root.setOnApplyWindowInsetsListener((v, insets) -> {
                 Insets i = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.ime() | WindowInsets.Type.displayCutout());
                 v.setPadding(i.left, i.top, i.right, i.bottom);
@@ -154,6 +170,16 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void sync(String json) {
             Store.put(MainActivity.this, "state", json);
             Scheduler.rescheduleAll(MainActivity.this);
+        }
+        @JavascriptInterface public void setTheme(String theme) {
+            try {
+                JSONObject st = Store.state(MainActivity.this);
+                JSONObject s = st.optJSONObject("settings");
+                if (s == null) { s = new JSONObject(); st.put("settings", s); }
+                s.put("theme", theme);
+                Store.put(MainActivity.this, "state", st);
+            } catch (Exception ignored) {}
+            runOnUiThread(MainActivity.this::applyBars);
         }
         @JavascriptInterface public String takePending() { return Store.takePending(MainActivity.this); }
         @JavascriptInterface public void testAlarm() { Scheduler.scheduleTest(MainActivity.this); }

@@ -33,6 +33,15 @@ final class Store {
         return s != null ? s : new JSONObject();
     }
 
+    /** The theme picked in Settings ("system", "light" or "dark") applied to this device. */
+    static boolean isDark(Context c) {
+        String t = settings(c).optString("theme", "system");
+        if ("dark".equals(t)) return true;
+        if ("light".equals(t)) return false;
+        return (c.getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+    }
+
     static JSONObject findTask(Context c, String id) {
         JSONArray tasks = state(c).optJSONArray("tasks");
         if (tasks == null) return null;
