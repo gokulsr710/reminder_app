@@ -1,0 +1,805 @@
+<title>Daybell Planner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-column phone app — sticky header, scrolling tab panel, fixed bottom tab bar, bottom sheets for forms and alarms */
+:root{
+  --bg:#F2F4F0; --surface:#FFFFFF; --sunk:#E8ECE6; --ink:#17201B; --muted:#5C6A62; --line:#D9DFD8;
+  --task:#1E7356; --task-soft:#D7EDE3; --cal:#D8602A; --cal-soft:#FBE3D6; --danger:#B83A32; --on-accent:#FFFFFF;
+  --shadow:0 10px 30px rgba(20,35,28,.12);
+  --display:"Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1412; --surface:#17201C; --sunk:#1F2925; --ink:#E6EEE9; --muted:#93A39A; --line:#28332E;
+  --task:#4FC598; --task-soft:#173A2D; --cal:#F28B57; --cal-soft:#3D2418; --danger:#F07468; --on-accent:#0B1210;
+  --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1412; --surface:#17201C; --sunk:#1F2925; --ink:#E6EEE9; --muted:#93A39A; --line:#28332E;
+  --task:#4FC598; --task-soft:#173A2D; --cal:#F28B57; --cal-soft:#3D2418; --danger:#F07468; --on-accent:#0B1210;
+  --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--task);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+.app{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 calc(96px + env(safe-area-inset-bottom,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.brand svg{color:var(--task)}
+.pill{font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--sunk);color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.pill i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.pill.ok i{background:var(--task)}
+.pill.warn i{background:var(--cal)}
+
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-block:4px 14px}
+.daynav h1{font-family:var(--display);font-weight:600;font-size:20px;margin:0;text-align:center;flex:1}
+.daynav h1 small{display:block;font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none}
+
+.summary{display:flex;align-items:center;gap:18px;background:var(--surface);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.ring{position:relative;width:118px;height:118px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .track{stroke:var(--sunk)}
+.ring .val{transition:stroke-dashoffset .5s ease}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-.02em}
+.ring b span{font-size:15px;font-weight:600;margin-left:1px}
+.sumtext{min-width:0;display:grid;gap:4px}
+.sumtext .big{font-family:var(--display);font-weight:600;font-size:19px;line-height:1.2}
+.sumtext .sub{color:var(--muted);font-size:13.5px}
+.stats{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap}
+.stats div{font-size:12px;color:var(--muted)}
+.stats strong{display:block;font-size:17px;color:var(--ink)}
+
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-block:16px 6px}
+.wd{border:0;background:transparent;padding:6px 0;border-radius:12px;display:grid;justify-items:center;gap:5px;color:var(--muted);font-size:11px;font-weight:600}
+.wd .bar{width:10px;height:38px;border-radius:6px;background:var(--sunk);position:relative;overflow:hidden}
+.wd .bar i{position:absolute;left:0;right:0;bottom:0;border-radius:6px}
+.wd .dn{font-size:13px;color:var(--ink)}
+.wd.sel{background:var(--surface);box-shadow:var(--shadow)}
+.wd.today .dn{text-decoration:underline;text-underline-offset:3px}
+.weeklbl{font-size:11px;color:var(--muted);text-align:center;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+
+.sechead{display:flex;align-items:baseline;justify-content:space-between;margin-block:22px 10px}
+.sechead h2{font-family:var(--display);font-size:17px;font-weight:600;margin:0}
+.sechead span{font-size:13px;color:var(--muted)}
+
+.list{display:grid;gap:8px}
+.task{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:16px;padding:12px 12px 12px 10px;border:1px solid var(--line)}
+.task .chk{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:transparent;flex:none;display:grid;place-items:center;color:transparent}
+.task.done .chk{background:var(--task);border-color:var(--task);color:var(--on-accent)}
+.task .body{flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:0;display:grid;gap:2px}
+.task .ttl{font-weight:600;overflow-wrap:anywhere}
+.task.done .ttl{text-decoration:line-through;color:var(--muted)}
+.task .meta{font-size:12.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.time{font-family:var(--display);font-weight:600;font-size:17px;flex:none;text-align:right}
+.chip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--sunk);color:var(--muted);letter-spacing:.02em}
+.chip.soon{background:var(--task-soft);color:var(--task)}
+.chip.late{background:var(--cal-soft);color:var(--cal)}
+
+.empty{border:1.5px dashed var(--line);border-radius:16px;padding:22px 18px;text-align:center;color:var(--muted);display:grid;gap:10px;justify-items:center}
+.empty strong{color:var(--ink);font-size:15px}
+
+.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:700;background:var(--sunk);color:var(--ink)}
+.btn.primary{background:var(--task);color:var(--on-accent)}
+.btn.cal{background:var(--cal);color:var(--on-accent)}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--line)}
+.btn.small{padding:8px 12px;font-size:13px;border-radius:10px}
+
+.fab{position:fixed;right:max(16px,calc(env(safe-area-inset-right,0px) + 16px),calc(50vw - 264px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:6;border:0;border-radius:18px;height:56px;padding:0 20px 0 16px;display:flex;align-items:center;gap:8px;font-weight:700;color:var(--on-accent);background:var(--task);box-shadow:var(--shadow)}
+.fab.cal{background:var(--cal)}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+nav.tabs button{border:0;background:transparent;padding:10px 0 12px;display:grid;justify-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
+nav.tabs button[aria-selected="true"]{color:var(--ink)}
+nav.tabs button[aria-selected="true"] svg{color:var(--task)}
+nav.tabs button[data-tab="cal"][aria-selected="true"] svg{color:var(--cal)}
+
+/* Calories */
+.addfood{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px;margin-top:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row > *{min-width:0}
+.field{display:grid;gap:5px;flex:1 1 120px}
+.field label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+input[type=text],input[type=number],input[type=date],input[type=time],select{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;min-height:44px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.qchip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 11px;font-size:13px}
+.qchip b{color:var(--cal);font-weight:700}
+.meal{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.meal h3{margin:0;padding:11px 14px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;background:var(--sunk)}
+.food{display:flex;align-items:center;gap:10px;padding:10px 8px 10px 14px;border-top:1px solid var(--line)}
+.food:first-of-type{border-top:0}
+.food .n{flex:1;min-width:0;overflow-wrap:anywhere}
+.food .k{font-weight:700}
+.food .x{width:34px;height:34px;border:0;background:transparent;border-radius:10px;color:var(--muted);display:grid;place-items:center}
+.meal .none{padding:12px 14px;color:var(--muted);font-size:13.5px}
+
+/* Settings */
+.set{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.set + .set{margin-top:14px}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-top:1px solid var(--line)}
+.srow:first-child{border-top:0}
+.srow .l{min-width:0}
+.srow .l strong{display:block;font-weight:600}
+.srow .l span{font-size:13px;color:var(--muted)}
+.srow select,.srow input{width:auto;max-width:48%}
+.switch{position:relative;width:52px;height:32px;flex:none}
+.switch input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .2s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.switch input:checked + span{background:var(--task)}
+.switch input:checked + span::after{transform:translateX(20px)}
+.switch input:focus-visible + span{outline:2px solid var(--task);outline-offset:2px}
+.note{font-size:13px;color:var(--muted);margin:14px 4px 0;line-height:1.5}
+
+/* Sheets */
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(8,14,11,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:grid;gap:14px;max-height:92%;overflow:auto;animation:up .22s ease}
+@keyframes up{from{transform:translateY(30px);opacity:.4}}
+.sheet h2{margin:0;font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.01em}
+.sheet .actions{display:flex;gap:8px;flex-wrap:wrap}
+.sheet .actions .btn{flex:1}
+.leadopts{display:flex;gap:6px;flex-wrap:wrap}
+.leadopts label{position:relative}
+.leadopts input{position:absolute;opacity:0}
+.leadopts span{display:block;border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:13px;font-weight:600}
+.leadopts input:checked + span{background:var(--task);border-color:var(--task);color:var(--on-accent)}
+.leadopts input:focus-visible + span{outline:2px solid var(--task);outline-offset:2px}
+
+.alarm{text-align:center;justify-items:center;padding-top:28px}
+.alarm .bell{width:76px;height:76px;border-radius:50%;background:var(--task-soft);color:var(--task);display:grid;place-items:center;animation:ring 1s ease-in-out infinite}
+@keyframes ring{0%,100%{transform:rotate(0)}20%{transform:rotate(-14deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(5deg)}}
+.alarm .when{font-family:var(--display);font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.alarm .what{font-size:19px;font-weight:600;overflow-wrap:anywhere}
+.alarm .actions{width:100%}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(214px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--ink);color:var(--bg);padding:10px 12px 10px 16px;border-radius:14px;display:flex;align-items:center;gap:12px;font-weight:600;font-size:14px;max-width:calc(100% - 32px);box-shadow:var(--shadow)}
+.toast button{border:0;background:transparent;color:var(--bg);font-weight:800;text-decoration:underline;padding:4px}
+.banner{position:fixed;z-index:8;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));max-width:528px;margin:0 auto;bottom:calc(150px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;align-items:center;background:var(--cal-soft);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13.5px;box-shadow:var(--shadow)}
+.banner .btn{flex:none}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      Daybell
+    </div>
+    <div class="pill" id="syncPill"><i></i><span>Loading…</span></div>
+  </header>
+
+  <div class="banner" id="audioBanner" hidden>
+    <span style="flex:1">Tap “Enable” once so alarms can play sound and voice on this device.</span>
+    <button class="btn small cal" id="enableAudio">Enable</button>
+  </div>
+
+  <!-- TASKS -->
+  <section id="tab-tasks">
+    <div class="daynav">
+      <button class="iconbtn" data-shift="-1" data-for="task" aria-label="Previous day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <h1 id="taskDayTitle"></h1>
+      <button class="iconbtn" data-shift="1" data-for="task" aria-label="Next day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+    <div class="summary">
+      <div class="ring" id="taskRing"></div>
+      <div class="sumtext">
+        <div class="big" id="taskBig"></div>
+        <div class="sub" id="taskSub"></div>
+        <div class="stats" id="taskStats"></div>
+      </div>
+    </div>
+    <div class="week" id="taskWeek"></div>
+    <div class="weeklbl">Tasks done this week</div>
+    <div class="sechead"><h2>Schedule</h2><span id="taskCount"></span></div>
+    <div class="list" id="taskList"></div>
+  </section>
+
+  <!-- CALORIES -->
+  <section id="tab-cal" hidden>
+    <div class="daynav">
+      <button class="iconbtn" data-shift="-1" data-for="cal" aria-label="Previous day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <h1 id="calDayTitle"></h1>
+      <button class="iconbtn" data-shift="1" data-for="cal" aria-label="Next day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+    <div class="summary">
+      <div class="ring" id="calRing"></div>
+      <div class="sumtext">
+        <div class="big" id="calBig"></div>
+        <div class="sub" id="calSub"></div>
+        <div class="stats" id="calStats"></div>
+      </div>
+    </div>
+    <div class="week" id="calWeek"></div>
+    <div class="weeklbl">Calories vs goal this week</div>
+
+    <form class="addfood" id="foodForm" autocomplete="off">
+      <div class="row">
+        <div class="field" style="flex:2 1 160px"><label for="foodName">Food</label><input type="text" id="foodName" placeholder="e.g. Oats with banana" required maxlength="60"></div>
+        <div class="field" style="flex:1 1 90px"><label for="foodKcal">kcal</label><input type="number" id="foodKcal" inputmode="numeric" min="1" max="5000" placeholder="350" required></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="foodMeal">Meal</label>
+          <select id="foodMeal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
+        <button class="btn cal" type="submit" style="align-self:end;flex:1 1 120px;min-height:44px">Add food</button>
+      </div>
+      <div class="chips" id="quickFoods"></div>
+    </form>
+    <div class="sechead"><h2>Food log</h2><span id="calCount"></span></div>
+    <div class="list" id="mealList"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-set" hidden>
+    <div class="sechead" style="margin-top:8px"><h2>Alarm</h2></div>
+    <div class="set">
+      <div class="srow"><div class="l"><strong>Alarm sound</strong><span>Chime when a task is due</span></div>
+        <label class="switch"><input type="checkbox" id="setSound" aria-label="Alarm sound"><span></span></label></div>
+      <div class="srow"><div class="l"><strong>Voice reminder</strong><span>Reads the task name out loud</span></div>
+        <label class="switch"><input type="checkbox" id="setVoice" aria-label="Voice reminder"><span></span></label></div>
+      <div class="srow" id="voiceRow"><div class="l"><strong>Voice</strong><span>From this device</span></div>
+        <select id="setVoiceName" aria-label="Voice"></select></div>
+      <div class="srow"><div class="l"><strong>Vibrate</strong><span>On phones that support it</span></div>
+        <label class="switch"><input type="checkbox" id="setVibrate" aria-label="Vibrate"><span></span></label></div>
+      <div class="srow"><div class="l"><strong>Default reminder</strong><span>For new tasks</span></div>
+        <select id="setLead" aria-label="Default reminder time"><option value="0">At task time</option><option value="5">5 min before</option><option value="10">10 min before</option><option value="15">15 min before</option><option value="30">30 min before</option><option value="60">1 hour before</option></select></div>
+      <div class="srow" id="wakeRow"><div class="l"><strong>Keep screen on</strong><span>Stops the phone sleeping while open</span></div>
+        <label class="switch"><input type="checkbox" id="setWake" aria-label="Keep screen on"><span></span></label></div>
+      <div class="srow"><div class="l"><strong>Test the alarm</strong><span>Plays it with your current settings</span></div>
+        <button class="btn small primary" id="testAlarm">Test</button></div>
+    </div>
+    <div class="sechead"><h2>Calories</h2></div>
+    <div class="set">
+      <div class="srow"><div class="l"><strong>Daily goal</strong><span>kcal per day</span></div>
+        <input type="number" id="setGoal" inputmode="numeric" min="500" max="10000" step="50" aria-label="Daily calorie goal" style="max-width:110px"></div>
+    </div>
+    <div class="set" id="permBox" hidden style="margin-top:14px"><div class="srow"><div class="l"><strong>Phone permissions</strong><span id="permText">Checking…</span></div><button class="btn small primary" id="permFix">Fix</button></div></div>
+    <p class="note" id="setNote">Alarms ring while Daybell is open on your phone, including in the background tab. Keep it open (and turn on “Keep screen on”) on days you rely on it. Your tasks and food log are saved to your account and are private to you.</p>
+  </section>
+</div>
+
+<button class="fab" id="fab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>New task</span></button>
+
+<nav class="tabs" role="tablist">
+  <div class="in">
+    <button role="tab" data-tab="tasks" aria-selected="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks</button>
+    <button role="tab" data-tab="cal" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5.5 1-8.5z"/></svg>Calories</button>
+    <button role="tab" data-tab="set" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+  </div>
+</nav>
+
+<!-- Task editor -->
+<div class="scrim" id="taskSheet" hidden>
+  <form class="sheet" id="taskForm" autocomplete="off" role="dialog" aria-labelledby="taskSheetTitle">
+    <h2 id="taskSheetTitle">New task</h2>
+    <div class="field"><label for="tTitle">Task</label><input type="text" id="tTitle" maxlength="80" placeholder="e.g. Call the bank" required></div>
+    <div class="row">
+      <div class="field"><label for="tDate">Date</label><input type="date" id="tDate" required></div>
+      <div class="field"><label for="tTime">Time</label><input type="time" id="tTime" required></div>
+    </div>
+    <div class="field"><label>Remind me</label>
+      <div class="leadopts" id="tLead"></div></div>
+    <div class="row">
+      <div class="field"><label for="tRepeat">Repeat</label>
+        <select id="tRepeat"><option value="none">Does not repeat</option><option value="daily">Every day</option><option value="weekdays">Weekdays (Mon–Fri)</option><option value="weekly">Every week</option></select></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn danger" id="tDelete" hidden>Delete</button>
+      <button type="button" class="btn ghost" id="tCancel">Cancel</button>
+      <button type="submit" class="btn primary">Save task</button>
+    </div>
+  </form>
+</div>
+
+<!-- Alarm -->
+<div class="scrim" id="alarmSheet" hidden>
+  <div class="sheet alarm" role="alertdialog" aria-labelledby="alarmWhat">
+    <div class="bell"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+    <div class="when num" id="alarmWhen"></div>
+    <div class="what" id="alarmWhat"></div>
+    <div class="sub" id="alarmSub" style="color:var(--muted)"></div>
+    <div class="actions">
+      <button class="btn ghost" id="aSnooze">Snooze 5 min</button>
+      <button class="btn ghost" id="aDismiss">Dismiss</button>
+    </div>
+    <button class="btn primary" id="aDone" style="width:100%">Mark as done</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
+
+<script>
+(() => {
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseYmd = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtTime = hm => { const [h, m] = hm.split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; return `${((h + 11) % 12) + 1}:${pad(m)} ${ap}`; };
+const today = () => ymd(new Date());
+const dayLabel = s => {
+  const t = today();
+  const rel = s === t ? "Today" : s === addDays(t, 1) ? "Tomorrow" : s === addDays(t, -1) ? "Yesterday" : parseYmd(s).toLocaleDateString(undefined, { weekday: "long" });
+  return { rel, date: parseYmd(s).toLocaleDateString(undefined, { day: "numeric", month: "short", year: parseYmd(s).getFullYear() === new Date().getFullYear() ? undefined : "numeric" }) };
+};
+const LEADS = [[0, "At time"], [5, "5 min"], [10, "10 min"], [15, "15 min"], [30, "30 min"], [60, "1 hour"]];
+
+/* ---------- state ---------- */
+const S = { tasks: [], meals: [], settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, voiceName: "", wake: false } };
+const view = { tab: "tasks", taskDay: today(), calDay: today() };
+
+/* Repeating tasks: one record holds the schedule, completion is tracked per date. */
+function occursOn(t, day) {
+  if (t.date === day) return true;
+  if (!t.repeat || t.repeat === "none" || day < t.date) return false;
+  const wd = parseYmd(day).getDay();
+  if (t.repeat === "daily") return true;
+  if (t.repeat === "weekdays") return wd >= 1 && wd <= 5;
+  if (t.repeat === "weekly") return wd === parseYmd(t.date).getDay();
+  return false;
+}
+const isDone = (t, day) => t.repeat && t.repeat !== "none" ? !!(t.doneDates || {})[day] : !!t.done;
+const tasksOn = day => S.tasks.filter(t => occursOn(t, day)).sort((a, b) => a.time.localeCompare(b.time));
+const mealsOn = day => S.meals.filter(m => m.date === day).sort((a, b) => (a.at || 0) - (b.at || 0));
+
+/* ---------- storage: account db when available, device storage as cache/fallback ---------- */
+const LS = "daybell-v1";
+function loadLocal() {
+  try {
+    const r = JSON.parse(localStorage.getItem(LS) || "null");
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; Object.assign(S.settings, r.settings || {}); }
+  } catch (e) {}
+}
+const NATIVE = window.DaybellNative || null;
+function saveLocal() {
+  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, settings: S.settings })); } catch (e) {}
+  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: S.tasks, settings: S.settings })); } catch (e) {}
+}
+/* Actions taken on the Android alarm screen while the app was closed. */
+function applyPending() {
+  if (!NATIVE) return;
+  let acts = [];
+  try { acts = JSON.parse(NATIVE.takePending() || "[]"); } catch (e) {}
+  acts.forEach(a => {
+    const t = S.tasks.find(x => x.id === a.id); if (!t || a.type !== "done") return;
+    const c = plain(t);
+    if (c.repeat && c.repeat !== "none") { c.doneDates = c.doneDates || {}; c.doneDates[a.day] = true; } else c.done = true;
+    put("task", c);
+  });
+}
+function refreshPerms() {
+  if (!NATIVE) return;
+  let st = {}; try { st = JSON.parse(NATIVE.permissionStatus()); } catch (e) {}
+  const missing = [];
+  if (st.notifications === false) missing.push("notifications");
+  if (st.exactAlarms === false) missing.push("alarms & reminders");
+  if (st.fullScreen === false) missing.push("full-screen alerts");
+  if (st.battery === false) missing.push("unrestricted battery");
+  $("#permBox").hidden = false;
+  $("#permText").textContent = missing.length ? "Allow " + missing.join(", ") + " so alarms ring when the app is closed" : "All set. Alarms ring even when the app is closed.";
+  $("#permFix").hidden = !missing.length;
+}
+window.daybellResume = () => { applyPending(); render(); refreshPerms(); };
+
+let col = null;
+const chains = new Map();
+function chain(id, fn) {
+  const p = (chains.get(id) || Promise.resolve()).then(fn).catch(e => { console.warn("save failed", e); setSync("warn", "Not synced"); });
+  chains.set(id, p);
+}
+function plain(o) { return JSON.parse(JSON.stringify(o)); }
+function put(kind, obj) {
+  obj.kind = kind;
+  if (kind !== "settings") {
+    const arr = kind === "task" ? S.tasks : S.meals;
+    const i = arr.findIndex(x => x.id === obj.id);
+    if (i >= 0) arr[i] = obj; else arr.push(obj);
+  }
+  saveLocal(); render();
+  if (col) { const data = plain(obj); chain(obj.id, () => col.doc(obj.id).set(data)); }
+}
+function remove(kind, id) {
+  const arr = kind === "task" ? S.tasks : S.meals;
+  const i = arr.findIndex(x => x.id === id);
+  if (i >= 0) arr.splice(i, 1);
+  saveLocal(); render();
+  if (col) chain(id, () => col.doc(id).delete());
+}
+
+function setSync(state, text) {
+  const p = $("#syncPill");
+  p.className = "pill " + (state === "cloud" ? "ok" : state === "warn" ? "warn" : "");
+  p.querySelector("span").textContent = text;
+}
+
+async function connect() {
+  if (NATIVE) { setSync("cloud", "Saved on this phone"); return; }
+  if (!window.claude || !window.claude.use) { setSync("local", "Saved on this device"); return; }
+  const giveUp = setTimeout(() => { if (!col) setSync("local", "Saved on this device"); }, 10000);
+  let db, user;
+  try { [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]); } catch (e) {}
+  clearTimeout(giveUp);
+  if (!db || !user) { setSync("local", "Saved on this device"); return; }
+  let uid;
+  try { uid = await user.id(); } catch (e) {}
+  if (!uid) { setSync("local", "Saved on this device"); return; }
+  col = db.collection("data/users/" + uid);
+  setSync("", "Syncing…");
+  let confirmed = false;
+  const slow = setTimeout(() => { if (!confirmed) setSync("warn", "Offline, saved on device"); }, 10000);
+  col.onSnapshot(snap => {
+    if (!snap.metadata.fromCache && !confirmed) {
+      confirmed = true; clearTimeout(slow); setSync("cloud", "Synced");
+      if (snap.empty && (S.tasks.length || S.meals.length)) {
+        // First visit with the account store: upload what this device already has.
+        [...S.tasks, ...S.meals, S.settings].forEach(o => { const d = plain(o); chain(o.id, () => col.doc(o.id).set(d)); });
+        return;
+      }
+    }
+    if (snap.metadata.fromCache && snap.empty) return;
+    const tasks = [], meals = []; let settings = null;
+    snap.docs.forEach(d => { const v = d.data(); if (!v) return; if (v.kind === "task") tasks.push(plain(v)); else if (v.kind === "meal") meals.push(plain(v)); else if (v.kind === "settings") settings = plain(v); });
+    S.tasks = tasks; S.meals = meals;
+    if (settings) Object.assign(S.settings, settings);
+    saveLocal(); render(); syncSettingsUI();
+  }, err => { clearTimeout(slow); setSync("warn", "Sync stopped, saved on device"); console.warn(err); });
+}
+
+/* ---------- rendering ---------- */
+function ring(el, pct, color, label) {
+  const r = 50, c = 2 * Math.PI * r, p = Math.max(0, Math.min(1, pct));
+  el.innerHTML = `<svg viewBox="0 0 118 118" aria-hidden="true"><circle class="track" cx="59" cy="59" r="${r}" fill="none" stroke-width="12"/><circle class="val" cx="59" cy="59" r="${r}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - p)}"/></svg><b class="num">${label}</b>`;
+}
+function weekDays(sel) {
+  const d = parseYmd(sel); const dow = (d.getDay() + 6) % 7; // Monday start
+  const mon = addDays(sel, -dow);
+  return Array.from({ length: 7 }, (_, i) => addDays(mon, i));
+}
+function weekStrip(el, sel, valueFn, color, which) {
+  const t = today();
+  el.innerHTML = weekDays(sel).map(day => {
+    const v = valueFn(day); const d = parseYmd(day);
+    const over = which === "cal" && v > 1;
+    return `<button class="wd ${day === sel ? "sel" : ""} ${day === t ? "today" : ""}" data-day="${day}" data-for="${which}" aria-label="${d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" })}">
+      <span>${d.toLocaleDateString(undefined, { weekday: "narrow" })}</span>
+      <span class="bar"><i style="height:${Math.round(Math.min(1, v) * 100)}%;background:${over ? "var(--danger)" : color}"></i></span>
+      <span class="dn num">${d.getDate()}</span></button>`;
+  }).join("");
+}
+function relChip(t, day) {
+  if (isDone(t, day)) return `<span class="chip soon">Done</span>`;
+  const due = parseYmd(day); const [h, m] = t.time.split(":").map(Number); due.setHours(h, m, 0, 0);
+  const diff = Math.round((due - Date.now()) / 60000);
+  if (diff < 0 && diff > -24 * 60) return `<span class="chip late">${diff > -60 ? -diff + " min late" : Math.round(-diff / 60) + " h late"}</span>`;
+  if (diff < 0) return `<span class="chip late">Missed</span>`;
+  if (diff <= 60) return `<span class="chip soon">in ${diff} min</span>`;
+  if (diff < 24 * 60) return `<span class="chip">in ${Math.floor(diff / 60)} h ${diff % 60 ? (diff % 60) + " m" : ""}</span>`;
+  return "";
+}
+const repeatLabel = { daily: "Every day", weekdays: "Weekdays", weekly: "Weekly" };
+
+function renderTasks() {
+  const day = view.taskDay, L = dayLabel(day);
+  $("#taskDayTitle").innerHTML = `<small>${esc(L.rel)}</small>${esc(L.date)}`;
+  const list = tasksOn(day), done = list.filter(t => isDone(t, day)).length, total = list.length;
+  const pct = total ? done / total : 0;
+  ring($("#taskRing"), pct, "var(--task)", total ? `${Math.round(pct * 100)}<span>%</span>` : "–");
+  $("#taskBig").textContent = total ? (done === total ? "All done for the day" : `${done} of ${total} tasks done`) : "Nothing planned";
+  const next = day === today() ? list.find(t => !isDone(t, day) && t.time >= `${pad(new Date().getHours())}:${pad(new Date().getMinutes())}`) : null;
+  $("#taskSub").textContent = next ? `Next: ${next.title} at ${fmtTime(next.time)}` : total ? (done === total ? "Nice work." : `${total - done} still to do`) : "Add a task with a time to get a reminder.";
+  const wk = weekDays(day); let wDone = 0, wTot = 0;
+  wk.forEach(d => { const l = tasksOn(d); wTot += l.length; wDone += l.filter(t => isDone(t, d)).length; });
+  $("#taskStats").innerHTML = `<div><strong class="num">${total - done}</strong>left</div><div><strong class="num">${wTot ? Math.round(wDone / wTot * 100) : 0}%</strong>this week</div>`;
+  weekStrip($("#taskWeek"), day, d => { const l = tasksOn(d); return l.length ? l.filter(t => isDone(t, d)).length / l.length : 0; }, "var(--task)", "task");
+  $("#taskCount").textContent = total ? `${total} task${total > 1 ? "s" : ""}` : "";
+  $("#taskList").innerHTML = total ? list.map(t => {
+    const dn = isDone(t, day);
+    const lead = +t.lead || 0;
+    return `<div class="task ${dn ? "done" : ""}">
+      <button class="chk" data-toggle="${t.id}" aria-label="${dn ? "Mark not done" : "Mark done"}: ${esc(t.title)}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></button>
+      <button class="body" data-edit="${t.id}"><span class="ttl">${esc(t.title)}</span>
+        <span class="meta">${relChip(t, day)}<span>${lead ? `Bell ${lead} min before` : "Bell at time"}</span>${t.repeat && t.repeat !== "none" ? `<span>· ${repeatLabel[t.repeat]}</span>` : ""}</span></button>
+      <div class="time num">${fmtTime(t.time)}</div></div>`;
+  }).join("") : `<div class="empty"><strong>No tasks for ${esc(L.rel === "Today" || L.rel === "Tomorrow" || L.rel === "Yesterday" ? L.rel.toLowerCase() : L.date)}</strong>Tap “New task”, give it a time, and Daybell rings before it starts.<button class="btn small ghost" id="sampleTasks">Add 3 example tasks</button></div>`;
+}
+
+function renderCal() {
+  const day = view.calDay, L = dayLabel(day), goal = +S.settings.goal || 2000;
+  $("#calDayTitle").innerHTML = `<small>${esc(L.rel)}</small>${esc(L.date)}`;
+  const list = mealsOn(day), eaten = list.reduce((s, m) => s + (+m.kcal || 0), 0), pct = eaten / goal;
+  ring($("#calRing"), pct, pct > 1 ? "var(--danger)" : "var(--cal)", `${Math.round(pct * 100)}<span>%</span>`);
+  $("#calBig").innerHTML = `<span class="num">${eaten.toLocaleString()}</span> / <span class="num">${goal.toLocaleString()}</span> kcal`;
+  $("#calSub").textContent = eaten > goal ? `${(eaten - goal).toLocaleString()} kcal over your goal` : `${(goal - eaten).toLocaleString()} kcal left today`;
+  const wk = weekDays(day), totals = wk.map(d => mealsOn(d).reduce((s, m) => s + (+m.kcal || 0), 0)), logged = totals.filter(x => x > 0);
+  $("#calStats").innerHTML = `<div><strong class="num">${list.length}</strong>items</div><div><strong class="num">${logged.length ? Math.round(logged.reduce((a, b) => a + b, 0) / logged.length).toLocaleString() : 0}</strong>avg / day</div>`;
+  weekStrip($("#calWeek"), day, d => mealsOn(d).reduce((s, m) => s + (+m.kcal || 0), 0) / goal, "var(--cal)", "cal");
+  $("#calCount").textContent = list.length ? `${eaten.toLocaleString()} kcal` : "";
+  const groups = ["Breakfast", "Lunch", "Dinner", "Snack"];
+  $("#mealList").innerHTML = groups.map(g => {
+    const items = list.filter(m => m.meal === g), sum = items.reduce((s, m) => s + (+m.kcal || 0), 0);
+    return `<div class="meal"><h3><span>${g}</span><span class="num">${sum ? sum.toLocaleString() + " kcal" : ""}</span></h3>${items.length ? items.map(m => `<div class="food"><span class="n">${esc(m.name)}</span><span class="k num">${(+m.kcal).toLocaleString()}</span><button class="x" data-delmeal="${m.id}" aria-label="Remove ${esc(m.name)}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`).join("") : `<div class="none">Nothing logged</div>`}</div>`;
+  }).join("");
+  // quick-add from recent foods
+  const seen = new Map();
+  [...S.meals].sort((a, b) => (b.at || 0) - (a.at || 0)).forEach(m => { const k = m.name.toLowerCase(); if (!seen.has(k) && seen.size < 6) seen.set(k, m); });
+  $("#quickFoods").innerHTML = seen.size ? [...seen.values()].map(m => `<button type="button" class="qchip" data-quick="${m.id}">${esc(m.name)} <b class="num">${m.kcal}</b></button>`).join("") : `<span style="font-size:13px;color:var(--muted)">Foods you add show up here for one-tap logging.</span>`;
+}
+
+function render() {
+  if (view.tab === "tasks") renderTasks();
+  if (view.tab === "cal") renderCal();
+}
+
+function showTab(tab) {
+  view.tab = tab;
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
+  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set";
+  const fab = $("#fab");
+  fab.hidden = tab !== "tasks";
+  if (tab === "set") { syncSettingsUI(); fillVoices(); }
+  try { sessionStorage.setItem("daybell-tab", tab); } catch (e) {}
+  render(); window.scrollTo(0, 0);
+}
+
+/* ---------- task sheet ---------- */
+let editing = null;
+function openTask(t) {
+  editing = t ? t.id : null;
+  $("#taskSheetTitle").textContent = t ? "Edit task" : "New task";
+  $("#tTitle").value = t ? t.title : "";
+  $("#tDate").value = t ? t.date : view.taskDay;
+  if (t) $("#tTime").value = t.time;
+  else { const d = new Date(Date.now() + 60 * 60000); $("#tTime").value = `${pad(d.getHours())}:00`; }
+  $("#tRepeat").value = t ? (t.repeat || "none") : "none";
+  const lead = t ? (+t.lead || 0) : (+S.settings.lead || 0);
+  $("#tLead").innerHTML = LEADS.map(([v, l]) => `<label><input type="radio" name="lead" value="${v}" ${v === lead ? "checked" : ""}><span>${l}</span></label>`).join("");
+  $("#tDelete").hidden = !t;
+  $("#taskSheet").hidden = false;
+  setTimeout(() => { if (!t) $("#tTitle").focus(); }, 60);
+}
+function closeTask() { $("#taskSheet").hidden = true; editing = null; }
+
+$("#taskForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const old = editing ? S.tasks.find(x => x.id === editing) : null;
+  const t = old ? plain(old) : { id: newId(), done: false, doneDates: {} };
+  t.title = $("#tTitle").value.trim(); if (!t.title) return;
+  t.date = $("#tDate").value; t.time = $("#tTime").value;
+  t.lead = +(document.querySelector('input[name="lead"]:checked') || { value: S.settings.lead }).value;
+  t.repeat = $("#tRepeat").value;
+  t.firedFor = null; t.snoozeUntil = null; // reschedule the bell
+  if (!old) view.taskDay = t.date;
+  put("task", t); closeTask();
+  toast(old ? "Task updated" : `Reminder set for ${fmtTime(t.time)}`);
+});
+$("#tCancel").onclick = closeTask;
+$("#taskSheet").addEventListener("click", e => { if (e.target.id === "taskSheet") closeTask(); });
+$("#tDelete").onclick = () => {
+  const t = S.tasks.find(x => x.id === editing); if (!t) return;
+  const copy = plain(t); remove("task", t.id); closeTask();
+  toast("Task deleted", () => put("task", copy));
+};
+
+function toggleTask(id) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const c = plain(t), day = view.taskDay;
+  if (c.repeat && c.repeat !== "none") { c.doneDates = c.doneDates || {}; if (c.doneDates[day]) delete c.doneDates[day]; else c.doneDates[day] = true; }
+  else c.done = !c.done;
+  put("task", c);
+}
+
+/* ---------- meals ---------- */
+$("#foodForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("#foodName").value.trim(), kcal = Math.round(+$("#foodKcal").value);
+  if (!name || !(kcal > 0)) return;
+  put("meal", { id: newId(), name, kcal, meal: $("#foodMeal").value, date: view.calDay, at: Date.now() });
+  $("#foodName").value = ""; $("#foodKcal").value = "";
+  toast(`Added ${kcal} kcal`);
+});
+function guessMeal() { const h = new Date().getHours(); return h < 11 ? "Breakfast" : h < 16 ? "Lunch" : h < 21 ? "Dinner" : "Snack"; }
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg, undo) {
+  $("#toastMsg").textContent = msg;
+  const u = $("#toastUndo"); u.hidden = !undo; u.onclick = () => { $("#toast").hidden = true; undo && undo(); };
+  $("#toast").hidden = false; clearTimeout(toastT); toastT = setTimeout(() => $("#toast").hidden = true, undo ? 5000 : 2200);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.tab) return showTab(b.dataset.tab);
+  if (b.dataset.shift) { const k = b.dataset.for === "cal" ? "calDay" : "taskDay"; view[k] = addDays(view[k], +b.dataset.shift); return render(); }
+  if (b.dataset.day) { view[b.dataset.for === "cal" ? "calDay" : "taskDay"] = b.dataset.day; return render(); }
+  if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
+  if (b.dataset.edit) return openTask(S.tasks.find(x => x.id === b.dataset.edit));
+  if (b.dataset.delmeal) { const m = S.meals.find(x => x.id === b.dataset.delmeal); if (m) { const c = plain(m); remove("meal", m.id); toast(`Removed ${m.name}`, () => put("meal", c)); } return; }
+  if (b.dataset.quick) { const m = S.meals.find(x => x.id === b.dataset.quick); if (m) { put("meal", { id: newId(), name: m.name, kcal: m.kcal, meal: $("#foodMeal").value, date: view.calDay, at: Date.now() }); toast(`Added ${m.name}`); } return; }
+  if (b.id === "sampleTasks") {
+    const d = view.taskDay, now = new Date(), base = d === today() ? now.getHours() : 8;
+    const at = h => `${pad(Math.min(23, h))}:${h > 23 ? "45" : "00"}`;
+    [["Example: Drink a glass of water", at(base + 1), "daily"], ["Example: Reply to emails", at(base + 2), "none"], ["Example: Evening walk", at(Math.max(base + 3, 18)), "none"]]
+      .forEach(([title, time, repeat]) => put("task", { id: newId(), title, date: d, time, lead: +S.settings.lead || 0, repeat, done: false, doneDates: {} }));
+    toast("Added 3 example tasks. Tap one to edit or delete it.");
+  }
+});
+$("#fab").onclick = () => openTask(null);
+
+/* ---------- settings ---------- */
+function syncSettingsUI() {
+  const s = S.settings;
+  const set = (id, prop, v) => { const el = $(id); if (document.activeElement !== el) el[prop] = v; };
+  set("#setSound", "checked", !!s.sound); set("#setVoice", "checked", !!s.voice); set("#setVibrate", "checked", !!s.vibrate);
+  set("#setWake", "checked", !!s.wake); set("#setLead", "value", String(s.lead)); set("#setGoal", "value", s.goal);
+  $("#voiceRow").hidden = !!NATIVE || !s.voice || !("speechSynthesis" in window);
+  if (NATIVE) { $("#wakeRow").hidden = true; refreshPerms(); }
+  if ($("#setVoiceName").options.length) set("#setVoiceName", "value", s.voiceName || "");
+}
+let setT;
+function saveSettings(immediate) {
+  render(); syncSettingsUI();
+  clearTimeout(setT);
+  const go = () => put("settings", S.settings);
+  immediate ? go() : (setT = setTimeout(go, 700));
+}
+$("#setSound").onchange = e => { S.settings.sound = e.target.checked; saveSettings(true); };
+$("#setVoice").onchange = e => { S.settings.voice = e.target.checked; saveSettings(true); };
+$("#setVibrate").onchange = e => { S.settings.vibrate = e.target.checked; saveSettings(true); };
+$("#setLead").onchange = e => { S.settings.lead = +e.target.value; saveSettings(true); };
+$("#setVoiceName").onchange = e => { S.settings.voiceName = e.target.value; saveSettings(true); speak("This is your Daybell voice."); };
+$("#setGoal").oninput = e => { const v = Math.round(+e.target.value); if (v >= 500 && v <= 10000) { S.settings.goal = v; saveSettings(false); } };
+$("#setWake").onchange = e => { S.settings.wake = e.target.checked; saveSettings(true); applyWake(); };
+$("#testAlarm").onclick = () => {
+  if (NATIVE) { NATIVE.testAlarm(); toast("Test alarm in 10 seconds. Close the app or lock your phone to try it."); return; }
+  unlockAudio(); startAlarm({ id: "__test", title: "Test reminder", time: `${pad(new Date().getHours())}:${pad(new Date().getMinutes())}`, lead: 0 }, today(), true); };
+
+function voices() { try { return speechSynthesis.getVoices(); } catch (e) { return []; } }
+function fillVoices() {
+  const sel = $("#setVoiceName"), vs = voices();
+  if (!vs.length) { sel.innerHTML = `<option value="">Device default</option>`; return; }
+  const lang = (navigator.language || "en").slice(0, 2);
+  const sorted = [...vs].sort((a, b) => (b.lang.startsWith(lang) - a.lang.startsWith(lang)) || a.name.localeCompare(b.name));
+  sel.innerHTML = `<option value="">Device default</option>` + sorted.map(v => `<option value="${esc(v.name)}">${esc(v.name)} (${esc(v.lang)})</option>`).join("");
+  sel.value = S.settings.voiceName || "";
+}
+if ("speechSynthesis" in window) speechSynthesis.onvoiceschanged = () => { if (view.tab === "set") fillVoices(); };
+
+/* wake lock */
+let wakeLock = null;
+async function applyWake() {
+  try {
+    if (S.settings.wake && "wakeLock" in navigator && document.visibilityState === "visible") { if (!wakeLock) { wakeLock = await navigator.wakeLock.request("screen"); wakeLock.addEventListener("release", () => { wakeLock = null; }); } }
+    else if (wakeLock) { await wakeLock.release(); wakeLock = null; }
+  } catch (e) { wakeLock = null; }
+}
+
+/* ---------- sound + voice ---------- */
+let actx = null;
+function unlockAudio() {
+  try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch (e) {}
+  try { if ("speechSynthesis" in window && !unlockAudio.spoke) { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); unlockAudio.spoke = true; } } catch (e) {}
+  updateBanner();
+}
+function updateBanner() { $("#audioBanner").hidden = !!NATIVE || !!(actx && actx.state === "running") || !(S.settings.sound || S.settings.voice); }
+document.addEventListener("pointerdown", unlockAudio, { passive: true });
+document.addEventListener("keydown", unlockAudio);
+$("#enableAudio").onclick = () => { unlockAudio(); toast("Alarm sound enabled"); };
+
+function chime() {
+  if (!actx) return;
+  const t0 = actx.currentTime;
+  [[0, 880], [0.2, 1108.7], [0.4, 1318.5]].forEach(([o, f]) => {
+    const osc = actx.createOscillator(), g = actx.createGain();
+    osc.type = "triangle"; osc.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t0 + o); g.gain.exponentialRampToValueAtTime(0.5, t0 + o + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + o + 0.38);
+    osc.connect(g).connect(actx.destination); osc.start(t0 + o); osc.stop(t0 + o + 0.4);
+  });
+}
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const v = voices().find(v => v.name === S.settings.voiceName); if (v) u.voice = v;
+    u.rate = 0.95; speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+/* ---------- alarms ---------- */
+const queue = []; let current = null, ringT = null, ringStop = null, voiceT = null;
+function dueDate(t, day) { const d = parseYmd(day); const [h, m] = t.time.split(":").map(Number); d.setHours(h, m, 0, 0); return d; }
+function checkAlarms() {
+  if (NATIVE) return; // the phone's alarm system rings instead
+  const now = Date.now(), days = [addDays(today(), -1), today()];
+  for (const t of S.tasks) for (const day of days) {
+    if (!occursOn(t, day) || isDone(t, day)) continue;
+    const key = day; // one ring per occurrence
+    if (t.firedFor === key && !(t.snoozeUntil && t.snoozeFor === key)) continue;
+    const trigger = t.snoozeUntil && t.snoozeFor === key ? t.snoozeUntil : dueDate(t, day).getTime() - (+t.lead || 0) * 60000;
+    if (now >= trigger && now - trigger < 3 * 3600000) {
+      if (current && current.t.id === t.id) continue;
+      if (queue.some(q => q.t.id === t.id)) continue;
+      const c = plain(t); c.firedFor = key; c.snoozeUntil = null; c.snoozeFor = null; put("task", c);
+      queue.push({ t: c, day });
+    }
+  }
+  if (!current && queue.length) { const q = queue.shift(); startAlarm(q.t, q.day); }
+}
+function startAlarm(t, day, test) {
+  current = { t, day, test };
+  $("#toast").hidden = true;
+  const due = dueDate(t, day), mins = Math.round((due - Date.now()) / 60000);
+  $("#alarmWhen").textContent = fmtTime(t.time);
+  $("#alarmWhat").textContent = t.title;
+  $("#alarmSub").textContent = test ? "This is how your reminders will look and sound." : mins > 0 ? `Starts in ${mins} minute${mins === 1 ? "" : "s"}` : mins === 0 ? "Starting now" : `Was due ${-mins} min ago`;
+  $("#aDone").hidden = !!test; $("#aSnooze").hidden = !!test;
+  $("#alarmSheet").hidden = false;
+  const phrase = test ? "Daybell reminder. This is a test." : `Reminder. ${t.title}. ${mins > 0 ? `In ${mins} minute${mins === 1 ? "" : "s"}.` : "It's time now."}`;
+  let n = 0;
+  const tick = () => {
+    if (S.settings.sound) chime();
+    if (S.settings.vibrate && navigator.vibrate) try { navigator.vibrate([300, 150, 300]); } catch (e) {}
+    if (S.settings.voice && n % 4 === 0) setTimeout(() => speak(phrase), S.settings.sound ? 900 : 0);
+    n++;
+  };
+  tick();
+  clearInterval(ringT); ringT = setInterval(tick, 3500);
+  clearTimeout(ringStop); ringStop = setTimeout(stopRinging, test ? 8000 : 60000);
+  try { document.title = "⏰ " + t.title; } catch (e) {}
+}
+function stopRinging() { clearInterval(ringT); ringT = null; try { speechSynthesis.cancel(); } catch (e) {} if (navigator.vibrate) try { navigator.vibrate(0); } catch (e) {} }
+function closeAlarm() {
+  stopRinging(); clearTimeout(ringStop); $("#alarmSheet").hidden = true; current = null; document.title = "Daybell Planner";
+  if (queue.length) setTimeout(() => { if (!current && queue.length) { const q = queue.shift(); startAlarm(q.t, q.day); } }, 600);
+}
+$("#aDismiss").onclick = closeAlarm;
+$("#aSnooze").onclick = () => {
+  const { t, day } = current; const live = S.tasks.find(x => x.id === t.id);
+  if (live) { const c = plain(live); c.snoozeUntil = Date.now() + 5 * 60000; c.snoozeFor = day; put("task", c); }
+  closeAlarm(); toast("Snoozed for 5 minutes");
+};
+$("#aDone").onclick = () => {
+  const { t, day } = current; const live = S.tasks.find(x => x.id === t.id);
+  if (live) { const c = plain(live); if (c.repeat && c.repeat !== "none") { c.doneDates = c.doneDates || {}; c.doneDates[day] = true; } else c.done = true; put("task", c); }
+  closeAlarm(); toast("Nice, task done");
+};
+
+/* ---------- boot ---------- */
+$("#permFix").onclick = () => { if (NATIVE) NATIVE.openPermissions(); };
+if (NATIVE) $("#setNote").textContent = "Daybell uses your phone's alarm system, so reminders ring with sound and voice even when the app is closed or the phone is locked. If your phone maker adds extra battery saving, set Daybell's battery use to Unrestricted.";
+loadLocal();
+saveLocal();
+applyPending();
+try { const t = sessionStorage.getItem("daybell-tab"); if (t) view.tab = t; } catch (e) {}
+$("#foodMeal").value = guessMeal();
+syncSettingsUI();
+showTab(view.tab);
+updateBanner();
+setInterval(() => { checkAlarms(); if (view.tab === "tasks") renderTasks(); }, 15000);
+setTimeout(checkAlarms, 1500);
+let lastDay = today();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    if (today() !== lastDay) { if (view.taskDay === lastDay) view.taskDay = today(); if (view.calDay === lastDay) view.calDay = today(); lastDay = today(); }
+    checkAlarms(); render(); applyWake();
+  }
+});
+applyWake();
+connect();
+})();
+</script>
