@@ -5,19 +5,19 @@
 /* Layout: one-column phone app — sticky header, scrolling tab panel, fixed bottom tab bar, bottom sheets for forms and alarms */
 :root{
   --bg:#F2F4F0; --surface:#FFFFFF; --sunk:#E8ECE6; --ink:#17201B; --muted:#5C6A62; --line:#D9DFD8;
-  --task:#1E7356; --task-soft:#D7EDE3; --cal:#D8602A; --cal-soft:#FBE3D6; --danger:#B83A32; --on-accent:#FFFFFF;
+  --task:#1E7356; --task-soft:#D7EDE3; --cal:#D8602A; --cal-soft:#FBE3D6; --money:#2D5BA6; --money-soft:#DCE6F6; --danger:#B83A32; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(20,35,28,.12);
   --display:"Bricolage Grotesque", "Figtree", system-ui, sans-serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0E1412; --surface:#17201C; --sunk:#1F2925; --ink:#E6EEE9; --muted:#93A39A; --line:#28332E;
-  --task:#4FC598; --task-soft:#173A2D; --cal:#F28B57; --cal-soft:#3D2418; --danger:#F07468; --on-accent:#0B1210;
+  --task:#4FC598; --task-soft:#173A2D; --cal:#F28B57; --cal-soft:#3D2418; --money:#86A9EC; --money-soft:#1D2A44; --danger:#F07468; --on-accent:#0B1210;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#0E1412; --surface:#17201C; --sunk:#1F2925; --ink:#E6EEE9; --muted:#93A39A; --line:#28332E;
-  --task:#4FC598; --task-soft:#173A2D; --cal:#F28B57; --cal-soft:#3D2418; --danger:#F07468; --on-accent:#0B1210;
+  --task:#4FC598; --task-soft:#173A2D; --cal:#F28B57; --cal-soft:#3D2418; --money:#86A9EC; --money-soft:#1D2A44; --danger:#F07468; --on-accent:#0B1210;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -98,11 +98,43 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .fab.cal{background:var(--cal)}
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
 nav.tabs button{border:0;background:transparent;padding:10px 0 12px;display:grid;justify-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
 nav.tabs button[aria-selected="true"]{color:var(--ink)}
 nav.tabs button[aria-selected="true"] svg{color:var(--task)}
 nav.tabs button[data-tab="cal"][aria-selected="true"] svg{color:var(--cal)}
+nav.tabs button[data-tab="money"][aria-selected="true"] svg{color:var(--money)}
+.fab.money{background:var(--money);color:var(--on-accent)}
+/* Money */
+.mhead{display:flex;justify-content:flex-end;margin:-6px 0 12px}
+.cats{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:12px;margin-top:16px}
+.cat{display:grid;gap:5px}
+.cat .t{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.cat .t span:first-child{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.cat .b{height:8px;border-radius:5px;background:var(--sunk);overflow:hidden}
+.cat .b i{display:block;height:100%;border-radius:5px;background:var(--money)}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.day h3{margin:0;padding:10px 14px;font-size:13px;font-weight:700;color:var(--muted);display:flex;justify-content:space-between;background:var(--sunk)}
+.tx{width:100%;border:0;border-top:1px solid var(--line);background:transparent;display:flex;align-items:center;gap:12px;padding:11px 14px;text-align:left}
+.day h3 + .tx{border-top:0}
+.tx .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:none;font-weight:800;font-size:14px;background:var(--money-soft);color:var(--money)}
+.tx.in .ic{background:var(--task-soft);color:var(--task)}
+.tx .m{flex:1;min-width:0;display:grid}
+.tx .m b{font-weight:600;overflow-wrap:anywhere}
+.tx .m span{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.tx .a{font-weight:700;font-size:16px;white-space:nowrap}
+.tx.in .a{color:var(--task)}
+.typeseg{margin:0}
+.seg.typeseg input:checked + span{background:var(--money);color:var(--on-accent)}
+.field .seg label,.field .catpick label{text-transform:none;letter-spacing:normal;font-size:14px;font-weight:600;color:var(--ink)}
+.catpick{display:flex;flex-wrap:wrap;gap:6px}
+.catpick label{position:relative}
+.catpick input{position:absolute;opacity:0;inset:0;margin:0}
+.catpick span{display:block;border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-size:13px;font-weight:600}
+.catpick input:checked + span{background:var(--money);border-color:var(--money);color:var(--on-accent)}
+.catpick input:focus-visible + span{outline:2px solid var(--money);outline-offset:2px}
+.btn.money{background:var(--money);color:var(--on-accent)}
+.amt{font-family:var(--display);font-size:24px;font-weight:700}
 
 /* Calories */
 .addfood{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px;margin-top:16px}
@@ -224,10 +256,30 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
           <select id="foodMeal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
         <button class="btn cal" type="submit" style="align-self:end;flex:1 1 120px;min-height:44px">Add food</button>
       </div>
-      <div class="chips" id="quickFoods"></div>
     </form>
     <div class="sechead"><h2>Food log</h2><span id="calCount"></span></div>
     <div class="list" id="mealList"></div>
+  </section>
+
+  <!-- MONEY -->
+  <section id="tab-money" hidden>
+    <div class="daynav">
+      <button class="iconbtn" data-mshift="-1" aria-label="Previous month"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <h1 id="moneyTitle"></h1>
+      <button class="iconbtn" data-mshift="1" aria-label="Next month"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+    <div class="mhead"><button class="btn small ghost" id="exportBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export PDF / Excel</button></div>
+    <div class="summary">
+      <div class="ring" id="moneyRing"></div>
+      <div class="sumtext">
+        <div class="big" id="moneyBig"></div>
+        <div class="sub" id="moneySub"></div>
+        <div class="stats" id="moneyStats"></div>
+      </div>
+    </div>
+    <div class="cats" id="moneyCats"></div>
+    <div class="sechead"><h2>Transactions</h2><span id="moneyCount"></span></div>
+    <div class="list" id="moneyList"></div>
   </section>
 
   <!-- SETTINGS -->
@@ -258,6 +310,13 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
       <div class="srow"><div class="l"><strong>Daily goal</strong><span>kcal per day</span></div>
         <input type="number" id="setGoal" inputmode="numeric" min="500" max="10000" step="50" aria-label="Daily calorie goal" style="max-width:110px"></div>
     </div>
+    <div class="sechead"><h2>Money</h2></div>
+    <div class="set">
+      <div class="srow"><div class="l"><strong>Currency</strong><span>Shown on amounts and exports</span></div>
+        <select id="setCurrency" aria-label="Currency"><option value="₹">₹ Rupee</option><option value="$">$ Dollar</option><option value="€">€ Euro</option><option value="£">£ Pound</option><option value="AED ">AED Dirham</option></select></div>
+      <div class="srow"><div class="l"><strong>Monthly budget</strong><span>Leave empty for no budget</span></div>
+        <input type="number" id="setBudget" inputmode="numeric" min="0" step="500" placeholder="None" aria-label="Monthly budget" style="max-width:120px"></div>
+    </div>
     <div class="set" id="permBox" hidden style="margin-top:14px"><div class="srow"><div class="l"><strong>Phone permissions</strong><span id="permText">Checking…</span></div><button class="btn small primary" id="permFix">Fix</button></div></div>
     <p class="note">Daybell uses your phone's alarm system, so reminders ring with sound and voice even when the app is closed or the phone is locked. Everything is saved on this phone only. If your phone maker adds extra battery saving, set Daybell's battery use to Unrestricted.</p>
   </section>
@@ -269,6 +328,7 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
   <div class="in">
     <button role="tab" data-tab="tasks" aria-selected="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks</button>
     <button role="tab" data-tab="cal" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5.5 1-8.5z"/></svg>Calories</button>
+    <button role="tab" data-tab="money" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2.5"/><path d="M2 10h20"/><path d="M16 15h2"/><path d="M6 6V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>Money</button>
     <button role="tab" data-tab="set" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
   </div>
 </nav>
@@ -296,6 +356,52 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
   </form>
 </div>
 
+<!-- Money entry editor -->
+<div class="scrim" id="txSheet" hidden>
+  <form class="sheet" id="txForm" autocomplete="off" role="dialog" aria-labelledby="txSheetTitle">
+    <h2 id="txSheetTitle">New entry</h2>
+    <div class="seg typeseg" role="radiogroup" aria-label="Type" style="grid-template-columns:1fr 1fr">
+      <label><input type="radio" name="txType" value="expense" id="txExpense" checked><span>Expense</span></label>
+      <label><input type="radio" name="txType" value="income" id="txIncome"><span>Income</span></label>
+    </div>
+    <div class="field"><label for="txAmount">Amount</label><input type="number" id="txAmount" class="amt" inputmode="decimal" min="0.01" step="0.01" placeholder="0" required></div>
+    <div class="field"><label>Category</label><div class="catpick" id="txCats"></div></div>
+    <div class="field"><label for="txNote">Note</label><input type="text" id="txNote" maxlength="80" placeholder="e.g. Lunch with team"></div>
+    <div class="row">
+      <div class="field"><label for="txDate">Date</label><input type="date" id="txDate" required></div>
+      <div class="field"><label for="txMethod">Paid by</label>
+        <select id="txMethod"><option>UPI</option><option>Cash</option><option>Card</option><option>Bank transfer</option><option>Other</option></select></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn danger" id="txDelete" hidden>Delete</button>
+      <button type="button" class="btn ghost" id="txCancel">Cancel</button>
+      <button type="submit" class="btn money">Save</button>
+    </div>
+  </form>
+</div>
+
+<!-- Export -->
+<div class="scrim" id="exSheet" hidden>
+  <form class="sheet" id="exForm" role="dialog" aria-labelledby="exTitle">
+    <h2 id="exTitle">Export money report</h2>
+    <div class="field"><label>Period</label>
+      <div class="seg typeseg" style="grid-template-columns:1fr 1fr;margin:0">
+        <label><input type="radio" name="exRange" value="month" checked><span id="exMonthLbl">This month</span></label>
+        <label><input type="radio" name="exRange" value="all"><span>All time</span></label>
+      </div></div>
+    <div class="field"><label>Format</label>
+      <div class="seg typeseg" style="grid-template-columns:1fr 1fr;margin:0">
+        <label><input type="radio" name="exFmt" value="pdf" checked><span>PDF</span></label>
+        <label><input type="radio" name="exFmt" value="xlsx"><span>Excel</span></label>
+      </div></div>
+    <p class="note" style="margin:0" id="exInfo"></p>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="exCancel">Cancel</button>
+      <button type="submit" class="btn money">Save file</button>
+    </div>
+  </form>
+</div>
+
 <div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
 
 <script>
@@ -318,8 +424,8 @@ const dayLabel = s => {
 const LEADS = [[0, "At time"], [5, "5 min"], [10, "10 min"], [15, "15 min"], [30, "30 min"], [60, "1 hour"]];
 
 /* ---------- state ---------- */
-const S = { tasks: [], meals: [], settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system" } };
-const view = { tab: "tasks", taskDay: today(), calDay: today() };
+const S = { tasks: [], meals: [], money: [], settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0 } };
+const view = { tab: "tasks", taskDay: today(), calDay: today(), month: today().slice(0, 7) };
 
 /* Repeating tasks: one record holds the schedule, completion is tracked per date. */
 function occursOn(t, day) {
@@ -340,12 +446,12 @@ const LS = "daybell-v1";
 function loadLocal() {
   try {
     const r = JSON.parse(localStorage.getItem(LS) || "null");
-    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; Object.assign(S.settings, r.settings || {}); }
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; Object.assign(S.settings, r.settings || {}); }
   } catch (e) {}
 }
 const NATIVE = window.DaybellNative || null;
 function saveLocal() {
-  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, settings: S.settings })); } catch (e) {}
+  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, settings: S.settings })); } catch (e) {}
   if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: S.tasks, settings: S.settings })); } catch (e) {}
 }
 /* Actions taken on the Android alarm screen while the app was closed. */
@@ -374,18 +480,19 @@ function refreshPerms() {
 }
 window.daybellResume = () => { applyPending(); render(); refreshPerms(); };
 
+const listFor = kind => kind === "task" ? S.tasks : kind === "meal" ? S.meals : S.money;
 function plain(o) { return JSON.parse(JSON.stringify(o)); }
 function put(kind, obj) {
   obj.kind = kind;
   if (kind !== "settings") {
-    const arr = kind === "task" ? S.tasks : S.meals;
+    const arr = listFor(kind);
     const i = arr.findIndex(x => x.id === obj.id);
     if (i >= 0) arr[i] = obj; else arr.push(obj);
   }
   saveLocal(); render();
 }
 function remove(kind, id) {
-  const arr = kind === "task" ? S.tasks : S.meals;
+  const arr = listFor(kind);
   const i = arr.findIndex(x => x.id === id);
   if (i >= 0) arr.splice(i, 1);
   saveLocal(); render();
@@ -465,23 +572,22 @@ function renderCal() {
     const items = list.filter(m => m.meal === g), sum = items.reduce((s, m) => s + (+m.kcal || 0), 0);
     return `<div class="meal"><h3><span>${g}</span><span class="num">${sum ? sum.toLocaleString() + " kcal" : ""}</span></h3>${items.length ? items.map(m => `<div class="food"><span class="n">${esc(m.name)}</span><span class="k num">${(+m.kcal).toLocaleString()}</span><button class="x" data-delmeal="${m.id}" aria-label="Remove ${esc(m.name)}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`).join("") : `<div class="none">Nothing logged</div>`}</div>`;
   }).join("");
-  // quick-add from recent foods
-  const seen = new Map();
-  [...S.meals].sort((a, b) => (b.at || 0) - (a.at || 0)).forEach(m => { const k = m.name.toLowerCase(); if (!seen.has(k) && seen.size < 6) seen.set(k, m); });
-  $("#quickFoods").innerHTML = seen.size ? [...seen.values()].map(m => `<button type="button" class="qchip" data-quick="${m.id}">${esc(m.name)} <b class="num">${m.kcal}</b></button>`).join("") : `<span style="font-size:13px;color:var(--muted)">Foods you add show up here for one-tap logging.</span>`;
 }
 
 function render() {
   if (view.tab === "tasks") renderTasks();
   if (view.tab === "cal") renderCal();
+  if (view.tab === "money") renderMoney();
 }
 
 function showTab(tab) {
   view.tab = tab;
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
-  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set";
+  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set"; $("#tab-money").hidden = tab !== "money";
   const fab = $("#fab");
-  fab.hidden = tab !== "tasks";
+  fab.hidden = tab !== "tasks" && tab !== "money";
+  fab.classList.toggle("money", tab === "money");
+  fab.querySelector("span").textContent = tab === "money" ? "Add entry" : "New task";
   if (tab === "set") syncSettingsUI();
   try { sessionStorage.setItem("daybell-tab", tab); } catch (e) {}
   render(); window.scrollTo(0, 0);
@@ -545,6 +651,139 @@ $("#foodForm").addEventListener("submit", e => {
 });
 function guessMeal() { const h = new Date().getHours(); return h < 11 ? "Breakfast" : h < 16 ? "Lunch" : h < 21 ? "Dinner" : "Snack"; }
 
+/* ---------- money ---------- */
+const CATS = {
+  expense: ["Food", "Groceries", "Transport", "Bills", "Rent", "Shopping", "Health", "Education", "Entertainment", "Family", "Other"],
+  income: ["Salary", "Business", "Freelance", "Gift", "Refund", "Interest", "Other"]
+};
+const cur = () => S.settings.currency || "₹";
+const money = n => cur() + (+n || 0).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const shiftMonth = (ym, n) => { const [y, m] = ym.split("-").map(Number); const d = new Date(y, m - 1 + n, 1); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; };
+const monthName = ym => { const [y, m] = ym.split("-").map(Number); return new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" }); };
+const txIn = ym => S.money.filter(t => !ym || t.date.slice(0, 7) === ym).sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0));
+function totals(list) {
+  let income = 0, expense = 0; const byCat = {};
+  list.forEach(t => { const a = +t.amount || 0; if (t.type === "income") income += a; else { expense += a; byCat[t.category] = (byCat[t.category] || 0) + a; } });
+  return { income, expense, balance: income - expense, cats: Object.entries(byCat).sort((a, b) => b[1] - a[1]) };
+}
+function renderMoney() {
+  const ym = view.month, list = txIn(ym), T = totals(list), budget = +S.settings.budget || 0;
+  const nowYm = today().slice(0, 7);
+  $("#moneyTitle").innerHTML = `<small>${ym === nowYm ? "This month" : ym < nowYm ? "Past month" : "Upcoming"}</small>${esc(monthName(ym))}`;
+  if (budget) {
+    const pct = T.expense / budget;
+    ring($("#moneyRing"), pct, pct > 1 ? "var(--danger)" : "var(--money)", `${Math.round(pct * 100)}<span>%</span>`);
+    $("#moneySub").textContent = T.expense > budget ? `${money(T.expense - budget)} over your ${money(budget)} budget` : `${money(budget - T.expense)} left of your ${money(budget)} budget`;
+  } else {
+    const pct = T.income ? T.expense / T.income : 0;
+    ring($("#moneyRing"), pct, pct > 1 ? "var(--danger)" : "var(--money)", T.income ? `${Math.round(pct * 100)}<span>%</span>` : "–");
+    $("#moneySub").textContent = T.income ? `That's ${Math.round(pct * 100)}% of this month's income` : "Set a monthly budget in Settings to track it here.";
+  }
+  $("#moneyBig").innerHTML = `<span class="num">${money(T.expense)}</span> spent`;
+  $("#moneyStats").innerHTML = `<div><strong class="num" style="color:var(--task)">${money(T.income)}</strong>income</div><div><strong class="num" ${T.balance < 0 ? 'style="color:var(--danger)"' : ""}>${T.balance < 0 ? "−" : ""}${money(Math.abs(T.balance))}</strong>balance</div>`;
+  const top = T.cats[0] ? T.cats[0][1] : 0;
+  $("#moneyCats").hidden = !T.cats.length;
+  $("#moneyCats").innerHTML = `<div class="sechead" style="margin:0"><h2>Where it went</h2><span>${T.cats.length} categor${T.cats.length === 1 ? "y" : "ies"}</span></div>` +
+    T.cats.map(([c, a]) => `<div class="cat"><div class="t"><span>${esc(c)}</span><span class="num">${money(a)} · ${Math.round(a / T.expense * 100)}%</span></div><div class="b"><i style="width:${Math.max(3, a / top * 100)}%"></i></div></div>`).join("");
+  $("#moneyCount").textContent = list.length ? `${list.length} entr${list.length === 1 ? "y" : "ies"}` : "";
+  if (!list.length) {
+    $("#moneyList").innerHTML = `<div class="empty"><strong>No entries in ${esc(monthName(ym))}</strong>Tap “Add entry” to record money you spend or receive.</div>`;
+    return;
+  }
+  const days = [];
+  list.forEach(t => { const d = days[days.length - 1]; if (d && d.date === t.date) d.items.push(t); else days.push({ date: t.date, items: [t] }); });
+  $("#moneyList").innerHTML = days.map(d => {
+    const L = dayLabel(d.date), net = d.items.reduce((s, t) => s + (t.type === "income" ? 1 : -1) * (+t.amount || 0), 0);
+    return `<div class="day"><h3><span>${esc(L.rel)}, ${esc(L.date)}</span><span class="num">${net < 0 ? "−" : "+"}${money(Math.abs(net))}</span></h3>` +
+      d.items.map(t => `<button class="tx ${t.type === "income" ? "in" : ""}" data-tx="${t.id}"><span class="ic">${esc((t.category || "?").slice(0, 1))}</span><span class="m"><b>${esc(t.note || t.category)}</b><span>${esc(t.note ? t.category + " · " : "")}${esc(t.method || "")}</span></span><span class="a num">${t.type === "income" ? "+" : "−"}${money(t.amount)}</span></button>`).join("") + `</div>`;
+  }).join("");
+}
+
+let txEditing = null;
+function fillCats(type, selected) {
+  const list = [...CATS[type]];
+  if (selected && !list.includes(selected)) list.splice(list.length - 1, 0, selected);
+  $("#txCats").innerHTML = list.map((c, i) => `<label><input type="radio" name="txCat" value="${esc(c)}" ${(selected ? c === selected : i === 0) ? "checked" : ""}><span>${esc(c)}</span></label>`).join("");
+}
+function openTx(t) {
+  txEditing = t ? t.id : null;
+  const type = t ? t.type : "expense";
+  $("#txSheetTitle").textContent = t ? "Edit entry" : "New entry";
+  $(type === "income" ? "#txIncome" : "#txExpense").checked = true;
+  $("#txAmount").value = t ? t.amount : "";
+  $("#txNote").value = t ? (t.note || "") : "";
+  $("#txDate").value = t ? t.date : (view.month === today().slice(0, 7) ? today() : view.month + "-01");
+  $("#txMethod").value = t ? (t.method || "UPI") : (S.settings.lastMethod || "UPI");
+  fillCats(type, t ? t.category : null);
+  $("#txDelete").hidden = !t;
+  $("#txSheet").hidden = false;
+  setTimeout(() => { if (!t) $("#txAmount").focus(); }, 60);
+}
+function closeTx() { $("#txSheet").hidden = true; txEditing = null; }
+document.querySelectorAll('input[name="txType"]').forEach(r => r.onchange = e => fillCats(e.target.value, null));
+$("#txForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const amount = Math.round(+$("#txAmount").value * 100) / 100;
+  if (!(amount > 0)) return;
+  const old = txEditing ? S.money.find(x => x.id === txEditing) : null;
+  const t = old ? plain(old) : { id: newId(), at: Date.now() };
+  t.type = document.querySelector('input[name="txType"]:checked').value;
+  t.amount = amount;
+  t.category = (document.querySelector('input[name="txCat"]:checked') || { value: "Other" }).value;
+  t.note = $("#txNote").value.trim();
+  t.date = $("#txDate").value;
+  t.method = $("#txMethod").value;
+  S.settings.lastMethod = t.method;
+  view.month = t.date.slice(0, 7);
+  put("money", t); closeTx();
+  toast(old ? "Entry updated" : `${t.type === "income" ? "Income" : "Expense"} of ${money(amount)} saved`);
+});
+$("#txCancel").onclick = closeTx;
+$("#txSheet").addEventListener("click", e => { if (e.target.id === "txSheet") closeTx(); });
+$("#txDelete").onclick = () => {
+  const t = S.money.find(x => x.id === txEditing); if (!t) return;
+  const copy = plain(t); remove("money", t.id); closeTx();
+  toast("Entry deleted", () => put("money", copy));
+};
+
+/* Export: the page builds the table; the phone writes the PDF or Excel file. */
+function exportList() {
+  const range = document.querySelector('input[name="exRange"]:checked').value;
+  const list = txIn(range === "month" ? view.month : null);
+  $("#exInfo").textContent = list.length
+    ? `${list.length} entr${list.length === 1 ? "y" : "ies"} will be saved as a table, with totals and a category summary. You choose where to save the file.`
+    : "There are no entries in this period yet.";
+  return list;
+}
+$("#exportBtn").onclick = () => { $("#exMonthLbl").textContent = monthName(view.month); exportList(); $("#exSheet").hidden = false; };
+document.querySelectorAll('input[name="exRange"]').forEach(r => r.onchange = exportList);
+$("#exCancel").onclick = () => { $("#exSheet").hidden = true; };
+$("#exSheet").addEventListener("click", e => { if (e.target.id === "exSheet") $("#exSheet").hidden = true; });
+$("#exForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const range = document.querySelector('input[name="exRange"]:checked').value;
+  const fmt = document.querySelector('input[name="exFmt"]:checked').value;
+  const list = exportList();
+  if (!list.length) { toast("Nothing to export in this period"); return; }
+  const rows = [...list].reverse().map(t => ({
+    date: t.date, type: t.type === "income" ? "Income" : "Expense", category: t.category || "", note: t.note || "",
+    method: t.method || "", amount: (t.type === "income" ? 1 : -1) * (+t.amount || 0)
+  }));
+  const T = totals(list);
+  const period = range === "month" ? monthName(view.month) : `All time (${rows[0].date} to ${rows[rows.length - 1].date})`;
+  const report = {
+    title: "Daybell money report", period, currency: cur().trim(), rows,
+    income: T.income, expense: T.expense, balance: T.balance,
+    categories: T.cats.map(([name, amount]) => ({ name, amount, share: T.expense ? amount / T.expense : 0 })),
+    generated: new Date().toLocaleString()
+  };
+  const fname = `Daybell-money-${range === "month" ? view.month : "all-time"}.${fmt}`;
+  if (!NATIVE || !NATIVE.exportReport) { toast("Export works in the Daybell phone app"); return; }
+  NATIVE.exportReport(fmt, fname, JSON.stringify(report));
+  $("#exSheet").hidden = true;
+});
+window.daybellExported = (ok, msg) => toast(msg || (ok ? "Saved" : "Not saved"));
+
 /* ---------- toast ---------- */
 let toastT;
 function toast(msg, undo) {
@@ -560,9 +799,10 @@ document.addEventListener("click", e => {
   if (b.dataset.shift) { const k = b.dataset.for === "cal" ? "calDay" : "taskDay"; view[k] = addDays(view[k], +b.dataset.shift); return render(); }
   if (b.dataset.day) { view[b.dataset.for === "cal" ? "calDay" : "taskDay"] = b.dataset.day; return render(); }
   if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
+  if (b.dataset.mshift) { view.month = shiftMonth(view.month, +b.dataset.mshift); return render(); }
+  if (b.dataset.tx) return openTx(S.money.find(x => x.id === b.dataset.tx));
   if (b.dataset.edit) return openTask(S.tasks.find(x => x.id === b.dataset.edit));
   if (b.dataset.delmeal) { const m = S.meals.find(x => x.id === b.dataset.delmeal); if (m) { const c = plain(m); remove("meal", m.id); toast(`Removed ${m.name}`, () => put("meal", c)); } return; }
-  if (b.dataset.quick) { const m = S.meals.find(x => x.id === b.dataset.quick); if (m) { put("meal", { id: newId(), name: m.name, kcal: m.kcal, meal: $("#foodMeal").value, date: view.calDay, at: Date.now() }); toast(`Added ${m.name}`); } return; }
   if (b.id === "sampleTasks") {
     const d = view.taskDay, now = new Date(), base = d === today() ? now.getHours() : 8;
     const at = h => `${pad(Math.min(23, h))}:${h > 23 ? "45" : "00"}`;
@@ -571,7 +811,7 @@ document.addEventListener("click", e => {
     toast("Added 3 example tasks. Tap one to edit or delete it.");
   }
 });
-$("#fab").onclick = () => openTask(null);
+$("#fab").onclick = () => view.tab === "money" ? openTx(null) : openTask(null);
 
 /* ---------- settings ---------- */
 function applyTheme() {
@@ -587,6 +827,7 @@ function syncSettingsUI() {
   const set = (id, prop, v) => { const el = $(id); if (document.activeElement !== el) el[prop] = v; };
   set("#setSound", "checked", !!s.sound); set("#setVoice", "checked", !!s.voice); set("#setVibrate", "checked", !!s.vibrate);
   set("#setLead", "value", String(s.lead)); set("#setGoal", "value", s.goal);
+  set("#setCurrency", "value", s.currency || "₹"); set("#setBudget", "value", s.budget ? s.budget : "");
   refreshPerms();
 }
 let setT;
@@ -602,6 +843,8 @@ document.querySelectorAll('input[name="theme"]').forEach(r => r.onchange = e => 
 $("#setVibrate").onchange = e => { S.settings.vibrate = e.target.checked; saveSettings(true); };
 $("#setLead").onchange = e => { S.settings.lead = +e.target.value; saveSettings(true); };
 $("#setGoal").oninput = e => { const v = Math.round(+e.target.value); if (v >= 500 && v <= 10000) { S.settings.goal = v; saveSettings(false); } };
+$("#setCurrency").onchange = e => { S.settings.currency = e.target.value; saveSettings(true); };
+$("#setBudget").oninput = e => { const v = Math.round(+e.target.value); if (v >= 0) { S.settings.budget = v; saveSettings(false); } };
 $("#testAlarm").onclick = () => {
   if (!NATIVE) return;
   NATIVE.testAlarm(); toast("Test alarm in 10 seconds. Close the app or lock your phone to try it.");

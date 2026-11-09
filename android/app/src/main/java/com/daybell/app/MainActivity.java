@@ -24,12 +24,16 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 
 public class MainActivity extends Activity {
     private WebView web;
     private FrameLayout root;
+    private static final int REQ_SAVE = 42;
+    private byte[] pendingFile;
+    private String pendingName;
 
     /** Colours the system bars and the page background for the chosen theme. */
     private void applyBars() {
@@ -122,6 +126,53 @@ public class MainActivity extends Activity {
         if (web != null) web.evaluateJavascript("window.daybellResume && window.daybellResume()", null);
     }
 
+    private void startExport(String fmt, String name, String json) {
+        try {
+            JSONObject report = new JSONObject(json);
+            boolean pdf = "pdf".equals(fmt);
+            pendingFile = pdf ? Exporter.pdf(report) : Exporter.xlsx(report);
+            pendingName = name;
+            Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .setType(pdf ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    .putExtra(Intent.EXTRA_TITLE, name);
+            startActivityForResult(i, REQ_SAVE);
+        } catch (Exception e) {
+            pendingFile = null;
+            notifyPage(false, "Couldn't create the file: " + e.getMessage());
+        }
+    }
+
+    private void notifyPage(boolean ok, String msg) {
+        if (web == null) return;
+        web.evaluateJavascript("window.daybellExported && window.daybellExported(" + ok + "," + JSONObject.quote(msg) + ")", null);
+    }
+
+    @Override protected void onActivityResult(int req, int result, Intent data) {
+        super.onActivityResult(req, result, data);
+        if (req != REQ_SAVE) return;
+        byte[] bytes = pendingFile;
+        pendingFile = null;
+        if (result != RESULT_OK || data == null || data.getData() == null || bytes == null) {
+            notifyPage(false, "Export cancelled");
+            return;
+        }
+        Uri uri = data.getData();
+        try (OutputStream out = getContentResolver().openOutputStream(uri, "wt")) {
+            out.write(bytes);
+            notifyPage(true, "Saved " + pendingName);
+        } catch (Exception e) {
+            notifyPage(false, "Couldn't save the file");
+            return;
+        }
+        // Open the saved file if the phone has an app for it.
+        try {
+            Intent view = new Intent(Intent.ACTION_VIEW).setDataAndType(uri, getContentResolver().getType(uri))
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(view, "Open " + pendingName));
+        } catch (Exception ignored) {}
+    }
+
     @Override public void onRequestPermissionsResult(int code, String[] perms, int[] results) {
         if (web != null) web.evaluateJavascript("window.daybellResume && window.daybellResume()", null);
     }
@@ -180,6 +231,9 @@ public class MainActivity extends Activity {
                 Store.put(MainActivity.this, "state", st);
             } catch (Exception ignored) {}
             runOnUiThread(MainActivity.this::applyBars);
+        }
+        @JavascriptInterface public void exportReport(String fmt, String name, String json) {
+            runOnUiThread(() -> startExport(fmt, name, json));
         }
         @JavascriptInterface public String takePending() { return Store.takePending(MainActivity.this); }
         @JavascriptInterface public void testAlarm() { Scheduler.scheduleTest(MainActivity.this); }

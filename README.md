@@ -5,7 +5,9 @@ A personal Android app for planning your day and tracking what you eat.
 - **Tasks:** add tasks with a date and time, set a reminder (at the time, or 5 to 60 minutes before), and repeat daily, on weekdays or weekly. A ring shows what percentage of the day's tasks are done, with a bar for each day of the week.
 - **Alarms:** ring through Android's own alarm system, so they work when the app is closed, the screen is locked or the phone has restarted. A full-screen alarm offers **Mark as done**, **Snooze 5 min** and **Dismiss**. Sound, a spoken reminder ("Reminder. Call the bank. In 5 minutes.") and vibration can each be turned on or off in Settings.
 - **Appearance:** pick System, Light or Dark in Settings. The alarm screen and system bars follow it too.
-- **Calories:** set a daily goal and log food by meal. The page shows how much of the goal you've used, how much is left, and a week view. Foods you've logged before can be added again with one tap.
+- **Calories:** set a daily goal and log food by meal. The page shows how much of the goal you've used, how much is left, and a week view.
+- **Money:** record expenses and income with an amount, category, note, date and payment method (UPI, cash, card, bank transfer). Each month shows what you spent, your income and balance, progress against an optional monthly budget, and where the money went by category.
+- **Export:** save a month or all-time money report as a **PDF** or an **Excel (.xlsx)** file. Both contain the transactions as a table, the totals, and a spending-by-category summary. You choose where on the phone to save it.
 
 ## Install
 
@@ -21,7 +23,7 @@ Tasks and the food log are stored on the phone only.
 | Path | What it is |
 | --- | --- |
 | `android/` | The Android app (Java, no extra libraries). |
-| `android/app/src/main/assets/index.html` | The app's screens: tasks, calories and settings (HTML, CSS and JavaScript). |
+| `android/app/src/main/assets/index.html` | The app's screens: tasks, calories, money and settings (HTML, CSS and JavaScript). |
 | `apk/Daybell.apk` | A signed build, ready to install. |
 
 How the Android side works:
@@ -30,6 +32,7 @@ How the Android side works:
 - `Scheduler` works out each task's next reminder time, including repeats, and books it with `AlarmManager.setAlarmClock`.
 - `AlarmService` plays the alarm tone, reads the reminder aloud and vibrates. It also shows the alarm notification.
 - `AlarmActivity` is the full-screen alarm page shown over the lock screen.
+- `Exporter` writes the money report as a PDF (with Android's `PdfDocument`) or as an Excel workbook with a Transactions sheet and a Summary sheet.
 - `BootReceiver` books the alarms again after a restart, an app update or a time-zone change.
 
 ## Build
