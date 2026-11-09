@@ -46,12 +46,12 @@ public class AlarmActivity extends Activity {
 
     private void build(Intent in) {
         boolean dark = Store.isDark(this);
-        int bg = dark ? 0xFF0D0D0D : 0xFFF3F3F1;
-        int ink = dark ? 0xFFECECEC : 0xFF141414;
-        int muted = dark ? 0xFF999999 : 0xFF666664;
-        int accent = 0xFF39FF14;
-        int onAccent = 0xFF0A0A0A;
-        int line = dark ? 0xFF2A2A2A : 0xFFDCDCDA;
+        int bg = dark ? 0xFF121212 : 0xFFF2F2F1;
+        int ink = dark ? 0xFFF2F2F2 : 0xFF161616;
+        int muted = dark ? 0xFF9E9E9E : 0xFF666664;
+        int accent = dark ? 0xFFF2600F : 0xFFF15A0F;
+        int onAccent = 0xFFFFFFFF;
+        int line = dark ? 0xFF303030 : 0xFFDCDCDA;
         getWindow().setStatusBarColor(bg);
         getWindow().setNavigationBarColor(bg);
 
@@ -68,7 +68,7 @@ public class AlarmActivity extends Activity {
         bell.setGravity(Gravity.CENTER);
         GradientDrawable circle = new GradientDrawable();
         circle.setShape(GradientDrawable.OVAL);
-        circle.setColor(dark ? 0xFF16290F : 0xFFDDF9D4);
+        circle.setColor(dark ? 0xFF3A1E10 : 0xFFFDE4D6);
         bell.setBackground(circle);
         root.addView(bell, new LinearLayout.LayoutParams(dp(104), dp(104)));
 
@@ -122,7 +122,7 @@ public class AlarmActivity extends Activity {
         btn.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
         btn.setStateListAnimator(null);
         GradientDrawable d = new GradientDrawable();
-        d.setCornerRadius(dp(16));
+        d.setCornerRadius(dp(29));
         d.setColor(fill == 0 ? Color.TRANSPARENT : fill);
         if (stroke != 0) d.setStroke(dp(1), stroke);
         btn.setBackground(d);
