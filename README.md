@@ -1,4 +1,6 @@
-# Daybell: reminders and calorie tracker
+<p align="center"><img src="logo.png" alt="Dayco" width="520"></p>
+
+# Dayco: your daily companion
 
 A personal Android app for planning your day and tracking what you eat.
 
@@ -13,9 +15,9 @@ A personal Android app for planning your day and tracking what you eat.
 
 ## Install
 
-1. Download [`apk/Daybell.apk`](apk/Daybell.apk) on your Android phone (Android 8.0 or newer) and open it. Allow "install unknown apps" when asked.
-2. Open Daybell and allow notifications.
-3. Go to **Settings → Phone permissions**. If anything is missing, tap **Fix**. On Xiaomi, Oppo, Vivo and Samsung phones, set Daybell's battery use to **Unrestricted** so alarms aren't blocked.
+1. Download [`apk/Dayco.apk`](apk/Dayco.apk) on your Android phone (Android 8.0 or newer) and open it. Allow "install unknown apps" when asked.
+2. Open Dayco and allow notifications.
+3. Go to **Settings → Phone permissions**. If anything is missing, tap **Fix**. On Xiaomi, Oppo, Vivo and Samsung phones, set Dayco's battery use to **Unrestricted** so alarms aren't blocked.
 4. Tap **Test**, then lock the phone. The test alarm rings within 10 seconds.
 
 Tasks and the food log are stored on the phone only.
@@ -26,11 +28,11 @@ Tasks and the food log are stored on the phone only.
 | --- | --- |
 | `android/` | The Android app (Java, no extra libraries). |
 | `android/app/src/main/assets/index.html` | The app's screens: tasks, calories, money and settings (HTML, CSS and JavaScript). |
-| `apk/Daybell.apk` | A signed build, ready to install. |
+| `apk/Dayco.apk` | A signed build, ready to install. |
 
 How the Android side works:
 
-- `MainActivity` shows the interface and gives the page a `DaybellNative` bridge. Every time tasks change, the page sends them over.
+- `MainActivity` shows the interface and gives the page a `DaycoNative` bridge. Every time tasks change, the page sends them over.
 - `Scheduler` works out each task's next reminder time, including repeats, and books it with `AlarmManager.setAlarmClock`.
 - `AlarmService` plays the alarm tone, reads the reminder aloud and vibrates. It also shows the alarm notification.
 - `AlarmActivity` is the full-screen alarm page shown over the lock screen.
@@ -60,4 +62,4 @@ keyAlias=daybell
 keyPassword=...
 ```
 
-Without that file, `assembleRelease` produces an unsigned APK, which Android won't install. Use `gradle assembleDebug` for a test build instead. An update only installs over the existing app when it is signed with the same key as `apk/Daybell.apk`. Keep that key safe: without it you'd have to uninstall the app, which deletes its data.
+Without that file, `assembleRelease` produces an unsigned APK, which Android won't install. Use `gradle assembleDebug` for a test build instead. An update only installs over the existing app when it is signed with the same key as `apk/Dayco.apk`. Keep that key safe: without it you'd have to uninstall the app, which deletes its data.

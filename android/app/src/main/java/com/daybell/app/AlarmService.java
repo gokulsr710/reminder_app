@@ -96,7 +96,7 @@ public class AlarmService extends Service {
             curTitle = "Test reminder";
             timeLabel = LocalTime.now().format(DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault()));
             sub = "This is how your reminders will ring.";
-            phrase = "Daybell reminder. This is a test.";
+            phrase = "Dayco reminder. This is a test.";
         } else {
             JSONObject t = Store.findTask(this, curId);
             Scheduler.markFired(this, curId, curDay);

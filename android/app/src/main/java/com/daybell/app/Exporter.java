@@ -122,7 +122,7 @@ final class Exporter {
     static byte[] pdf(JSONObject r) throws Exception {
         String cur = r.optString("currency", "₹");
         NumberFormat nf = numbers(cur);
-        Pdf p = new Pdf("Daybell · generated " + r.optString("generated"));
+        Pdf p = new Pdf("Dayco · generated " + r.optString("generated"));
         p.newPage();
 
         Paint title = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -322,7 +322,7 @@ final class Exporter {
                         .append(num("B" + rr, c.optDouble("amount"), 3)).append(num("C" + rr, c.optDouble("share"), 6)).append("</row>");
             }
         }
-        s2.append("<row r=\"").append(rr + 1).append("\">").append(str("A" + (rr + 1), "Generated " + r.optString("generated") + " by Daybell", 0)).append("</row>");
+        s2.append("<row r=\"").append(rr + 1).append("\">").append(str("A" + (rr + 1), "Generated " + r.optString("generated") + " by Dayco", 0)).append("</row>");
         s2.append("</sheetData></worksheet>");
 
         String contentTypes = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"

@@ -113,7 +113,7 @@ public class MainActivity extends Activity {
             while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
             body = out.toString(StandardCharsets.UTF_8.name());
         } catch (Exception e) {
-            body = "<p>Could not load Daybell.</p>";
+            body = "<p>Could not load Dayco.</p>";
         }
         return "<!doctype html><html><head><meta charset=\"utf-8\">"
                 + "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\">"
