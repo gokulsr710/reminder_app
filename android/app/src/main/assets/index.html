@@ -5,19 +5,19 @@
 /* Layout: one-column phone app — sticky header, scrolling tab panel, fixed bottom tab bar, bottom sheets for forms and alarms */
 :root{
   --bg:#F2F2F1; --surface:#FFFFFF; --sunk:#E8E8E6; --ink:#161616; --muted:#666664; --line:#DCDCDA;
-  --task:#F15A0F; --task-soft:#FDE4D6; --task-ink:#C2410C; --pos:#16803C; --cal:#B7791F; --cal-soft:#FAEFD9; --on-cal:#FFFFFF; --money:#F15A0F; --money-soft:#FDE4D6; --on-money:#FFFFFF; --danger:#B83A32; --on-accent:#FFFFFF;
+  --task:#F15A0F; --task-soft:#FDE4D6; --task-ink:#C2410C; --pos:#16803C; --cal:#B7791F; --cal-soft:#FAEFD9; --on-cal:#FFFFFF; --money:#F15A0F; --money-soft:#FDE4D6; --on-money:#FFFFFF; --water:#1C7FE0; --water-hi:#5CB6FF; --water-soft:#DCEBFB; --danger:#B83A32; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.10);
   --display:"Bricolage Grotesque", "Figtree", system-ui, sans-serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#121212; --surface:#1E1E1E; --sunk:#282828; --ink:#F2F2F2; --muted:#9E9E9E; --line:#303030;
-  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --danger:#FF6B5E; --on-accent:#FFFFFF;
+  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --danger:#FF6B5E; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#121212; --surface:#1E1E1E; --sunk:#282828; --ink:#F2F2F2; --muted:#9E9E9E; --line:#303030;
-  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --danger:#FF6B5E; --on-accent:#FFFFFF;
+  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --danger:#FF6B5E; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -99,12 +99,49 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .fab.cal{background:var(--cal)}
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
 nav.tabs button{border:0;background:transparent;padding:10px 0 12px;display:grid;justify-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
 nav.tabs button[aria-selected="true"]{color:var(--ink)}
 nav.tabs button[aria-selected="true"] svg{color:var(--task-ink)}
 nav.tabs button[data-tab="cal"][aria-selected="true"] svg{color:var(--cal)}
 nav.tabs button[data-tab="money"][aria-selected="true"] svg{color:var(--money)}
+nav.tabs button[data-tab="water"][aria-selected="true"] svg{color:var(--water)}
+/* Water */
+.wcard{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:20px;padding:16px 12px 16px 6px;box-shadow:var(--shadow)}
+#bottle{width:150px;height:auto;flex:none;overflow:visible}
+.bcap{fill:var(--ink);opacity:.85}
+.bcapline{fill:var(--bg);opacity:.35}
+.bglass{fill:var(--sunk)}
+.boutline{fill:none;stroke:var(--ink);stroke-opacity:.35;stroke-width:3}
+.bshine{fill:none;stroke:#fff;stroke-opacity:.18;stroke-width:6;stroke-linecap:round}
+.bl{stroke:var(--ink);stroke-opacity:.28;stroke-width:1.5;stroke-dasharray:4 5}
+.blab{font:600 12px var(--body);fill:var(--muted)}
+.wfill{transition:transform 1.4s cubic-bezier(.3,.7,.2,1);transform:translateY(360px)}
+.wave{fill:url(#wgrad)}
+.w1{animation:wave 3.2s linear infinite}
+.w2{opacity:.45;animation:wave 5s linear infinite reverse;transform:translateY(-4px)}
+@keyframes wave{from{transform:translateX(0)}to{transform:translateX(-70px)}}
+.w2{animation-name:wave2}
+@keyframes wave2{from{transform:translate(0,-4px)}to{transform:translate(-90px,-4px)}}
+.bubbles circle{fill:#fff;opacity:0;animation:bub 4.2s ease-in infinite}
+@keyframes bub{0%{opacity:0;transform:translateY(0)}20%{opacity:.55}100%{opacity:0;transform:translateY(-30px)}}
+#bottle.empty .bubbles{display:none}
+.stream{fill:var(--water-hi);opacity:0;transform-origin:50% 0;transform:scaleY(0)}
+#bottle.pouring .stream{animation:pour 1.5s ease-out}
+@keyframes pour{0%{opacity:.9;transform:scaleY(0)}25%{opacity:.9;transform:scaleY(1)}75%{opacity:.8;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
+.wside{flex:1;min-width:0;display:grid;gap:10px}
+.wside .big{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.1}
+.wside .sub{color:var(--muted);font-size:13.5px}
+.lvls{display:grid;gap:6px}
+.lvl{display:flex;align-items:center;gap:10px;padding:8px 6px 8px 8px;border-radius:14px;background:var(--bg)}
+.lvl .chk{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:transparent;flex:none;display:grid;place-items:center;color:transparent}
+.lvl.done .chk{background:var(--water);border-color:var(--water);color:#fff}
+.lvl .lt{flex:1;min-width:0;display:grid;line-height:1.25}
+.lvl .lt b{font-weight:700;font-size:15px}
+.lvl .lt span{font-size:12px;color:var(--muted)}
+.lvl .x{width:28px;height:28px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px;flex:none}
+.addlvl{border-radius:999px;justify-self:start}
+.wopts{margin-top:16px}
 .fab.money{background:var(--money);color:var(--on-money)}
 /* Money */
 .mhead{display:flex;justify-content:flex-end;margin:-6px 0 12px}
@@ -262,6 +299,29 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
     <div class="list" id="mealList"></div>
   </section>
 
+  <!-- WATER -->
+  <section id="tab-water" hidden>
+    <div class="daynav">
+      <button class="iconbtn" data-shift="-1" data-for="water" aria-label="Previous day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <h1 id="waterDayTitle"></h1>
+      <button class="iconbtn" data-shift="1" data-for="water" aria-label="Next day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+    <div class="sechead" style="margin-top:0"><h2>Water consumption today</h2></div>
+    <div class="wcard">
+      <svg id="bottle" viewBox="0 0 200 360" role="img" aria-label="Water bottle showing how much you've drunk today"></svg>
+      <div class="wside">
+        <div><div class="big" id="waterBig"></div><div class="sub" id="waterSub"></div></div>
+        <div class="lvls" id="waterLevels"></div>
+      </div>
+    </div>
+    <div class="week" id="waterWeek"></div>
+    <div class="weeklbl">Water this week</div>
+    <div class="set wopts">
+      <div class="srow"><div class="l"><strong>Water reminders</strong><span>Rings at each level's time, even when the app is closed</span></div>
+        <label class="switch"><input type="checkbox" id="waterRemind" aria-label="Water reminders"><span></span></label></div>
+    </div>
+  </section>
+
   <!-- MONEY -->
   <section id="tab-money" hidden>
     <div class="daynav">
@@ -329,6 +389,7 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
   <div class="in">
     <button role="tab" data-tab="tasks" aria-selected="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks</button>
     <button role="tab" data-tab="cal" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5.5 1-8.5z"/></svg>Calories</button>
+    <button role="tab" data-tab="water" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7c3 3.6 6.5 7.6 6.5 11.3a6.5 6.5 0 0 1-13 0c0-3.7 3.5-7.7 6.5-11.3z"/></svg>Water</button>
     <button role="tab" data-tab="money" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2.5"/><path d="M2 10h20"/><path d="M16 15h2"/><path d="M6 6V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>Money</button>
     <button role="tab" data-tab="set" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
   </div>
@@ -353,6 +414,19 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
       <button type="button" class="btn danger" id="tDelete" hidden>Delete</button>
       <button type="button" class="btn ghost" id="tCancel">Cancel</button>
       <button type="submit" class="btn primary">Save task</button>
+    </div>
+  </form>
+</div>
+
+<!-- Add water level -->
+<div class="scrim" id="lvlSheet" hidden>
+  <form class="sheet" id="lvlForm" role="dialog" aria-labelledby="lvlTitle">
+    <h2 id="lvlTitle">Add a water level</h2>
+    <p class="note" style="margin:0">Each level is 1 L. You'll get a reminder at this time every day.</p>
+    <div class="field"><label for="lvlTime">Reminder time</label><input type="time" id="lvlTime" required></div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="lvlCancel">Cancel</button>
+      <button type="submit" class="btn primary">Add level</button>
     </div>
   </form>
 </div>
@@ -425,8 +499,8 @@ const dayLabel = s => {
 const LEADS = [[0, "At time"], [5, "5 min"], [10, "10 min"], [15, "15 min"], [30, "30 min"], [60, "1 hour"]];
 
 /* ---------- state ---------- */
-const S = { tasks: [], meals: [], money: [], settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0 } };
-const view = { tab: "tasks", taskDay: today(), calDay: today(), month: today().slice(0, 7) };
+const S = { tasks: [], meals: [], money: [], water: {}, settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true } };
+const view = { tab: "tasks", taskDay: today(), calDay: today(), month: today().slice(0, 7), waterDay: today() };
 
 /* Repeating tasks: one record holds the schedule, completion is tracked per date. */
 function occursOn(t, day) {
@@ -447,13 +521,13 @@ const LS = "daybell-v1";
 function loadLocal() {
   try {
     const r = JSON.parse(localStorage.getItem(LS) || "null");
-    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; Object.assign(S.settings, r.settings || {}); }
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; Object.assign(S.settings, r.settings || {}); }
   } catch (e) {}
 }
 const NATIVE = window.DaybellNative || null;
 function saveLocal() {
-  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, settings: S.settings })); } catch (e) {}
-  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: S.tasks, settings: S.settings })); } catch (e) {}
+  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, water: S.water, settings: S.settings })); } catch (e) {}
+  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: S.tasks.concat(waterAlarmTasks()), settings: S.settings })); } catch (e) {}
 }
 /* Actions taken on the Android alarm screen while the app was closed. */
 function applyPending() {
@@ -461,7 +535,9 @@ function applyPending() {
   let acts = [];
   try { acts = JSON.parse(NATIVE.takePending() || "[]"); } catch (e) {}
   acts.forEach(a => {
-    const t = S.tasks.find(x => x.id === a.id); if (!t || a.type !== "done") return;
+    if (a.type !== "done") return;
+    if (String(a.id).startsWith("water-")) { const tm = a.id.slice(6, 8) + ":" + a.id.slice(8, 10); setWater(a.day, tm, true); return; }
+    const t = S.tasks.find(x => x.id === a.id); if (!t) return;
     const c = plain(t);
     if (c.repeat && c.repeat !== "none") { c.doneDates = c.doneDates || {}; c.doneDates[a.day] = true; } else c.done = true;
     put("task", c);
@@ -579,12 +655,13 @@ function render() {
   if (view.tab === "tasks") renderTasks();
   if (view.tab === "cal") renderCal();
   if (view.tab === "money") renderMoney();
+  if (view.tab === "water") renderWater();
 }
 
 function showTab(tab) {
   view.tab = tab;
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
-  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set"; $("#tab-money").hidden = tab !== "money";
+  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set"; $("#tab-money").hidden = tab !== "money"; $("#tab-water").hidden = tab !== "water";
   const fab = $("#fab");
   fab.hidden = tab !== "tasks" && tab !== "money";
   fab.classList.toggle("money", tab === "money");
@@ -651,6 +728,120 @@ $("#foodForm").addEventListener("submit", e => {
   toast(`Added ${kcal} kcal`);
 });
 function guessMeal() { const h = new Date().getHours(); return h < 11 ? "Breakfast" : h < 16 ? "Lunch" : h < 21 ? "Dinner" : "Snack"; }
+
+/* ---------- water ---------- */
+const WATER_MIN = 3, WATER_MAX = 8;
+const waterTimes = () => [...(S.settings.waterTimes || ["09:00", "12:00", "18:00"])].sort();
+const waterDone = day => (S.water[day] || []).filter(t => waterTimes().includes(t));
+const waterId = time => "water-" + time.replace(":", "");
+/* Water reminders go to the phone's alarm system as daily tasks. */
+function waterAlarmTasks() {
+  if (S.settings.waterRemind === false) return [];
+  const since = S.settings.waterSince || today();
+  return waterTimes().map((time, i) => {
+    const doneDates = {};
+    Object.keys(S.water).forEach(d => { if ((S.water[d] || []).includes(time)) doneDates[d] = true; });
+    return { id: waterId(time), title: `Drink 1 litre of water (level ${i + 1})`, date: since, time, lead: 0, repeat: "daily", doneDates };
+  });
+}
+function setWater(day, time, done) {
+  const cur = new Set(S.water[day] || []);
+  if (done) cur.add(time); else cur.delete(time);
+  S.water[day] = [...cur].sort();
+  saveLocal(); render();
+}
+
+/* Bottle drawing. The interior runs from y=112 (shoulder) to y=346 (base). */
+const B_TOP = 112, B_BOT = 346, B_H = B_BOT - B_TOP;
+const BOTTLE = "M86,36 L86,58 C86,78 54,86 54,114 L54,326 Q54,350 78,350 L122,350 Q146,350 146,326 L146,114 C146,86 114,78 114,58 L114,36 Z";
+function wavePath(amp, len) {
+  let d = `M-200,0`;
+  for (let x = -200; x < 400; x += len) d += ` q${len / 4},${-amp} ${len / 2},0 t${len / 2},0`;
+  return d + " L400,400 L-200,400 Z";
+}
+let lastFill = -1;
+function drawBottle(n, filled) {
+  const svg = $("#bottle");
+  const seg = B_H / n;
+  const y = B_BOT - filled * seg;
+  if (!svg.dataset.built || +svg.dataset.n !== n) {
+    const lines = Array.from({ length: n - 1 }, (_, i) => {
+      const ly = B_BOT - (i + 1) * seg;
+      return `<line x1="58" x2="142" y1="${ly}" y2="${ly}" class="bl"/>`;
+    }).join("");
+    const labels = Array.from({ length: n }, (_, i) => {
+      const ly = B_BOT - (i + 0.5) * seg;
+      return `<text x="166" y="${ly + 4}" class="blab">${i + 1} L</text>`;
+    }).join("");
+    svg.innerHTML = `
+      <defs>
+        <clipPath id="bclip"><path d="${BOTTLE}"/></clipPath>
+        <linearGradient id="wgrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--water-hi)"/><stop offset="1" stop-color="var(--water)"/></linearGradient>
+      </defs>
+      <rect x="80" y="6" width="40" height="28" rx="7" class="bcap"/>
+      <rect x="80" y="26" width="40" height="4" class="bcapline"/>
+      <path d="${BOTTLE}" class="bglass"/>
+      <g clip-path="url(#bclip)">
+        <rect class="stream" x="96" y="36" width="8" height="320" rx="4"/>
+        <g class="wfill" id="wfill">
+          <path class="wave w2" d="${wavePath(7, 90)}"/>
+          <path class="wave w1" d="${wavePath(6, 70)}"/>
+          <g class="bubbles">${[64, 88, 108, 126, 76, 118].map((bx, i) => `<circle cx="${bx}" cy="${34 + (i % 3) * 18}" r="${2 + (i % 3)}" style="animation-delay:${i * 0.7}s"/>`).join("")}</g>
+        </g>
+        ${lines}
+      </g>
+      <path d="${BOTTLE}" class="boutline"/>
+      <path d="M66,128 C64,170 64,250 66,310" class="bshine"/>
+      ${labels}`;
+    svg.dataset.built = "1"; svg.dataset.n = n;
+  }
+  const g = $("#wfill");
+  g.style.transform = `translateY(${filled ? y : B_BOT + 12}px)`;
+  svg.classList.toggle("empty", !filled);
+  if (lastFill >= 0 && filled > lastFill) {
+    svg.classList.remove("pouring"); void svg.getBoundingClientRect(); svg.classList.add("pouring");
+    clearTimeout(drawBottle.t); drawBottle.t = setTimeout(() => svg.classList.remove("pouring"), 1500);
+  }
+  lastFill = filled;
+}
+
+function renderWater() {
+  const day = view.waterDay, L = dayLabel(day), times = waterTimes(), n = times.length;
+  const doneSet = new Set(waterDone(day)), done = doneSet.size;
+  $("#waterDayTitle").innerHTML = `<small>${esc(L.rel)}</small>${esc(L.date)}`;
+  drawBottle(n, done);
+  $("#waterBig").innerHTML = `<span class="num">${done}</span> of <span class="num">${n}</span> L`;
+  const now = new Date(), hm = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const next = day === today() ? times.find(t => !doneSet.has(t) && t >= hm) : null;
+  $("#waterSub").textContent = done >= n ? "Goal reached. Well done!" : next ? `Next glass at ${fmtTime(next)}` : day === today() ? `${n - done} L still to drink today` : `${n - done} L missed`;
+  $("#waterLevels").innerHTML = times.map((t, i) => {
+    const isDone = doneSet.has(t);
+    let chip = "";
+    if (!isDone && day === today()) chip = t <= hm ? `<span class="chip late">Due</span>` : "";
+    return `<div class="lvl ${isDone ? "done" : ""}">
+      <button class="chk" data-water="${t}" aria-label="${isDone ? "Undo" : "Mark done"}: level ${i + 1} at ${fmtTime(t)}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></button>
+      <div class="lt"><b class="num">${fmtTime(t)}</b><span>Level ${i + 1} · 1 L ${chip}</span></div>
+      ${n > WATER_MIN ? `<button class="x" data-unlevel="${t}" aria-label="Remove the ${fmtTime(t)} level"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>` : ""}
+    </div>`;
+  }).join("") + (n < WATER_MAX ? `<button class="btn small ghost addlvl" id="addLevel">+ Add level</button>` : "");
+  weekStrip($("#waterWeek"), day, d => waterDone(d).length / n, "var(--water)", "water");
+  $("#waterRemind").checked = S.settings.waterRemind !== false;
+}
+
+/* add-level sheet */
+$("#lvlCancel").onclick = () => { $("#lvlSheet").hidden = true; };
+$("#lvlSheet").addEventListener("click", e => { if (e.target.id === "lvlSheet") $("#lvlSheet").hidden = true; });
+$("#lvlForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const t = $("#lvlTime").value; if (!t) return;
+  const times = waterTimes();
+  if (times.includes(t)) { toast(`There's already a level at ${fmtTime(t)}`); return; }
+  S.settings.waterTimes = [...times, t].sort();
+  $("#lvlSheet").hidden = true;
+  saveSettings(true);
+  toast(`Added a 1 L level at ${fmtTime(t)}`);
+});
+$("#waterRemind").onchange = e => { S.settings.waterRemind = e.target.checked; saveSettings(true); toast(e.target.checked ? "Water reminders on" : "Water reminders off"); };
 
 /* ---------- money ---------- */
 const CATS = {
@@ -797,8 +988,18 @@ function toast(msg, undo) {
 document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.dataset.tab) return showTab(b.dataset.tab);
-  if (b.dataset.shift) { const k = b.dataset.for === "cal" ? "calDay" : "taskDay"; view[k] = addDays(view[k], +b.dataset.shift); return render(); }
-  if (b.dataset.day) { view[b.dataset.for === "cal" ? "calDay" : "taskDay"] = b.dataset.day; return render(); }
+  const dayKey = f => f === "cal" ? "calDay" : f === "water" ? "waterDay" : "taskDay";
+  if (b.dataset.shift) { const k = dayKey(b.dataset.for); view[k] = addDays(view[k], +b.dataset.shift); return render(); }
+  if (b.dataset.day) { view[dayKey(b.dataset.for)] = b.dataset.day; return render(); }
+  if (b.dataset.water) { const t = b.dataset.water; const was = waterDone(view.waterDay).includes(t); setWater(view.waterDay, t, !was); if (!was) toast(`1 L done at ${fmtTime(t)}`); return; }
+  if (b.dataset.unlevel) {
+    const t = b.dataset.unlevel, before = [...waterTimes()];
+    if (before.length <= WATER_MIN) return;
+    S.settings.waterTimes = before.filter(x => x !== t); saveSettings(true);
+    toast(`Removed the ${fmtTime(t)} level`, () => { S.settings.waterTimes = before; saveSettings(true); });
+    return;
+  }
+  if (b.id === "addLevel") { const last = waterTimes().slice(-1)[0] || "18:00"; const h = Math.min(23, +last.slice(0, 2) + 2); $("#lvlTime").value = `${pad(h)}:00`; $("#lvlSheet").hidden = false; return; }
   if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
   if (b.dataset.mshift) { view.month = shiftMonth(view.month, +b.dataset.mshift); return render(); }
   if (b.dataset.tx) return openTx(S.money.find(x => x.id === b.dataset.tx));
@@ -854,6 +1055,7 @@ $("#testAlarm").onclick = () => {
 /* ---------- boot ---------- */
 $("#permFix").onclick = () => { if (NATIVE) NATIVE.openPermissions(); };
 loadLocal();
+if (!S.settings.waterSince) S.settings.waterSince = today();
 applyTheme();
 saveLocal();
 applyPending();
@@ -865,7 +1067,7 @@ setInterval(() => { if (view.tab === "tasks") renderTasks(); }, 30000);
 let lastDay = today();
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
-    if (today() !== lastDay) { if (view.taskDay === lastDay) view.taskDay = today(); if (view.calDay === lastDay) view.calDay = today(); lastDay = today(); }
+    if (today() !== lastDay) { if (view.taskDay === lastDay) view.taskDay = today(); if (view.calDay === lastDay) view.calDay = today(); if (view.waterDay === lastDay) view.waterDay = today(); lastDay = today(); }
     render();
   }
 });
