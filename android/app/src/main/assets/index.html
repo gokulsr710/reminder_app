@@ -5,19 +5,19 @@
 /* Layout: one-column phone app — sticky header, scrolling tab panel, fixed bottom tab bar, bottom sheets for forms and alarms */
 :root{
   --bg:#F2F2F1; --surface:#FFFFFF; --sunk:#E8E8E6; --ink:#161616; --muted:#666664; --line:#DCDCDA;
-  --task:#F15A0F; --task-soft:#FDE4D6; --task-ink:#C2410C; --pos:#16803C; --cal:#B7791F; --cal-soft:#FAEFD9; --on-cal:#FFFFFF; --money:#F15A0F; --money-soft:#FDE4D6; --on-money:#FFFFFF; --water:#1C7FE0; --water-hi:#5CB6FF; --water-soft:#DCEBFB; --danger:#B83A32; --on-accent:#FFFFFF;
+  --task:#F15A0F; --task-soft:#FDE4D6; --task-ink:#C2410C; --pos:#16803C; --cal:#B7791F; --cal-soft:#FAEFD9; --on-cal:#FFFFFF; --money:#F15A0F; --money-soft:#FDE4D6; --on-money:#FFFFFF; --water:#1C7FE0; --water-hi:#5CB6FF; --water-soft:#DCEBFB; --fig:#F2742A; --fig-hi:#FFC49C; --danger:#B83A32; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.10);
   --display:"Bricolage Grotesque", "Figtree", system-ui, sans-serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#121212; --surface:#1E1E1E; --sunk:#282828; --ink:#F2F2F2; --muted:#9E9E9E; --line:#303030;
-  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --danger:#FF6B5E; --on-accent:#FFFFFF;
+  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --fig:#C9480C; --fig-hi:#FF9A5C; --danger:#FF6B5E; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#121212; --surface:#1E1E1E; --sunk:#282828; --ink:#F2F2F2; --muted:#9E9E9E; --line:#303030;
-  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --danger:#FF6B5E; --on-accent:#FFFFFF;
+  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --fig:#C9480C; --fig-hi:#FF9A5C; --danger:#FF6B5E; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -101,13 +101,56 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .fab.cal{background:var(--cal)}
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
 nav.tabs button{border:0;background:transparent;padding:10px 0 12px;display:grid;justify-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
 nav.tabs button[aria-selected="true"]{color:var(--ink)}
 nav.tabs button[aria-selected="true"] svg{color:var(--task-ink)}
 nav.tabs button[data-tab="cal"][aria-selected="true"] svg{color:var(--cal)}
 nav.tabs button[data-tab="money"][aria-selected="true"] svg{color:var(--money)}
 nav.tabs button[data-tab="water"][aria-selected="true"] svg{color:var(--water)}
+nav.tabs button{font-size:11px}
+/* Body */
+.bodycard{display:flex;align-items:center;gap:14px;background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+.bodycard.complete{box-shadow:0 0 0 2px var(--pos),var(--shadow)}
+#bodySvg{width:132px;height:auto;flex:none;overflow:visible}
+#bodySvg .me path,#bodySvg .me ellipse{fill:url(#bodyG);stroke:var(--task-ink);stroke-width:2.4;stroke-linejoin:round}
+#bodySvg .ghost path,#bodySvg .ghost ellipse{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-dasharray:5 5;opacity:.6}
+.bodycard .bt{flex:1;min-width:0;display:grid;gap:8px}
+.bodycard .bt .big{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.15}
+.bodycard.complete .bt .big{color:var(--pos)}
+.bodycard .bt .sub{color:var(--muted);font-size:13.5px}
+.pbar{height:10px;border-radius:6px;background:var(--sunk);overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:6px;background:var(--task);transition:width 1.4s cubic-bezier(.3,.7,.2,1)}
+.plabel2{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:600}
+.legend{font-size:11.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.legend i{width:18px;border-top:2px dashed var(--muted)}
+.bstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.bstats div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:2px;min-width:0}
+.bstats span{font-size:11.5px;color:var(--muted);font-weight:600}
+.bstats strong{font-size:15px;overflow-wrap:anywhere}
+.tline{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x proximity}
+.tf{flex:none;width:76px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 6px 8px;display:grid;justify-items:center;gap:2px;scroll-snap-align:end}
+.tf svg{width:44px;height:auto}
+.tf .mini path,.tf .mini ellipse{fill:var(--task-soft);stroke:var(--task-ink);stroke-width:4}
+.tf.goal{border-style:dashed}
+#setupBody path,#setupBody ellipse{fill:var(--task-soft);stroke:var(--task-ink);stroke-width:4}
+.tf.goal .mini path,.tf.goal .mini ellipse{fill:none;stroke-dasharray:10 8}
+.tf b{font-size:11.5px;margin-top:4px}
+.tf span{font-size:11px;color:var(--muted)}
+#bodyChart{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px}
+#bodyChart svg{width:100%;height:auto;display:block;overflow:visible}
+#bodyChart .tgt{fill:var(--pos)}
+#bodyChart .wline{fill:none;stroke:var(--task);stroke-width:2.5;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+#bodyChart .area{fill:var(--task);opacity:.12}
+#bodyChart .tline{stroke:var(--pos);stroke-dasharray:5 5;stroke-width:1.5;vector-effect:non-scaling-stroke}
+#bodyChart .tlab{font:600 10px var(--body);fill:var(--muted)}
+#bodyChart .dot{fill:var(--task)}
+#bodyChart .dotl{fill:var(--surface);stroke:var(--task);stroke-width:3}
+.wrow{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 8px 10px 14px}
+.wrow .m{flex:1;min-width:0;display:grid}
+.wrow .m b{font-size:16px}
+.wrow .m span{font-size:12.5px;color:var(--muted)}
+.wrow .x{width:32px;height:32px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px}
 /* Water */
 .wcard{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:20px;padding:16px 12px 16px 6px;box-shadow:var(--shadow)}
 #bottle{width:150px;height:auto;flex:none;overflow:visible}
@@ -352,6 +395,40 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
     </div>
   </section>
 
+  <!-- BODY -->
+  <section id="tab-body" hidden>
+    <div class="sechead" style="margin-top:4px"><h2>Body transformation</h2><button class="btn small ghost" id="bodyGoalBtn">Edit goal</button></div>
+    <div id="bodySetup" class="empty">
+      <svg viewBox="0 0 200 392" width="70" aria-hidden="true" id="setupBody"></svg>
+      <strong>Track your body transformation</strong>
+      Set your starting weight and your target weight. Each time you log your weight, the body outline changes to match your progress.
+      <button class="btn primary" id="bodySetupBtn">Set starting &amp; target weight</button>
+    </div>
+    <div id="bodyMain" hidden>
+      <div class="bodycard" id="bodyCard">
+        <svg id="bodySvg" viewBox="0 0 200 392" role="img" aria-label="Body outline showing your progress"></svg>
+        <div class="bt">
+          <div class="big" id="bodyHead"></div>
+          <div class="sub" id="bodyNote"></div>
+          <div class="pbar"><i id="bodyBar"></i></div>
+          <div class="plabel2"><span>Start</span><span id="bodyPct"></span><span>Goal</span></div>
+          <div class="legend"><i></i>Dashed outline: your goal shape</div>
+        </div>
+      </div>
+      <div class="bstats" id="bodyStats"></div>
+      <div class="sechead"><h2>Body timeline</h2><span>Swipe to see earlier</span></div>
+      <div class="tline" id="bodyTimeline"></div>
+      <div class="sechead"><h2>Weight trend</h2></div>
+      <div id="bodyChart"></div>
+      <div class="set" style="margin-top:14px">
+        <div class="srow"><div class="l"><strong>Weigh-in reminder</strong><span id="bodyRemindLbl"></span></div>
+          <button class="btn small ghost" id="bodyRemindBtn">Change</button></div>
+      </div>
+      <div class="sechead"><h2>Weigh-ins</h2></div>
+      <div class="list" id="bodyLog"></div>
+    </div>
+  </section>
+
   <!-- MONEY -->
   <section id="tab-money" hidden>
     <div class="daynav">
@@ -424,6 +501,7 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
     <button role="tab" data-tab="tasks" aria-selected="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks</button>
     <button role="tab" data-tab="cal" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5.5 1-8.5z"/></svg>Calories</button>
     <button role="tab" data-tab="water" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7c3 3.6 6.5 7.6 6.5 11.3a6.5 6.5 0 0 1-13 0c0-3.7 3.5-7.7 6.5-11.3z"/></svg>Water</button>
+    <button role="tab" data-tab="body" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.3"/><path d="M8.5 8.5h7l-.8 6h-1.6L13 21h-2l-.1-6.5H9.3z"/><path d="M8.5 8.5 6 13M15.5 8.5 18 13"/></svg>Body</button>
     <button role="tab" data-tab="money" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2.5"/><path d="M2 10h20"/><path d="M16 15h2"/><path d="M6 6V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>Money</button>
     <button role="tab" data-tab="set" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
   </div>
@@ -442,7 +520,7 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
       <div class="leadopts" id="tLead"></div></div>
     <div class="row">
       <div class="field"><label for="tRepeat">Repeat</label>
-        <select id="tRepeat"><option value="none">Does not repeat</option><option value="daily">Every day</option><option value="weekdays">Weekdays (Mon–Fri)</option><option value="weekly">Every week</option></select></div>
+        <select id="tRepeat"><option value="none">Does not repeat</option><option value="daily">Every day</option><option value="weekdays">Weekdays (Mon–Fri)</option><option value="weekly">Every week</option><option value="monthly">Every month</option></select></div>
     </div>
     <div class="actions">
       <button type="button" class="btn danger" id="tDelete" hidden>Delete</button>
@@ -461,6 +539,43 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
     <div class="actions">
       <button type="button" class="btn ghost" id="lvlCancel">Cancel</button>
       <button type="submit" class="btn primary">Add level</button>
+    </div>
+  </form>
+</div>
+
+<!-- Body goal -->
+<div class="scrim" id="goalSheet" hidden>
+  <form class="sheet" id="goalForm" autocomplete="off" role="dialog" aria-labelledby="goalTitle">
+    <h2 id="goalTitle">Your weight goal</h2>
+    <div class="row">
+      <div class="field"><label for="gStart">Starting weight (kg)</label><input type="number" id="gStart" inputmode="decimal" step="0.1" min="20" max="400" required></div>
+      <div class="field"><label for="gStartDate">Starting on</label><input type="date" id="gStartDate" required></div>
+    </div>
+    <div class="field"><label for="gTarget">Target / ideal weight (kg)</label><input type="number" id="gTarget" inputmode="decimal" step="0.1" min="20" max="400" required></div>
+    <div class="row">
+      <div class="field"><label for="gRemind">Weigh-in reminder</label>
+        <select id="gRemind"><option value="off">Off</option><option value="daily">Every day</option><option value="monthly">Every month</option></select></div>
+      <div class="field"><label for="gTime">At</label><input type="time" id="gTime"></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="gCancel">Cancel</button>
+      <button type="submit" class="btn primary">Save goal</button>
+    </div>
+  </form>
+</div>
+
+<!-- Log weight -->
+<div class="scrim" id="weighSheet" hidden>
+  <form class="sheet" id="weighForm" autocomplete="off" role="dialog" aria-labelledby="weighTitle">
+    <h2 id="weighTitle">Log your weight</h2>
+    <p class="note" style="margin:0" id="wLast"></p>
+    <div class="row">
+      <div class="field"><label for="wWeight">Weight (kg)</label><input type="number" id="wWeight" class="amt" inputmode="decimal" step="0.1" min="20" max="400" required></div>
+      <div class="field"><label for="wDate">Date</label><input type="date" id="wDate" required></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="wCancel">Cancel</button>
+      <button type="submit" class="btn primary">Save weight</button>
     </div>
   </form>
 </div>
@@ -534,7 +649,7 @@ const dayLabel = s => {
 const LEADS = [[0, "At time"], [5, "5 min"], [10, "10 min"], [15, "15 min"], [30, "30 min"], [60, "1 hour"]];
 
 /* ---------- state ---------- */
-const S = { tasks: [], meals: [], money: [], water: {}, settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true, waterSound: true, moneySound: true } };
+const S = { tasks: [], meals: [], money: [], water: {}, body: { entries: [] }, settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true, waterSound: true, moneySound: true } };
 const view = { tab: "tasks", taskDay: today(), calDay: today(), month: today().slice(0, 7), waterDay: today() };
 
 /* Repeating tasks: one record holds the schedule, completion is tracked per date. */
@@ -545,6 +660,7 @@ function occursOn(t, day) {
   if (t.repeat === "daily") return true;
   if (t.repeat === "weekdays") return wd >= 1 && wd <= 5;
   if (t.repeat === "weekly") return wd === parseYmd(t.date).getDay();
+  if (t.repeat === "monthly") { const d = parseYmd(day), dim = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); return d.getDate() === Math.min(parseYmd(t.date).getDate(), dim); }
   return false;
 }
 const isDone = (t, day) => t.repeat && t.repeat !== "none" ? !!(t.doneDates || {})[day] : !!t.done;
@@ -556,21 +672,23 @@ const LS = "daybell-v1";
 function loadLocal() {
   try {
     const r = JSON.parse(localStorage.getItem(LS) || "null");
-    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; Object.assign(S.settings, r.settings || {}); }
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; Object.assign(S.settings, r.settings || {}); }
   } catch (e) {}
 }
 const NATIVE = window.DaybellNative || null;
 function saveLocal() {
-  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, water: S.water, settings: S.settings })); } catch (e) {}
-  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: S.tasks.concat(waterAlarmTasks()), settings: S.settings })); } catch (e) {}
+  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, water: S.water, body: S.body, settings: S.settings })); } catch (e) {}
+  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: S.tasks.concat(waterAlarmTasks(), bodyAlarmTasks()), settings: S.settings })); } catch (e) {}
 }
 /* Actions taken on the Android alarm screen while the app was closed. */
+let openWeighAfterResume = false;
 function applyPending() {
   if (!NATIVE) return;
   let acts = [];
   try { acts = JSON.parse(NATIVE.takePending() || "[]"); } catch (e) {}
   acts.forEach(a => {
     if (a.type !== "done") return;
+    if (a.id === "body-weighin") { openWeighAfterResume = true; return; }
     if (String(a.id).startsWith("water-")) { const tm = a.id.slice(6, 8) + ":" + a.id.slice(8, 10); setWater(a.day, tm, true); return; }
     const t = S.tasks.find(x => x.id === a.id); if (!t) return;
     const c = plain(t);
@@ -590,7 +708,7 @@ function refreshPerms() {
   $("#permText").textContent = missing.length ? "Allow " + missing.join(", ") + " so alarms ring when the app is closed" : "All set. Alarms ring even when the app is closed.";
   $("#permFix").hidden = !missing.length;
 }
-window.daybellResume = () => { applyPending(); render(); refreshPerms(); };
+window.daybellResume = () => { applyPending(); render(); refreshPerms(); if (openWeighAfterResume) { openWeighAfterResume = false; showTab("body"); openWeigh(); } };
 
 const listFor = kind => kind === "task" ? S.tasks : kind === "meal" ? S.meals : S.money;
 function plain(o) { return JSON.parse(JSON.stringify(o)); }
@@ -641,7 +759,7 @@ function relChip(t, day) {
   if (diff < 24 * 60) return `<span class="chip">in ${Math.floor(diff / 60)} h ${diff % 60 ? (diff % 60) + " m" : ""}</span>`;
   return "";
 }
-const repeatLabel = { daily: "Every day", weekdays: "Weekdays", weekly: "Weekly" };
+const repeatLabel = { daily: "Every day", weekdays: "Weekdays", weekly: "Weekly", monthly: "Monthly" };
 
 function renderTasks() {
   const day = view.taskDay, L = dayLabel(day);
@@ -691,16 +809,17 @@ function render() {
   if (view.tab === "cal") renderCal();
   if (view.tab === "money") renderMoney();
   if (view.tab === "water") renderWater();
+  if (view.tab === "body") renderBody();
 }
 
 function showTab(tab) {
   view.tab = tab;
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
-  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set"; $("#tab-money").hidden = tab !== "money"; $("#tab-water").hidden = tab !== "water";
+  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set"; $("#tab-money").hidden = tab !== "money"; $("#tab-water").hidden = tab !== "water"; $("#tab-body").hidden = tab !== "body";
   const fab = $("#fab");
-  fab.hidden = tab !== "tasks" && tab !== "money";
+  fab.hidden = tab !== "tasks" && tab !== "money" && tab !== "body";
   fab.classList.toggle("money", tab === "money");
-  fab.querySelector("span").textContent = tab === "money" ? "Add entry" : "New task";
+  fab.querySelector("span").textContent = tab === "money" ? "Add entry" : tab === "body" ? "Log weight" : "New task";
   if (tab === "set") syncSettingsUI();
   try { sessionStorage.setItem("daybell-tab", tab); } catch (e) {}
   render(); window.scrollTo(0, 0);
@@ -931,6 +1050,226 @@ $("#waterSound").onchange = e => {
   toast(e.target.checked ? "Filling sound on" : "Filling sound off");
 };
 $("#waterRemind").onchange = e => { S.settings.waterRemind = e.target.checked; saveSettings(true); toast(e.target.checked ? "Water reminders on" : "Water reminders off"); };
+
+/* ---------- body transformation ---------- */
+/* The outline is built from control points down the right side of the body.
+   Each point has a lean and a full half-width; the "fullness" value f (0 = lean,
+   1 = full) blends between them, then the side is mirrored and smoothed. */
+const BODY_OUTER = [ // [y, lean half-width, full half-width]
+  [58, 9, 12], [68, 10, 16], [74, 25, 32], [80, 35, 43], [93, 37, 48], [106, 31, 45],
+  [124, 29, 48], [148, 23, 54], [170, 26, 58], [192, 31, 55], [220, 30, 51],
+  [258, 25, 40], [292, 20, 29], [322, 21, 28], [360, 13, 17], [377, 17, 21], [386, 14, 18]
+];
+const BODY_INNER = [[386, 5, 6], [376, 5, 5], [360, 6, 5], [322, 6, 4], [292, 5, 2.5], [252, 4, 1], [220, 0, 0]];
+const BODY_ARM = [ // closed loop for the right arm
+  [86, 38, 46], [110, 45, 63], [160, 46, 70], [196, 45, 66], [218, 43, 62], [234, 45, 64],
+  [246, 41, 59], [236, 36, 53], [217, 37, 54], [160, 38, 57], [118, 35, 50], [104, 33, 46]
+];
+const lerp = (a, b, t) => a + (b - a) * t;
+function smoothPath(pts, closed) {
+  // Catmull-Rom spline through the points, written as cubic Béziers.
+  const n = pts.length, P = i => pts[closed ? (i + n) % n : Math.max(0, Math.min(n - 1, i))];
+  let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for (let i = 0; i < (closed ? n : n - 1); i++) {
+    const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
+    d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d + (closed ? " Z" : "");
+}
+function bodyShape(f) {
+  const w = ([y, a, b]) => lerp(a, b, f);
+  const right = BODY_OUTER.map(p => [100 + w(p), p[0]]).concat(BODY_INNER.slice(0, -1).map(p => [100 + w(p), p[0]]));
+  const crotch = [100, lerp(218, 226, Math.min(1, f))];
+  const left = right.slice().reverse().map(([x, y]) => [200 - x, y]);
+  const torso = smoothPath([...right, crotch, ...left], true);
+  const armR = BODY_ARM.map(p => [100 + w(p), p[0]]);
+  const armL = armR.map(([x, y]) => [200 - x, y]).reverse();
+  return { torso, arms: [smoothPath(armR, true), smoothPath(armL, true)], head: { rx: lerp(18, 24, f), ry: lerp(23.5, 26, f) } };
+}
+function bodyMarkup(f, cls) {
+  const s = bodyShape(f);
+  return `<g class="${cls}">${s.arms.map(d => `<path d="${d}"/>`).join("")}<path d="${s.torso}"/><ellipse cx="100" cy="34" rx="${s.head.rx.toFixed(1)}" ry="${s.head.ry.toFixed(1)}"/></g>`;
+}
+
+/* Weight data */
+const bodyEntries = () => [...(S.body.entries || [])].sort((a, b) => a.date.localeCompare(b.date));
+const kg = n => `${(+n).toLocaleString(undefined, { maximumFractionDigits: 1 })} kg`;
+function bodyPlan() {
+  const b = S.body, start = +b.start, target = +b.target;
+  if (!(start > 0) || !(target > 0)) return null;
+  const losing = target <= start, size = Math.min(1, Math.abs(start - target) / start / 0.25);
+  // A bigger goal starts from a fuller outline; the target is a fit, lean outline.
+  const fStart = losing ? 0.35 + 0.65 * size : 0.02;
+  const fTarget = losing ? 0.12 : 0.15 + 0.5 * size;
+  return { start, target, losing, fStart, fTarget };
+}
+function progressOf(w, plan) {
+  if (!plan || plan.start === plan.target) return 1;
+  return (w - plan.start) / (plan.target - plan.start);
+}
+function fullnessOf(w, plan) {
+  const p = Math.max(-0.35, Math.min(1, progressOf(w, plan)));
+  return Math.max(0, Math.min(1.15, lerp(plan.fStart, plan.fTarget, p)));
+}
+
+let bodyShownF = null, bodyAnim = 0;
+function drawBodyAnimated(fTo, plan) {
+  const svg = $("#bodySvg");
+  const ghost = bodyMarkup(plan.fTarget, "ghost");
+  const paint = f => { svg.innerHTML = `<defs><linearGradient id="bodyG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--fig-hi)"/><stop offset="1" stop-color="var(--fig)"/></linearGradient></defs>${bodyMarkup(f, "me")}${ghost}`; };
+  cancelAnimationFrame(bodyAnim);
+  const from = bodyShownF == null ? fTo : bodyShownF;
+  if (Math.abs(from - fTo) < 0.002 || matchMedia("(prefers-reduced-motion: reduce)").matches) { paint(fTo); bodyShownF = fTo; return; }
+  const t0 = performance.now(), dur = 1600;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+    bodyShownF = lerp(from, fTo, e); paint(bodyShownF);
+    if (k < 1) bodyAnim = requestAnimationFrame(step);
+  };
+  bodyAnim = requestAnimationFrame(step);
+}
+
+function renderBody() {
+  const plan = bodyPlan(), list = bodyEntries();
+  $("#bodySetup").hidden = !!plan;
+  $("#bodyMain").hidden = !plan;
+  $("#fab").hidden = view.tab === "body" && !plan;
+  if (!plan) return;
+  const cur = list.length ? +list[list.length - 1].weight : plan.start;
+  const prev = list.length > 1 ? +list[list.length - 2].weight : null;
+  const p = progressOf(cur, plan), pc = Math.max(0, Math.min(1, p));
+  const done = p >= 1;
+  drawBodyAnimated(fullnessOf(cur, plan), plan);
+  $("#bodyCard").classList.toggle("complete", done);
+  $("#bodyPct").textContent = `${Math.round(pc * 100)}%`;
+  $("#bodyBar").style.width = `${pc * 100}%`;
+  const moved = plan.losing ? plan.start - cur : cur - plan.start;
+  const togo = Math.abs(plan.target - cur);
+  $("#bodyHead").textContent = done ? "Transformation complete!" : `${kg(togo)} to go`;
+  $("#bodyNote").textContent = done
+    ? `You reached your ${kg(plan.target)} target. Keep logging to stay on track.`
+    : `${moved >= 0 ? (plan.losing ? "Lost " : "Gained ") + kg(moved) : (plan.losing ? "Up " : "Down ") + kg(-moved)} since you started at ${kg(plan.start)}.`;
+  let diffTxt = "First weigh-in";
+  if (prev != null) {
+    const d = cur - prev;
+    diffTxt = d === 0 ? "No change" : `${d < 0 ? "−" : "+"}${kg(Math.abs(d))}`;
+  }
+  // average change per week since the first entry
+  let rate = "–";
+  if (list.length > 1) {
+    const days = (parseYmd(list[list.length - 1].date) - parseYmd(list[0].date)) / 864e5;
+    if (days >= 1) { const r = (cur - +list[0].weight) / days * 7; rate = `${r < 0 ? "−" : "+"}${Math.abs(r).toFixed(2)} kg`; }
+  }
+  $("#bodyStats").innerHTML = [
+    ["Current", kg(cur)], ["Target", kg(plan.target)], ["Start", kg(plan.start)],
+    ["Last change", diffTxt], ["Per week", rate], [plan.losing ? "Lost" : "Gained", kg(Math.max(0, moved))]
+  ].map(([l, v]) => `<div><span>${l}</span><strong class="num">${v}</strong></div>`).join("");
+
+  // Weight chart
+  const pts = list.length ? list : [{ date: S.body.startDate || today(), weight: plan.start }];
+  const ws = pts.map(e => +e.weight).concat([plan.target, plan.start]);
+  const lo = Math.min(...ws) - 1, hi = Math.max(...ws) + 1;
+  const W = 320, H = 120, X = i => pts.length === 1 ? W / 2 : 14 + i * (W - 28) / (pts.length - 1), Y = v => 10 + (hi - v) / (hi - lo) * (H - 28);
+  const line = pts.map((e, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(+e.weight).toFixed(1)}`).join(" ");
+  $("#bodyChart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">
+    <line x1="0" x2="${W}" y1="${Y(plan.target)}" y2="${Y(plan.target)}" class="tline"/>
+    <text x="4" y="${Y(plan.target) + (Y(plan.target) > H / 2 ? -6 : 13)}" class="tlab tgt">Target ${kg(plan.target)}</text>
+    <path d="${line} L${X(pts.length - 1)},${H - 18} L${X(0)},${H - 18} Z" class="area"/>
+    <path d="${line}" class="wline"/>
+    ${pts.map((e, i) => `<circle cx="${X(i)}" cy="${Y(+e.weight)}" r="${i === pts.length - 1 ? 4.5 : 2.6}" class="${i === pts.length - 1 ? "dotl" : "dot"}"/>`).join("")}
+    <text x="${X(0)}" y="${H - 4}" class="tlab" text-anchor="${pts.length === 1 ? "middle" : "start"}">${esc(dayLabel(pts[0].date).date)}</text>
+    ${pts.length > 1 ? `<text x="${X(pts.length - 1)}" y="${H - 4}" class="tlab" text-anchor="end">${esc(dayLabel(pts[pts.length - 1].date).date)}</text>` : ""}
+  </svg>`;
+
+  // Timeline of body shapes: start, up to 10 sampled check-ins, and the goal
+  let sample = list;
+  if (list.length > 10) { sample = Array.from({ length: 10 }, (_, i) => list[Math.round(i * (list.length - 1) / 9)]); }
+  const frames = [{ label: "Start", sub: kg(plan.start), f: plan.fStart, cls: "" }]
+    .concat(sample.map(e => ({ label: dayLabel(e.date).date, sub: kg(e.weight), f: fullnessOf(+e.weight, plan), cls: "" })))
+    .concat([{ label: done ? "Reached" : "Goal", sub: kg(plan.target), f: plan.fTarget, cls: "goal" }]);
+  $("#bodyTimeline").innerHTML = frames.map(fr => `<div class="tf ${fr.cls}"><svg viewBox="0 0 200 392" aria-hidden="true">${bodyMarkup(fr.f, "mini")}</svg><b>${esc(fr.label)}</b><span class="num">${esc(fr.sub)}</span></div>`).join("");
+  const tl = $("#bodyTimeline"); tl.scrollLeft = tl.scrollWidth;
+
+  // Log list (newest first) with change from the previous entry
+  $("#bodyLog").innerHTML = list.length ? list.map((e, i) => {
+    const d = i ? +e.weight - +list[i - 1].weight : null;
+    const good = d != null && (plan.losing ? d < 0 : d > 0);
+    return `<div class="wrow"><div class="m"><b class="num">${kg(e.weight)}</b><span>${esc(dayLabel(e.date).rel)}, ${esc(dayLabel(e.date).date)}</span></div>
+      ${d == null ? `<span class="chip">Start</span>` : `<span class="chip ${d === 0 ? "" : good ? "soon" : "late"}">${d === 0 ? "±0" : (d < 0 ? "−" : "+") + kg(Math.abs(d))}</span>`}
+      <button class="x" data-delweight="${e.id}" aria-label="Delete the ${kg(e.weight)} entry"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`;
+  }).reverse().join("") : `<div class="empty">No weigh-ins yet. Tap “Log weight” to add today's.</div>`;
+  $("#bodyRemindLbl").textContent = { off: "Off", daily: `Daily at ${fmtTime(S.body.remindTime || "08:00")}`, monthly: `Monthly at ${fmtTime(S.body.remindTime || "08:00")}` }[S.body.remind || "off"];
+}
+
+/* Weigh-in reminders go to the phone's alarm system. */
+function bodyAlarmTasks() {
+  const r = S.body.remind || "off";
+  if (r === "off" || !bodyPlan()) return [];
+  const doneDates = {};
+  (S.body.entries || []).forEach(e => { doneDates[e.date] = true; });
+  return [{ id: "body-weighin", title: "Time to log your weight", date: S.body.remindSince || today(), time: S.body.remindTime || "08:00", lead: 0, repeat: r, doneDates }];
+}
+
+/* Goal sheet */
+function openGoal() {
+  const b = S.body, last = bodyEntries().slice(-1)[0];
+  $("#gStart").value = b.start || (last ? last.weight : "");
+  $("#gStartDate").value = b.startDate || today();
+  $("#gTarget").value = b.target || "";
+  $("#gRemind").value = b.remind || "off";
+  $("#gTime").value = b.remindTime || "08:00";
+  $("#goalSheet").hidden = false;
+}
+$("#goalForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const start = Math.round(+$("#gStart").value * 10) / 10, target = Math.round(+$("#gTarget").value * 10) / 10;
+  if (!(start >= 20 && start <= 400) || !(target >= 20 && target <= 400)) { toast("Enter weights between 20 and 400 kg"); return; }
+  const b = S.body, startDate = $("#gStartDate").value || today();
+  const remind = $("#gRemind").value, time = $("#gTime").value || "08:00";
+  if (remind !== b.remind || time !== b.remindTime) b.remindSince = today();
+  Object.assign(b, { start, target, startDate, remind, remindTime: time });
+  b.entries = b.entries || [];
+  const first = bodyEntries()[0];
+  if (!first || startDate < first.date) b.entries.push({ id: newId(), date: startDate, weight: start });
+  else if (first.date === startDate) first.weight = start;
+  bodyShownF = null;
+  $("#goalSheet").hidden = true;
+  saveLocal(); render();
+  toast(`Goal set: ${kg(start)} → ${kg(target)}`);
+});
+$("#gCancel").onclick = () => { $("#goalSheet").hidden = true; };
+$("#goalSheet").addEventListener("click", e => { if (e.target.id === "goalSheet") $("#goalSheet").hidden = true; });
+
+/* Log sheet */
+function openWeigh() {
+  const last = bodyEntries().slice(-1)[0];
+  $("#wWeight").value = last ? last.weight : (S.body.start || "");
+  $("#wDate").value = today();
+  $("#wLast").textContent = last ? `Last: ${kg(last.weight)} on ${dayLabel(last.date).date}` : "";
+  $("#weighSheet").hidden = false;
+  setTimeout(() => $("#wWeight").select(), 60);
+}
+$("#weighForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const w = Math.round(+$("#wWeight").value * 10) / 10, date = $("#wDate").value || today();
+  if (!(w >= 20 && w <= 400)) { toast("Enter a weight between 20 and 400 kg"); return; }
+  const list = S.body.entries = S.body.entries || [];
+  const before = bodyEntries().filter(x => x.date < date).slice(-1)[0];
+  const same = list.find(x => x.date === date);
+  if (same) same.weight = w; else list.push({ id: newId(), date, weight: w });
+  $("#weighSheet").hidden = true;
+  saveLocal(); render();
+  const plan = bodyPlan();
+  let msg = `Logged ${kg(w)}`;
+  if (before) { const d = w - +before.weight; msg = d === 0 ? `${kg(w)}: no change since ${dayLabel(before.date).date}` : `${d < 0 ? "Down" : "Up"} ${kg(Math.abs(d))} since ${dayLabel(before.date).date}`; }
+  if (plan && progressOf(w, plan) >= 1) msg = `Target reached! ${kg(w)}`;
+  else if (plan) msg += ` · ${kg(Math.abs(plan.target - w))} to go`;
+  toast(msg);
+});
+$("#wCancel").onclick = () => { $("#weighSheet").hidden = true; };
+$("#weighSheet").addEventListener("click", e => { if (e.target.id === "weighSheet") $("#weighSheet").hidden = true; });
+
+$("#setupBody").innerHTML = bodyMarkup(0.55, "mini");
 
 /* ---------- money ---------- */
 const CATS = {
@@ -1279,6 +1618,13 @@ document.addEventListener("click", e => {
   }
   if (b.id === "addLevel") { const last = waterTimes().slice(-1)[0] || "18:00"; const h = Math.min(23, +last.slice(0, 2) + 2); $("#lvlTime").value = `${pad(h)}:00`; $("#lvlSheet").hidden = false; return; }
   if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
+  if (b.id === "bodySetupBtn" || b.id === "bodyGoalBtn" || b.id === "bodyRemindBtn") return openGoal();
+  if (b.dataset.delweight) {
+    const e = S.body.entries.find(x => x.id === b.dataset.delweight); if (!e) return;
+    S.body.entries = S.body.entries.filter(x => x !== e); saveLocal(); render();
+    toast(`Deleted ${kg(e.weight)}`, () => { S.body.entries.push(e); saveLocal(); render(); });
+    return;
+  }
   if (b.dataset.mshift) { view.month = shiftMonth(view.month, +b.dataset.mshift); return render(); }
   if (b.dataset.tx) return openTx(S.money.find(x => x.id === b.dataset.tx));
   if (b.dataset.edit) return openTask(S.tasks.find(x => x.id === b.dataset.edit));
@@ -1291,7 +1637,7 @@ document.addEventListener("click", e => {
     toast("Added 3 example tasks. Tap one to edit or delete it.");
   }
 });
-$("#fab").onclick = () => view.tab === "money" ? openTx(null) : openTask(null);
+$("#fab").onclick = () => view.tab === "money" ? openTx(null) : view.tab === "body" ? openWeigh() : openTask(null);
 
 /* ---------- settings ---------- */
 function applyTheme() {

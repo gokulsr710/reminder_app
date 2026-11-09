@@ -30,6 +30,7 @@ final class Scheduler {
             case "daily": return true;
             case "weekdays": return wd <= 5;
             case "weekly": return wd == start.getDayOfWeek().getValue();
+            case "monthly": return day.getDayOfMonth() == Math.min(start.getDayOfMonth(), day.lengthOfMonth());
             default: return false;
         }
     }
