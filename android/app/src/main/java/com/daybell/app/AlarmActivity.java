@@ -49,8 +49,8 @@ public class AlarmActivity extends Activity {
         int bg = dark ? 0xFF0D0D0D : 0xFFF3F3F1;
         int ink = dark ? 0xFFECECEC : 0xFF141414;
         int muted = dark ? 0xFF999999 : 0xFF666664;
-        int accent = dark ? 0xFFECECEC : 0xFF1B1B1B;
-        int onAccent = dark ? 0xFF111111 : 0xFFFFFFFF;
+        int accent = 0xFF39FF14;
+        int onAccent = 0xFF0A0A0A;
         int line = dark ? 0xFF2A2A2A : 0xFFDCDCDA;
         getWindow().setStatusBarColor(bg);
         getWindow().setNavigationBarColor(bg);
@@ -68,7 +68,7 @@ public class AlarmActivity extends Activity {
         bell.setGravity(Gravity.CENTER);
         GradientDrawable circle = new GradientDrawable();
         circle.setShape(GradientDrawable.OVAL);
-        circle.setColor(dark ? 0xFF2A2A2A : 0xFFE4E4E2);
+        circle.setColor(dark ? 0xFF16290F : 0xFFDDF9D4);
         bell.setBackground(circle);
         root.addView(bell, new LinearLayout.LayoutParams(dp(104), dp(104)));
 
