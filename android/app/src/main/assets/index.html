@@ -4,20 +4,20 @@
 <style>
 /* Layout: one-column phone app — sticky header, scrolling tab panel, fixed bottom tab bar, bottom sheets for forms and alarms */
 :root{
-  --bg:#F2F4F0; --surface:#FFFFFF; --sunk:#E8ECE6; --ink:#17201B; --muted:#5C6A62; --line:#D9DFD8;
-  --task:#1E7356; --task-soft:#D7EDE3; --cal:#D8602A; --cal-soft:#FBE3D6; --money:#2D5BA6; --money-soft:#DCE6F6; --danger:#B83A32; --on-accent:#FFFFFF;
-  --shadow:0 10px 30px rgba(20,35,28,.12);
+  --bg:#F3F3F1; --surface:#FFFFFF; --sunk:#E9E9E7; --ink:#141414; --muted:#666664; --line:#DCDCDA;
+  --task:#1B1B1B; --task-soft:#E4E4E2; --pos:#1E7356; --cal:#D8602A; --cal-soft:#FBE3D6; --money:#2D5BA6; --money-soft:#DCE6F6; --danger:#B83A32; --on-accent:#FFFFFF;
+  --shadow:0 10px 30px rgba(0,0,0,.10);
   --display:"Bricolage Grotesque", "Figtree", system-ui, sans-serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0E1412; --surface:#17201C; --sunk:#1F2925; --ink:#E6EEE9; --muted:#93A39A; --line:#28332E;
-  --task:#4FC598; --task-soft:#173A2D; --cal:#F28B57; --cal-soft:#3D2418; --money:#86A9EC; --money-soft:#1D2A44; --danger:#F07468; --on-accent:#0B1210;
+  --bg:#0D0D0D; --surface:#171717; --sunk:#202020; --ink:#ECECEC; --muted:#999999; --line:#2A2A2A;
+  --task:#ECECEC; --task-soft:#2A2A2A; --pos:#6CC59A; --cal:#F28B57; --cal-soft:#3D2418; --money:#86A9EC; --money-soft:#1D2A44; --danger:#F07468; --on-accent:#111111;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#0E1412; --surface:#17201C; --sunk:#1F2925; --ink:#E6EEE9; --muted:#93A39A; --line:#28332E;
-  --task:#4FC598; --task-soft:#173A2D; --cal:#F28B57; --cal-soft:#3D2418; --money:#86A9EC; --money-soft:#1D2A44; --danger:#F07468; --on-accent:#0B1210;
+  --bg:#0D0D0D; --surface:#171717; --sunk:#202020; --ink:#ECECEC; --muted:#999999; --line:#2A2A2A;
+  --task:#ECECEC; --task-soft:#2A2A2A; --pos:#6CC59A; --cal:#F28B57; --cal-soft:#3D2418; --money:#86A9EC; --money-soft:#1D2A44; --danger:#F07468; --on-accent:#111111;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -118,12 +118,12 @@ nav.tabs button[data-tab="money"][aria-selected="true"] svg{color:var(--money)}
 .tx{width:100%;border:0;border-top:1px solid var(--line);background:transparent;display:flex;align-items:center;gap:12px;padding:11px 14px;text-align:left}
 .day h3 + .tx{border-top:0}
 .tx .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:none;font-weight:800;font-size:14px;background:var(--money-soft);color:var(--money)}
-.tx.in .ic{background:var(--task-soft);color:var(--task)}
+.tx.in .ic{background:var(--task-soft);color:var(--pos)}
 .tx .m{flex:1;min-width:0;display:grid}
 .tx .m b{font-weight:600;overflow-wrap:anywhere}
 .tx .m span{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
 .tx .a{font-weight:700;font-size:16px;white-space:nowrap}
-.tx.in .a{color:var(--task)}
+.tx.in .a{color:var(--pos)}
 .typeseg{margin:0}
 .seg.typeseg input:checked + span{background:var(--money);color:var(--on-accent)}
 .field .seg label,.field .catpick label{text-transform:none;letter-spacing:normal;font-size:14px;font-weight:600;color:var(--ink)}
@@ -680,7 +680,7 @@ function renderMoney() {
     $("#moneySub").textContent = T.income ? `That's ${Math.round(pct * 100)}% of this month's income` : "Set a monthly budget in Settings to track it here.";
   }
   $("#moneyBig").innerHTML = `<span class="num">${money(T.expense)}</span> spent`;
-  $("#moneyStats").innerHTML = `<div><strong class="num" style="color:var(--task)">${money(T.income)}</strong>income</div><div><strong class="num" ${T.balance < 0 ? 'style="color:var(--danger)"' : ""}>${T.balance < 0 ? "−" : ""}${money(Math.abs(T.balance))}</strong>balance</div>`;
+  $("#moneyStats").innerHTML = `<div><strong class="num" style="color:var(--pos)">${money(T.income)}</strong>income</div><div><strong class="num" ${T.balance < 0 ? 'style="color:var(--danger)"' : ""}>${T.balance < 0 ? "−" : ""}${money(Math.abs(T.balance))}</strong>balance</div>`;
   const top = T.cats[0] ? T.cats[0][1] : 0;
   $("#moneyCats").hidden = !T.cats.length;
   $("#moneyCats").innerHTML = `<div class="sechead" style="margin:0"><h2>Where it went</h2><span>${T.cats.length} categor${T.cats.length === 1 ? "y" : "ies"}</span></div>` +

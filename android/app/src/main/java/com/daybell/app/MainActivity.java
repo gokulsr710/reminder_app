@@ -38,8 +38,8 @@ public class MainActivity extends Activity {
     /** Colours the system bars and the page background for the chosen theme. */
     private void applyBars() {
         boolean dark = Store.isDark(this);
-        int bg = dark ? 0xFF0E1412 : 0xFFF2F4F0;
-        int bar = dark ? 0xFF17201C : 0xFFFFFFFF;
+        int bg = dark ? 0xFF0D0D0D : 0xFFF3F3F1;
+        int bar = dark ? 0xFF171717 : 0xFFFFFFFF;
         root.setBackgroundColor(bg);
         web.setBackgroundColor(bg);
         getWindow().setStatusBarColor(bg);

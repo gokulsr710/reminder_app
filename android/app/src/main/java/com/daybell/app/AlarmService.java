@@ -129,7 +129,7 @@ public class AlarmService extends Service {
                 .setCategory(Notification.CATEGORY_ALARM)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setOngoing(true)
-                .setColor(0xFF1E7356)
+                .setColor(0xFF1B1B1B)
                 .setContentIntent(fullPi)
                 .setFullScreenIntent(fullPi, true)
                 .setDeleteIntent(svc(ACTION_DISMISS, 13));
