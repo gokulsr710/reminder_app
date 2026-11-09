@@ -142,6 +142,27 @@ nav.tabs button[data-tab="water"][aria-selected="true"] svg{color:var(--water)}
 .lvl .x{width:28px;height:28px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px;flex:none}
 .addlvl{border-radius:999px;justify-self:start}
 .wopts{margin-top:16px}
+.pig{width:132px;flex:none;position:relative}
+.pig svg{width:100%;height:auto;display:block;overflow:visible}
+.pig .pbody{fill:var(--money-soft);stroke:var(--money);stroke-width:3}
+.pig .poutline{fill:none;stroke:var(--money);stroke-width:3}
+.pig.over .poutline{stroke:var(--danger)}
+.pig .pline{fill:none;stroke:var(--money);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.pig .pleg{fill:var(--money-soft);stroke:var(--money);stroke-width:3}
+.pig .pear{fill:var(--money);opacity:.9}
+.pig .peye{fill:var(--ink)}
+.pig .pnose{fill:var(--money);opacity:.35}
+.pig .pslot{fill:var(--ink);opacity:.8}
+.pig .pcoins{transition:transform 1.2s cubic-bezier(.3,.7,.2,1)}
+.pig .plabel{font:800 22px var(--display);fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round;text-anchor:middle}
+.pig .psub{font:700 10px var(--body);fill:var(--muted);paint-order:stroke;stroke:var(--surface);stroke-width:3px;text-anchor:middle;letter-spacing:.06em;text-transform:uppercase}
+.pig.over .pbody,.pig.over .pleg{fill:color-mix(in srgb,var(--danger) 18%,var(--surface));stroke:var(--danger)}
+.pig.over .pline{stroke:var(--danger)}
+.pig.over .pear,.pig.over .pnose{fill:var(--danger)}
+.pig.hop svg{animation:hop .9s 1s ease-out}
+.pig.shake svg{animation:shake .6s ease-in-out}
+@keyframes hop{0%,100%{transform:none}25%{transform:translateY(-9px) rotate(-4deg)}50%{transform:translateY(0) rotate(2deg)}70%{transform:translateY(-4px) rotate(-1deg)}}
+@keyframes shake{0%,100%{transform:none}15%{transform:rotate(-9deg) translateX(-3px)}35%{transform:rotate(8deg) translateX(3px)}55%{transform:rotate(-6deg)}75%{transform:rotate(4deg)}}
 #fx{position:fixed;inset:0;width:100%;height:100%;z-index:25;pointer-events:none}
 @keyframes pin{0%{box-shadow:var(--shadow)}30%{box-shadow:0 0 0 3px var(--pos),0 0 34px color-mix(in srgb,var(--pos) 55%,transparent);transform:scale(1.025)}100%{box-shadow:var(--shadow);transform:none}}
 @keyframes pout{0%{box-shadow:var(--shadow)}30%{box-shadow:0 0 0 3px var(--danger),0 0 34px color-mix(in srgb,var(--danger) 50%,transparent);transform:scale(.975)}100%{box-shadow:var(--shadow);transform:none}}
@@ -338,7 +359,7 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
     </div>
     <div class="mhead"><button class="btn small ghost" id="exportBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export PDF / Excel</button></div>
     <div class="summary">
-      <div class="ring" id="moneyRing"></div>
+      <div class="pig" id="moneyRing"></div>
       <div class="sumtext">
         <div class="big" id="moneyBig"></div>
         <div class="sub" id="moneySub"></div>
@@ -924,17 +945,53 @@ function totals(list) {
   list.forEach(t => { const a = +t.amount || 0; if (t.type === "income") income += a; else { expense += a; byCat[t.category] = (byCat[t.category] || 0) + a; } });
   return { income, expense, balance: income - expense, cats: Object.entries(byCat).sort((a, b) => b[1] - a[1]) };
 }
+/* Piggy bank: fills with gold coins to show the share of money still left. */
+function piggy(el, frac, label, sub, over) {
+  const TOP = 24, BOT = 94, H = BOT - TOP;
+  if (!el.dataset.built) {
+    el.innerHTML = `<svg viewBox="0 0 150 112" aria-hidden="true">
+      <defs>
+        <clipPath id="pigClip"><ellipse cx="72" cy="59" rx="49" ry="36"/></clipPath>
+        <linearGradient id="goldG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFE27A"/><stop offset="1" stop-color="#D99A12"/></linearGradient>
+        <pattern id="coinP" width="14" height="7" patternUnits="userSpaceOnUse"><ellipse cx="7" cy="3.5" rx="6.2" ry="3" fill="none" stroke="#B57B05" stroke-opacity=".45" stroke-width="1"/></pattern>
+      </defs>
+      <rect class="pleg" x="38" y="80" width="13" height="20" rx="5"/><rect class="pleg" x="56" y="84" width="13" height="18" rx="5"/>
+      <rect class="pleg" x="82" y="84" width="13" height="18" rx="5"/><rect class="pleg" x="98" y="80" width="13" height="20" rx="5"/>
+      <path class="pline" d="M24,56 c-9,-1 -12,-10 -6,-13 c6,-3 8,6 1,8"/>
+      <ellipse class="pbody" cx="72" cy="59" rx="49" ry="36"/>
+      <g clip-path="url(#pigClip)"><g class="pcoins" id="pigCoins">
+        <rect x="18" y="0" width="110" height="80" fill="url(#goldG)"/>
+        <rect x="18" y="0" width="110" height="80" fill="url(#coinP)"/>
+        <path d="M18,0 q7,-4 14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0" fill="#FFE9A0"/>
+      </g></g>
+      <ellipse class="poutline" cx="72" cy="59" rx="49" ry="36"/>
+      <path class="pear" d="M90,27 L100,10 L108,31 Z"/>
+      <ellipse class="pbody" cx="124" cy="62" rx="12" ry="14"/>
+      <ellipse class="pnose" cx="121" cy="59" rx="2.2" ry="3.2"/><ellipse class="pnose" cx="128" cy="59" rx="2.2" ry="3.2"/>
+      <circle class="peye" cx="104" cy="47" r="3.6"/>
+      <rect class="pslot" id="pigSlot" x="58" y="20.5" width="26" height="5" rx="2.5"/>
+      <text class="plabel num" id="pigLabel" x="70" y="63"></text>
+      <text class="psub" id="pigSub" x="70" y="77"></text>
+    </svg>`;
+    el.dataset.built = "1";
+  }
+  const f = Math.max(0, Math.min(1, frac));
+  el.querySelector("#pigCoins").style.transform = `translateY(${f > 0 ? BOT - f * H : BOT + 6}px)`;
+  el.querySelector("#pigLabel").textContent = label;
+  el.querySelector("#pigSub").textContent = sub;
+  el.classList.toggle("over", !!over);
+}
 function renderMoney() {
   const ym = view.month, list = txIn(ym), T = totals(list), budget = +S.settings.budget || 0;
   const nowYm = today().slice(0, 7);
   $("#moneyTitle").innerHTML = `<small>${ym === nowYm ? "This month" : ym < nowYm ? "Past month" : "Upcoming"}</small>${esc(monthName(ym))}`;
   if (budget) {
     const pct = T.expense / budget;
-    ring($("#moneyRing"), pct, pct > 1 ? "var(--danger)" : "var(--money)", `${Math.round(pct * 100)}<span>%</span>`);
+    piggy($("#moneyRing"), 1 - pct, pct > 1 ? "Over" : `${Math.round((1 - pct) * 100)}%`, pct > 1 ? "budget" : "left", pct > 1);
     $("#moneySub").textContent = T.expense > budget ? `${money(T.expense - budget)} over your ${money(budget)} budget` : `${money(budget - T.expense)} left of your ${money(budget)} budget`;
   } else {
     const pct = T.income ? T.expense / T.income : 0;
-    ring($("#moneyRing"), pct, pct > 1 ? "var(--danger)" : "var(--money)", T.income ? `${Math.round(pct * 100)}<span>%</span>` : "–");
+    piggy($("#moneyRing"), T.income ? 1 - pct : 0, T.income ? (pct > 1 ? "Over" : `${Math.round((1 - pct) * 100)}%`) : "–", T.income ? (pct > 1 ? "spent" : "saved") : "empty", pct > 1);
     $("#moneySub").textContent = T.income ? `That's ${Math.round(pct * 100)}% of this month's income` : "Set a monthly budget in Settings to track it here.";
   }
   $("#moneyBig").innerHTML = `<span class="num" id="mSpent">${money(T.expense)}</span> spent`;
@@ -1090,10 +1147,12 @@ function moneyFx(type, amount) {
   moneySound(type, count);
   const card = document.querySelector("#tab-money .summary");
   if (card) { card.classList.remove("pulse-in", "pulse-out"); void card.offsetWidth; card.classList.add(type === "income" ? "pulse-in" : "pulse-out"); }
+  const pig = $("#moneyRing");
+  if (pig) { pig.classList.remove("hop", "shake"); void pig.offsetWidth; pig.classList.add(type === "income" ? "hop" : "shake"); }
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const cv = $("#fx"), c = cv.getContext("2d"), dpr = window.devicePixelRatio || 1;
   cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cv.hidden = false;
-  const ringEl = $("#moneyRing").getBoundingClientRect();
+  const slotEl = document.getElementById("pigSlot"), ringEl = (slotEl || $("#moneyRing")).getBoundingClientRect();
   const tx = ringEl.left + ringEl.width / 2, ty = ringEl.top + ringEl.height / 2;
   const sym = cur().trim().slice(0, 1) || "₹";
   const parts = Array.from({ length: count }, (_, i) => {
