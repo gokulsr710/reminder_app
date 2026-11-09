@@ -6,7 +6,7 @@ A personal Android app for planning your day and tracking what you eat.
 - **Alarms:** ring through Android's own alarm system, so they work when the app is closed, the screen is locked or the phone has restarted. A full-screen alarm offers **Mark as done**, **Snooze 5 min** and **Dismiss**. Sound, a spoken reminder ("Reminder. Call the bank. In 5 minutes.") and vibration can each be turned on or off in Settings.
 - **Appearance:** pick System, Light or Dark in Settings. The alarm screen and system bars follow it too.
 - **Calories:** set a daily goal and log food by meal. The page shows how much of the goal you've used, how much is left, and a week view.
-- **Water:** a bottle fills up one 1-litre level at a time, with a moving water effect. Reminders ring at 9 AM, 12 PM and 6 PM (add up to 8 levels at your own times). Tap a level, or **Mark as done** on the alarm, to fill it.
+- **Water:** a bottle fills up one 1-litre level at a time, with a moving water effect. Reminders ring at 9 AM, 12 PM and 6 PM (add up to 8 levels at your own times). Tap a level, or **Mark as done** on the alarm, to fill it. A pouring sound plays as it fills (switch it off in the Water tab).
 - **Money:** record expenses and income with an amount, category, note, date and payment method (UPI, cash, card, bank transfer). Each month shows what you spent, your income and balance, progress against an optional monthly budget, and where the money went by category.
 - **Export:** save a month or all-time money report as a **PDF** or an **Excel (.xlsx)** file. Both contain the transactions as a table, the totals, and a spending-by-category summary. You choose where on the phone to save it.
 

@@ -319,6 +319,8 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
     <div class="set wopts">
       <div class="srow"><div class="l"><strong>Water reminders</strong><span>Rings at each level's time, even when the app is closed</span></div>
         <label class="switch"><input type="checkbox" id="waterRemind" aria-label="Water reminders"><span></span></label></div>
+      <div class="srow"><div class="l"><strong>Filling sound</strong><span>Pouring and bubbling sound as the bottle fills</span></div>
+        <label class="switch"><input type="checkbox" id="waterSound" aria-label="Filling sound"><span></span></label></div>
     </div>
   </section>
 
@@ -499,7 +501,7 @@ const dayLabel = s => {
 const LEADS = [[0, "At time"], [5, "5 min"], [10, "10 min"], [15, "15 min"], [30, "30 min"], [60, "1 hour"]];
 
 /* ---------- state ---------- */
-const S = { tasks: [], meals: [], money: [], water: {}, settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true } };
+const S = { tasks: [], meals: [], money: [], water: {}, settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true, waterSound: true } };
 const view = { tab: "tasks", taskDay: today(), calDay: today(), month: today().slice(0, 7), waterDay: today() };
 
 /* Repeating tasks: one record holds the schedule, completion is tracked per date. */
@@ -801,6 +803,7 @@ function drawBottle(n, filled) {
   if (lastFill >= 0 && filled > lastFill) {
     svg.classList.remove("pouring"); void svg.getBoundingClientRect(); svg.classList.add("pouring");
     clearTimeout(drawBottle.t); drawBottle.t = setTimeout(() => svg.classList.remove("pouring"), 1500);
+    playPour(filled / n);
   }
   lastFill = filled;
 }
@@ -826,6 +829,54 @@ function renderWater() {
   }).join("") + (n < WATER_MAX ? `<button class="btn small ghost addlvl" id="addLevel">+ Add level</button>` : "");
   weekStrip($("#waterWeek"), day, d => waterDone(d).length / n, "var(--water)", "water");
   $("#waterRemind").checked = S.settings.waterRemind !== false;
+  $("#waterSound").checked = S.settings.waterSound !== false;
+}
+
+/* Filling sound, made on the fly: a stream of filtered noise plus bubble "glugs".
+   The pitch rises as the bottle gets fuller, like a real bottle being filled. */
+let pourCtx = null;
+function playPour(fullness) {
+  if (S.settings.waterSound === false) return;
+  try {
+    if (!pourCtx) pourCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (pourCtx.state === "suspended") pourCtx.resume();
+  } catch (e) { return; }
+  const ac = pourCtx, t0 = ac.currentTime + 0.02, dur = 1.4;
+  const out = ac.createGain(); out.gain.value = 0.9; out.connect(ac.destination);
+
+  // Stream: white noise through a moving band-pass filter.
+  const len = Math.floor(ac.sampleRate * dur);
+  const buf = ac.createBuffer(1, len, ac.sampleRate), data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  const noise = ac.createBufferSource(); noise.buffer = buf;
+  const bp = ac.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 1.6;
+  const base = 700 + fullness * 900;
+  bp.frequency.setValueAtTime(base * 0.8, t0);
+  bp.frequency.linearRampToValueAtTime(base * 1.25, t0 + dur);
+  const lfo = ac.createOscillator(), lfoGain = ac.createGain();
+  lfo.frequency.value = 9; lfoGain.gain.value = 220; lfo.connect(lfoGain).connect(bp.frequency);
+  const ng = ac.createGain();
+  ng.gain.setValueAtTime(0.0001, t0);
+  ng.gain.exponentialRampToValueAtTime(0.22, t0 + 0.08);
+  ng.gain.setValueAtTime(0.22, t0 + dur - 0.35);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  noise.connect(bp).connect(ng).connect(out);
+  noise.start(t0); noise.stop(t0 + dur); lfo.start(t0); lfo.stop(t0 + dur);
+
+  // Bubbles: short sine blips that sweep upward.
+  const glugs = 7;
+  for (let i = 0; i < glugs; i++) {
+    const at = t0 + 0.12 + (i / glugs) * (dur - 0.3) + Math.random() * 0.06;
+    const f = (260 + fullness * 340) * (0.85 + Math.random() * 0.35);
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(f, at);
+    o.frequency.exponentialRampToValueAtTime(f * 2.1, at + 0.07);
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(0.16, at + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + 0.09);
+    o.connect(g).connect(out); o.start(at); o.stop(at + 0.1);
+  }
 }
 
 /* add-level sheet */
@@ -841,6 +892,11 @@ $("#lvlForm").addEventListener("submit", e => {
   saveSettings(true);
   toast(`Added a 1 L level at ${fmtTime(t)}`);
 });
+$("#waterSound").onchange = e => {
+  S.settings.waterSound = e.target.checked; saveSettings(true);
+  if (e.target.checked) playPour(0.5);
+  toast(e.target.checked ? "Filling sound on" : "Filling sound off");
+};
 $("#waterRemind").onchange = e => { S.settings.waterRemind = e.target.checked; saveSettings(true); toast(e.target.checked ? "Water reminders on" : "Water reminders off"); };
 
 /* ---------- money ---------- */
