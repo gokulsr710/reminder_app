@@ -115,7 +115,7 @@ final class Exporter {
 
         void header() {
             Paint h = new Paint(bold); h.setColor(Color.WHITE);
-            row(HEAD, h, 0xFF2D5BA6, 0);
+            row(HEAD, h, 0xFFE4550D, 0);
         }
     }
 
@@ -138,11 +138,11 @@ final class Exporter {
                 {"Income", amount(nf, cur, r.optDouble("income"), false)},
                 {"Expenses", amount(nf, cur, r.optDouble("expense"), false)},
                 {"Balance", amount(nf, cur, r.optDouble("balance"), false)}};
-        int[] colors = {0xFF1E7356, 0xFFB83A32, r.optDouble("balance") < 0 ? 0xFFB83A32 : 0xFF2D5BA6};
+        int[] colors = {0xFF1E7356, 0xFFB83A32, r.optDouble("balance") < 0 ? 0xFFB83A32 : 0xFFE4550D};
         float bw = (W - 2 * M - 20) / 3f;
         for (int i = 0; i < 3; i++) {
             float x = M + i * (bw + 10);
-            p.fill.setColor(0xFFF0F3F8);
+            p.fill.setColor(0xFFFBF1EB);
             p.c.drawRoundRect(x, p.y, x + bw, p.y + 52, 8, 8, p.fill);
             p.c.drawText(boxes[i][0].toUpperCase(Locale.ROOT), x + 12, p.y + 18, p.muted);
             Paint v = new Paint(title); v.setTextSize(15); v.setColor(colors[i]);
@@ -163,11 +163,11 @@ final class Exporter {
             double a = t.optDouble("amount");
             p.row(new String[]{prettyDate(t.optString("date")), t.optString("type"), t.optString("category"),
                             t.optString("note"), t.optString("method"), amount(nf, cur, a, true)},
-                    p.text, i % 2 == 1 ? 0xFFF4F6F9 : 0, a < 0 ? 0xFFB83A32 : 0xFF1E7356);
+                    p.text, i % 2 == 1 ? 0xFFFBF5F1 : 0, a < 0 ? 0xFFB83A32 : 0xFF1E7356);
         }
         // Total line
         if (p.needs(24)) p.newPage();
-        p.fill.setColor(0xFF2D5BA6);
+        p.fill.setColor(0xFFE4550D);
         p.c.drawRect(M, p.y, W - M, p.y + 1.2f, p.fill);
         p.y += 4;
         p.row(new String[]{"Total", "", "", "", "", amount(nf, cur, r.optDouble("balance"), true)}, p.bold, 0, 0);
@@ -179,7 +179,7 @@ final class Exporter {
             p.c.drawText("Spending by category", M, p.y, h2);
             p.y += 10;
             Paint hh = new Paint(p.bold); hh.setColor(Color.WHITE);
-            p.fill.setColor(0xFF2D5BA6);
+            p.fill.setColor(0xFFE4550D);
             p.c.drawRect(M, p.y, W - M, p.y + 20, p.fill);
             p.c.drawText("Category", M + 6, p.y + 13.5f, hh);
             hh.setTextAlign(Paint.Align.RIGHT);
@@ -190,12 +190,12 @@ final class Exporter {
                 if (p.needs(20)) p.newPage();
                 JSONObject cObj = cats.getJSONObject(i);
                 double share = cObj.optDouble("share");
-                if (i % 2 == 1) { p.fill.setColor(0xFFF4F6F9); p.c.drawRect(M, p.y, W - M, p.y + 20, p.fill); }
+                if (i % 2 == 1) { p.fill.setColor(0xFFFBF5F1); p.c.drawRect(M, p.y, W - M, p.y + 20, p.fill); }
                 p.c.drawText(p.fit(cObj.optString("name"), p.text, 200), M + 6, p.y + 13.5f, p.text);
                 // share bar
-                p.fill.setColor(0xFFDCE6F6);
+                p.fill.setColor(0xFFFDE4D6);
                 p.c.drawRect(M + 375, p.y + 7, M + 465, p.y + 13, p.fill);
-                p.fill.setColor(0xFF2D5BA6);
+                p.fill.setColor(0xFFE4550D);
                 p.c.drawRect(M + 375, p.y + 7, M + 375 + (float) (90 * Math.min(1, share)), p.y + 13, p.fill);
                 Paint rt = new Paint(p.text); rt.setTextAlign(Paint.Align.RIGHT);
                 p.c.drawText(amount(nf, cur, cObj.optDouble("amount"), false), M + 360, p.y + 13.5f, rt);
@@ -257,7 +257,7 @@ final class Exporter {
                 + "<font><b/><sz val=\"11\"/><name val=\"Calibri\"/></font>"
                 + "<font><b/><sz val=\"16\"/><name val=\"Calibri\"/></font></fonts>"
                 + "<fills count=\"3\"><fill><patternFill patternType=\"none\"/></fill><fill><patternFill patternType=\"gray125\"/></fill>"
-                + "<fill><patternFill patternType=\"solid\"><fgColor rgb=\"FF2D5BA6\"/><bgColor indexed=\"64\"/></patternFill></fill></fills>"
+                + "<fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFE4550D\"/><bgColor indexed=\"64\"/></patternFill></fill></fills>"
                 + "<borders count=\"1\"><border><left/><right/><top/><bottom/><diagonal/></border></borders>"
                 + "<cellStyleXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\"/></cellStyleXfs>"
                 + "<cellXfs count=\"8\">"
