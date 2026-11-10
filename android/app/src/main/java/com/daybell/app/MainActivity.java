@@ -216,7 +216,9 @@ public class MainActivity extends Activity {
             } else if (!st.optBoolean("fullScreen", true)) {
                 startActivity(new Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT, pkg));
             } else if (!st.optBoolean("battery", true)) {
-                startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, pkg));
+                // Opens the phone's battery optimisation list; the person picks Dayco and sets it to
+                // "Don't optimise" / Unrestricted. This needs no special permission.
+                startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
             } else {
                 startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, pkg));
             }

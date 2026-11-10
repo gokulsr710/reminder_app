@@ -21,10 +21,10 @@ Turn features on or off in **Settings → Features**. Only the ones you turn on 
 
 1. Download [`apk/Dayco.apk`](apk/Dayco.apk) on your Android phone (Android 8.0 or newer) and open it. Allow "install unknown apps" when asked.
 2. Open Dayco and allow notifications.
-3. Go to **Settings → Phone permissions**. If anything is missing, tap **Fix**. On Xiaomi, Oppo, Vivo and Samsung phones, set Dayco's battery use to **Unrestricted** so alarms aren't blocked.
+3. Go to **Settings → Phone permissions**. If anything is missing, tap **Fix**. If it asks for unrestricted battery, **Fix** opens the battery list: find Dayco and choose **Don't optimise** (on Xiaomi, Oppo, Vivo and Samsung, set battery use to **Unrestricted**).
 4. Tap **Test**, then lock the phone. The test alarm rings within 10 seconds.
 
-Tasks and the food log are stored on the phone only.
+Everything is stored on the phone only. The app has no internet permission, so your data can't leave the phone. (Its two fonts, Bricolage Grotesque and Figtree, are built in under the SIL Open Font License.)
 
 ## Project layout
 
