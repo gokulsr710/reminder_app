@@ -148,6 +148,31 @@ nav.tabs button{font-size:11px}
 #bodyChart .dotl{fill:var(--surface);stroke:var(--task);stroke-width:3}
 .wrow{width:100%;text-align:left;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 10px 10px 14px}
 .wrow .more{color:var(--muted);flex:none}
+.bmicard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:14px;display:grid;gap:12px}
+.bmihead{display:flex;align-items:center;gap:12px}
+.bmival{font-family:var(--display);font-weight:800;font-size:34px;line-height:1}
+.bmihead .l{flex:1;min-width:0;display:grid;gap:2px}
+.bmihead .l b{font-size:15px}
+.bmihead .l span{font-size:12.5px;color:var(--muted)}
+.bmitag{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;color:#fff;white-space:nowrap}
+.bmiscale{position:relative;padding:22px 0 18px}
+.bmibar{display:flex;height:10px;border-radius:6px;overflow:hidden}
+.bmibar i{display:block;height:100%}
+.bmimk{position:absolute;top:0;transform:translateX(-50%);display:grid;justify-items:center;font-size:10.5px;font-weight:800;white-space:nowrap}
+.bmimk::after{content:"";width:0;height:0;border:6px solid transparent;border-top-color:currentColor;margin-top:1px}
+.bmimk.tg{top:auto;bottom:0;color:var(--pos)}
+.bmimk.tg::after{display:none}
+.bmimk.tg::before{content:"";width:0;height:0;border:6px solid transparent;border-bottom-color:currentColor;margin-bottom:1px}
+.bmiticks{position:relative;height:14px;font-size:10.5px;color:var(--muted);margin:-8px 0 0}
+.bmiticks span{position:absolute;transform:translateX(-50%)}
+.bmiticks span:first-child{transform:none}
+.bmiticks span:last-child{transform:translateX(-100%)}
+.bmilegend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;color:var(--muted)}
+.bmilegend span{display:flex;align-items:center;gap:5px}
+.bmilegend i{width:10px;height:10px;border-radius:3px}
+.bmirange{font-size:13px;background:var(--bg);border-radius:12px;padding:10px 12px;line-height:1.45}
+.bmirange b{color:var(--ink)}
+.bmifine{font-size:11.5px;color:var(--muted)}
 .wrow .m{flex:1;min-width:0;display:grid}
 .wrow .m b{font-size:16px}
 .wrow .m span{font-size:12.5px;color:var(--muted)}
@@ -417,6 +442,7 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
         </div>
       </div>
       <div class="bstats" id="bodyStats"></div>
+      <div class="bmicard" id="bmiCard"></div>
       <div class="sechead"><h2>Body timeline</h2><span>Swipe to see earlier</span></div>
       <div class="tline" id="bodyTimeline"></div>
       <div class="sechead"><h2>Weight trend</h2></div>
@@ -556,6 +582,11 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
       <div class="field"><label for="gStartDate">Starting on</label><input type="date" id="gStartDate" required></div>
     </div>
     <div class="field"><label for="gTarget">Target / ideal weight (kg)</label><input type="number" id="gTarget" inputmode="decimal" step="0.1" min="20" max="400" required></div>
+    <div class="row">
+      <div class="field"><label for="gHeight">Height (cm)</label><input type="number" id="gHeight" inputmode="decimal" step="0.5" min="100" max="250" placeholder="e.g. 170"></div>
+      <div class="field"><label for="gScale">BMI ranges</label>
+        <select id="gScale"><option value="asian">Asian / Indian</option><option value="who">WHO standard</option></select></div>
+    </div>
     <div class="row">
       <div class="field"><label for="gRemind">Weigh-in reminder</label>
         <select id="gRemind"><option value="off">Off</option><option value="daily">Every day</option><option value="monthly">Every month</option></select></div>
@@ -1184,6 +1215,52 @@ function drawBodyAnimated(fTo, plan) {
   bodyAnim = requestAnimationFrame(step);
 }
 
+/* ---------- BMI ---------- */
+const BMI_SCALES = {
+  asian: { name: "Asian / Indian ranges", cut: [18.5, 23, 25] },
+  who: { name: "WHO standard ranges", cut: [18.5, 25, 30] }
+};
+const BMI_CATS = [
+  { name: "Underweight", color: "var(--water)" }, { name: "Healthy", color: "var(--pos)" },
+  { name: "Overweight", color: "var(--cal)" }, { name: "Obese", color: "var(--danger)" }
+];
+const bmiOf = w => S.body.height ? w / Math.pow(S.body.height / 100, 2) : null;
+const bmiCut = () => (BMI_SCALES[S.body.bmiScale] || BMI_SCALES.asian).cut;
+const bmiCat = v => BMI_CATS[bmiCut().filter(c => v >= c).length];
+function renderBmi(cur, plan) {
+  const el = $("#bmiCard");
+  if (!S.body.height) {
+    el.innerHTML = `<div class="bmihead"><div class="l"><b>BMI</b><span>Add your height to see your body mass index and the healthy weight range for you.</span></div><button class="btn small primary" id="bmiAdd" style="border-radius:999px">Add height</button></div>`;
+    return;
+  }
+  const v = bmiOf(cur), cat = bmiCat(v), cut = bmiCut(), m2 = Math.pow(S.body.height / 100, 2);
+  const LO = 15, HI = 40, pos = x => Math.max(0, Math.min(100, (x - LO) / (HI - LO) * 100));
+  const edges = [LO, ...cut, HI];
+  const bar = BMI_CATS.map((c, i) => `<i style="width:${pos(edges[i + 1]) - pos(edges[i])}%;background:${c.color}"></i>`).join("");
+  const tB = bmiOf(plan.target), sB = bmiOf(plan.start);
+  const hLo = cut[0] * m2, hHi = cut[1] * m2 - 0.1;
+  let advice;
+  if (v < cut[0]) advice = `You're ${kg(hLo - cur)} below the healthy range.`;
+  else if (v < cut[1]) advice = `You're in the healthy range.`;
+  else advice = `You're ${kg(cur - hHi)} above the healthy range.`;
+  const tcat = bmiCat(tB);
+  el.innerHTML = `
+    <div class="bmihead">
+      <div class="bmival num">${v.toFixed(1)}</div>
+      <div class="l"><b>Your BMI</b><span>${S.body.height} cm · ${kg(cur)}</span></div>
+      <span class="bmitag" style="background:${cat.color}">${cat.name}</span>
+    </div>
+    <div class="bmiscale">
+      <div class="bmimk" style="left:${pos(v)}%;color:${cat.color}">Now ${v.toFixed(1)}</div>
+      <div class="bmibar">${bar}</div>
+      ${Math.abs(tB - v) > 0.3 ? `<div class="bmimk tg" style="left:${pos(tB)}%">Goal ${tB.toFixed(1)}</div>` : ""}
+    </div>
+    <div class="bmiticks num">${[LO, ...cut, HI].map(c => `<span style="left:${pos(c)}%">${c}</span>`).join("")}</div>
+    <div class="bmilegend">${BMI_CATS.map((c, i) => `<span><i style="background:${c.color}"></i>${c.name} ${i === 0 ? `&lt;${cut[0]}` : i === 3 ? `${cut[2]}+` : `${cut[i - 1]}–${(cut[i] - 0.1).toFixed(1)}`}</span>`).join("")}</div>
+    <div class="bmirange">Healthy weight for your height: <b class="num">${kg(hLo)} – ${kg(hHi)}</b>. ${advice}<br>
+      Started at BMI <b class="num">${sB.toFixed(1)}</b> (${bmiCat(sB).name.toLowerCase()}); your target gives BMI <b class="num">${tB.toFixed(1)}</b> (${tcat.name.toLowerCase()}).</div>
+    <div class="bmifine">Uses ${(BMI_SCALES[S.body.bmiScale] || BMI_SCALES.asian).name}. BMI is a general guide and doesn't account for muscle, age or build.</div>`;
+}
 function renderBody() {
   const plan = bodyPlan(), list = bodyEntries();
   $("#bodySetup").hidden = !!plan;
@@ -1219,6 +1296,7 @@ function renderBody() {
     ["Current", kg(cur)], ["Target", kg(plan.target)], ["Start", kg(plan.start)],
     ["Last change", diffTxt], ["Per week", rate], [plan.losing ? "Lost" : "Gained", kg(Math.max(0, moved))]
   ].map(([l, v]) => `<div><span>${l}</span><strong class="num">${v}</strong></div>`).join("");
+  renderBmi(cur, plan);
 
   // Weight chart
   const pts = list.length ? list : [{ date: S.body.startDate || today(), weight: plan.start }];
@@ -1249,7 +1327,7 @@ function renderBody() {
   $("#bodyLog").innerHTML = list.length ? list.map((e, i) => {
     const d = i ? +e.weight - +list[i - 1].weight : null;
     const good = d != null && (plan.losing ? d < 0 : d > 0);
-    return `<button class="wrow" data-wentry="${e.id}" aria-label="${kg(e.weight)} on ${esc(dayLabel(e.date).date)}: edit or delete"><span class="m"><b class="num">${kg(e.weight)}</b><span>${esc(dayLabel(e.date).rel)}, ${esc(dayLabel(e.date).date)}</span></span>
+    return `<button class="wrow" data-wentry="${e.id}" aria-label="${kg(e.weight)} on ${esc(dayLabel(e.date).date)}: edit or delete"><span class="m"><b class="num">${kg(e.weight)}</b><span>${esc(dayLabel(e.date).rel)}, ${esc(dayLabel(e.date).date)}${S.body.height ? ` · BMI ${bmiOf(+e.weight).toFixed(1)}` : ""}</span></span>
       ${d == null ? `<span class="chip">Start</span>` : `<span class="chip ${d === 0 ? "" : good ? "soon" : "late"}">${d === 0 ? "±0" : (d < 0 ? "−" : "+") + kg(Math.abs(d))}</span>`}
       <svg class="more" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>`;
   }).reverse().join("") : `<div class="empty">No weigh-ins yet. Tap “Log weight” to add today's.</div>`;
@@ -1266,14 +1344,17 @@ function bodyAlarmTasks() {
 }
 
 /* Goal sheet */
-function openGoal() {
+function openGoal(focusHeight) {
   const b = S.body, last = bodyEntries().slice(-1)[0];
   $("#gStart").value = b.start || (last ? last.weight : "");
   $("#gStartDate").value = b.startDate || today();
   $("#gTarget").value = b.target || "";
   $("#gRemind").value = b.remind || "off";
   $("#gTime").value = b.remindTime || "08:00";
+  $("#gHeight").value = b.height || "";
+  $("#gScale").value = b.bmiScale || "asian";
   $("#goalSheet").hidden = false;
+  if (focusHeight) setTimeout(() => $("#gHeight").focus(), 80);
 }
 $("#goalForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -1281,6 +1362,9 @@ $("#goalForm").addEventListener("submit", e => {
   if (!(start >= 20 && start <= 400) || !(target >= 20 && target <= 400)) { toast("Enter weights between 20 and 400 kg"); return; }
   const b = S.body, startDate = $("#gStartDate").value || today();
   const remind = $("#gRemind").value, time = $("#gTime").value || "08:00";
+  const hRaw = $("#gHeight").value.trim(), height = hRaw ? Math.round(+hRaw * 10) / 10 : 0;
+  if (hRaw && !(height >= 100 && height <= 250)) { toast("Enter a height between 100 and 250 cm"); return; }
+  b.height = height || null; b.bmiScale = $("#gScale").value;
   if (remind !== b.remind || time !== b.remindTime) b.remindSince = today();
   Object.assign(b, { start, target, startDate, remind, remindTime: time });
   b.entries = b.entries || [];
@@ -1708,6 +1792,7 @@ document.addEventListener("click", e => {
   if (b.id === "addLevel") { const last = waterTimes().slice(-1)[0] || "18:00"; const h = Math.min(23, +last.slice(0, 2) + 2); $("#lvlTime").value = `${pad(h)}:00`; $("#lvlSheet").hidden = false; return; }
   if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
   if (b.id === "bodySetupBtn" || b.id === "bodyGoalBtn" || b.id === "bodyRemindBtn") return openGoal();
+  if (b.id === "bmiAdd") return openGoal(true);
   if (b.dataset.wentry) return openWeighActions(b.dataset.wentry);
   if (b.dataset.mshift) { view.month = shiftMonth(view.month, +b.dataset.mshift); return render(); }
   if (b.dataset.tx) return openTx(S.money.find(x => x.id === b.dataset.tx));
