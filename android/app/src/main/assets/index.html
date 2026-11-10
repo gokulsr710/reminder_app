@@ -1728,9 +1728,18 @@ function trashNote(n) {
   saveLocal(); render();
   toast("Note moved to Trash", () => { delete n.trashed; saveLocal(); render(); });
 }
+/* Copy through the page itself; the app has no clipboard code of its own. */
 function copyText(text) {
-  if (NATIVE && NATIVE.copyText) { NATIVE.copyText(text); toast("Copied to clipboard"); return; }
-  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => toast("Copied to clipboard"), () => toast("Couldn't copy here"));
+  const fallback = () => {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+    ta.remove();
+    toast(ok ? "Copied to clipboard" : "Couldn't copy. Select the text and copy it instead.");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast("Copied to clipboard"), fallback);
+  else fallback();
 }
 
 /* Editor events */

@@ -5,8 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -251,12 +249,6 @@ public class MainActivity extends Activity {
                 Intent send = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text);
                 if (subject != null && !subject.isEmpty()) send.putExtra(Intent.EXTRA_SUBJECT, subject);
                 try { startActivity(Intent.createChooser(send, "Share note")); } catch (Exception ignored) {}
-            });
-        }
-        @JavascriptInterface public void copyText(String text) {
-            runOnUiThread(() -> {
-                ClipboardManager cm = getSystemService(ClipboardManager.class);
-                if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("Dayco note", text));
             });
         }
         @JavascriptInterface public String takePending() { return Store.takePending(MainActivity.this); }
