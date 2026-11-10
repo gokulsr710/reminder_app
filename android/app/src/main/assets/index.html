@@ -30,7 +30,7 @@ button{cursor:pointer}
 :focus-visible{outline:2px solid var(--task-ink);outline-offset:2px}
 .num{font-variant-numeric:tabular-nums}
 
-.app{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 calc(96px + env(safe-area-inset-bottom,0px))}
+.app{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 calc(170px + env(safe-area-inset-bottom,0px))}
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
 .brand .logo{width:34px;height:auto;border-radius:9px;box-shadow:0 2px 8px rgba(60,40,160,.35)}
@@ -146,11 +146,12 @@ nav.tabs button{font-size:11px}
 #bodyChart .tlab{font:600 10px var(--body);fill:var(--muted)}
 #bodyChart .dot{fill:var(--task)}
 #bodyChart .dotl{fill:var(--surface);stroke:var(--task);stroke-width:3}
-.wrow{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 8px 10px 14px}
+.wrow{width:100%;text-align:left;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 10px 10px 14px}
+.wrow .more{color:var(--muted);flex:none}
 .wrow .m{flex:1;min-width:0;display:grid}
 .wrow .m b{font-size:16px}
 .wrow .m span{font-size:12.5px;color:var(--muted)}
-.wrow .x{width:32px;height:32px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px}
+
 /* Water */
 .wcard{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:20px;padding:16px 12px 16px 6px;box-shadow:var(--shadow)}
 #bottle{width:150px;height:auto;flex:none;overflow:visible}
@@ -460,6 +461,9 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
         <label><input type="radio" name="theme" value="dark" id="themeDark"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>Dark</span></label>
       </div>
     </div>
+    <div class="sechead"><h2>Features</h2></div>
+    <div class="set" id="featureList"></div>
+    <p class="note" style="margin-top:8px">Only the features you turn on appear in the app. Turning one off hides it and stops its reminders; its data is kept, so you can turn it back on anytime.</p>
     <div class="sechead"><h2>Alarm</h2></div>
     <div class="set">
       <div class="srow"><div class="l"><strong>Alarm sound</strong><span>Chime when a task is due</span></div>
@@ -468,24 +472,24 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
         <label class="switch"><input type="checkbox" id="setVoice" aria-label="Voice reminder"><span></span></label></div>
       <div class="srow"><div class="l"><strong>Vibrate</strong><span>On phones that support it</span></div>
         <label class="switch"><input type="checkbox" id="setVibrate" aria-label="Vibrate"><span></span></label></div>
-      <div class="srow"><div class="l"><strong>Default reminder</strong><span>For new tasks</span></div>
+      <div class="srow" data-feature="tasks"><div class="l"><strong>Default reminder</strong><span>For new tasks</span></div>
         <select id="setLead" aria-label="Default reminder time"><option value="0">At task time</option><option value="5">5 min before</option><option value="10">10 min before</option><option value="15">15 min before</option><option value="30">30 min before</option><option value="60">1 hour before</option></select></div>
       <div class="srow"><div class="l"><strong>Test the alarm</strong><span>Plays it with your current settings</span></div>
         <button class="btn small primary" id="testAlarm">Test</button></div>
     </div>
-    <div class="sechead"><h2>Calories</h2></div>
-    <div class="set">
+    <div class="sechead" data-feature="cal"><h2>Calories</h2></div>
+    <div class="set" data-feature="cal">
       <div class="srow"><div class="l"><strong>Daily goal</strong><span>kcal per day</span></div>
         <input type="number" id="setGoal" inputmode="numeric" min="500" max="10000" step="50" aria-label="Daily calorie goal" style="max-width:110px"></div>
     </div>
-    <div class="sechead"><h2>Money</h2></div>
-    <div class="set">
+    <div class="sechead" data-feature="money"><h2>Money</h2></div>
+    <div class="set" data-feature="money">
       <div class="srow"><div class="l"><strong>Currency</strong><span>Shown on amounts and exports</span></div>
         <select id="setCurrency" aria-label="Currency"><option value="₹">₹ Rupee</option><option value="$">$ Dollar</option><option value="€">€ Euro</option><option value="£">£ Pound</option><option value="AED ">AED Dirham</option></select></div>
       <div class="srow"><div class="l"><strong>Monthly budget</strong><span>Leave empty for no budget</span></div>
         <input type="number" id="setBudget" inputmode="numeric" min="0" step="500" placeholder="None" aria-label="Monthly budget" style="max-width:120px"></div>
     </div>
-    <div class="set" style="margin-top:14px">
+    <div class="set" style="margin-top:14px" data-feature="money">
       <div class="srow"><div class="l"><strong>Money sound effects</strong><span>Cash register sound for income, whoosh for expenses</span></div>
         <label class="switch"><input type="checkbox" id="setMoneySound" aria-label="Money sound effects"><span></span></label></div>
     </div>
@@ -562,6 +566,19 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
       <button type="submit" class="btn primary">Save goal</button>
     </div>
   </form>
+</div>
+
+<!-- Weigh-in actions -->
+<div class="scrim" id="wActSheet" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="wActTitle">
+    <h2 id="wActTitle"></h2>
+    <p class="note" style="margin:0" id="wActSub"></p>
+    <div class="actions">
+      <button type="button" class="btn danger" id="wActDelete">Delete</button>
+      <button type="button" class="btn primary" id="wActEdit">Edit</button>
+    </div>
+    <button type="button" class="btn ghost" id="wActCancel" style="border-radius:999px">Cancel</button>
+  </div>
 </div>
 
 <!-- Log weight -->
@@ -648,6 +665,17 @@ const dayLabel = s => {
 };
 const LEADS = [[0, "At time"], [5, "5 min"], [10, "10 min"], [15, "15 min"], [30, "30 min"], [60, "1 hour"]];
 
+/* ---------- features ----------
+   Every feature the app offers. Add a new one here (with its tab and section)
+   and it shows up in Settings → Features automatically. */
+const FEATURES = [
+  { id: "tasks", name: "Tasks", desc: "To-dos with alarm reminders" },
+  { id: "cal", name: "Calories", desc: "Food log and daily calorie goal" },
+  { id: "water", name: "Water", desc: "Water bottle tracker and drink reminders" },
+  { id: "body", name: "Body", desc: "Weight goal and body transformation" },
+  { id: "money", name: "Money", desc: "Expenses, income, budget and reports" }
+];
+
 /* ---------- state ---------- */
 const S = { tasks: [], meals: [], money: [], water: {}, body: { entries: [] }, settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true, waterSound: true, moneySound: true } };
 const view = { tab: "tasks", taskDay: today(), calDay: today(), month: today().slice(0, 7), waterDay: today() };
@@ -678,7 +706,7 @@ function loadLocal() {
 const NATIVE = window.DaybellNative || null;
 function saveLocal() {
   try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, water: S.water, body: S.body, settings: S.settings })); } catch (e) {}
-  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: S.tasks.concat(waterAlarmTasks(), bodyAlarmTasks()), settings: S.settings })); } catch (e) {}
+  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: (featureOn("tasks") ? S.tasks : []).concat(featureOn("water") ? waterAlarmTasks() : [], featureOn("body") ? bodyAlarmTasks() : []), settings: S.settings })); } catch (e) {}
 }
 /* Actions taken on the Android alarm screen while the app was closed. */
 let openWeighAfterResume = false;
@@ -708,7 +736,7 @@ function refreshPerms() {
   $("#permText").textContent = missing.length ? "Allow " + missing.join(", ") + " so alarms ring when the app is closed" : "All set. Alarms ring even when the app is closed.";
   $("#permFix").hidden = !missing.length;
 }
-window.daybellResume = () => { applyPending(); render(); refreshPerms(); if (openWeighAfterResume) { openWeighAfterResume = false; showTab("body"); openWeigh(); } };
+window.daybellResume = () => { applyPending(); render(); refreshPerms(); if (openWeighAfterResume) { openWeighAfterResume = false; if (featureOn("body")) { showTab("body"); openWeigh(null); } } };
 
 const listFor = kind => kind === "task" ? S.tasks : kind === "meal" ? S.meals : S.money;
 function plain(o) { return JSON.parse(JSON.stringify(o)); }
@@ -812,7 +840,34 @@ function render() {
   if (view.tab === "body") renderBody();
 }
 
+const featureOn = id => (S.settings.features || {})[id] !== false;
+function renderFeatureList() {
+  const on = FEATURES.filter(f => featureOn(f.id)).length;
+  $("#featureList").innerHTML = FEATURES.map(f => `<div class="srow"><div class="l"><strong>${esc(f.name)}</strong><span>${esc(f.desc)}</span></div>
+    <label class="switch"><input type="checkbox" data-feature-toggle="${f.id}" aria-label="${esc(f.name)}" ${featureOn(f.id) ? "checked" : ""} ${featureOn(f.id) && on === 1 ? "disabled" : ""}><span></span></label></div>`).join("");
+}
+function applyFeatures() {
+  let shown = 0;
+  document.querySelectorAll("nav.tabs button[data-tab]").forEach(b => {
+    const t = b.dataset.tab, vis = t === "set" || featureOn(t);
+    b.hidden = !vis; if (vis) shown++;
+  });
+  $("nav.tabs .in").style.gridTemplateColumns = `repeat(${shown},1fr)`;
+  document.querySelectorAll("#tab-set [data-feature]").forEach(el => { el.hidden = !featureOn(el.dataset.feature); });
+  if (view.tab !== "set" && !featureOn(view.tab)) view.tab = (FEATURES.find(f => featureOn(f.id)) || { id: "set" }).id;
+}
+document.addEventListener("change", e => {
+  const id = e.target.dataset && e.target.dataset.featureToggle; if (!id) return;
+  const on = e.target.checked;
+  if (!on && FEATURES.filter(f => featureOn(f.id)).length <= 1) { e.target.checked = true; toast("Keep at least one feature on"); return; }
+  S.settings.features = Object.assign({}, S.settings.features, { [id]: on });
+  const name = FEATURES.find(f => f.id === id).name;
+  saveSettings(true);
+  applyFeatures(); renderFeatureList();
+  toast(on ? `${name} turned on` : `${name} turned off. Its data is kept.`);
+});
 function showTab(tab) {
+  if (tab !== "set" && !featureOn(tab)) tab = (FEATURES.find(f => featureOn(f.id)) || { id: "set" }).id;
   view.tab = tab;
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
   $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set"; $("#tab-money").hidden = tab !== "money"; $("#tab-water").hidden = tab !== "water"; $("#tab-body").hidden = tab !== "body";
@@ -820,7 +875,7 @@ function showTab(tab) {
   fab.hidden = tab !== "tasks" && tab !== "money" && tab !== "body";
   fab.classList.toggle("money", tab === "money");
   fab.querySelector("span").textContent = tab === "money" ? "Add entry" : tab === "body" ? "Log weight" : "New task";
-  if (tab === "set") syncSettingsUI();
+  if (tab === "set") { syncSettingsUI(); renderFeatureList(); }
   try { sessionStorage.setItem("daybell-tab", tab); } catch (e) {}
   render(); window.scrollTo(0, 0);
 }
@@ -1194,9 +1249,9 @@ function renderBody() {
   $("#bodyLog").innerHTML = list.length ? list.map((e, i) => {
     const d = i ? +e.weight - +list[i - 1].weight : null;
     const good = d != null && (plan.losing ? d < 0 : d > 0);
-    return `<div class="wrow"><div class="m"><b class="num">${kg(e.weight)}</b><span>${esc(dayLabel(e.date).rel)}, ${esc(dayLabel(e.date).date)}</span></div>
+    return `<button class="wrow" data-wentry="${e.id}" aria-label="${kg(e.weight)} on ${esc(dayLabel(e.date).date)}: edit or delete"><span class="m"><b class="num">${kg(e.weight)}</b><span>${esc(dayLabel(e.date).rel)}, ${esc(dayLabel(e.date).date)}</span></span>
       ${d == null ? `<span class="chip">Start</span>` : `<span class="chip ${d === 0 ? "" : good ? "soon" : "late"}">${d === 0 ? "±0" : (d < 0 ? "−" : "+") + kg(Math.abs(d))}</span>`}
-      <button class="x" data-delweight="${e.id}" aria-label="Delete the ${kg(e.weight)} entry"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`;
+      <svg class="more" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>`;
   }).reverse().join("") : `<div class="empty">No weigh-ins yet. Tap “Log weight” to add today's.</div>`;
   $("#bodyRemindLbl").textContent = { off: "Off", daily: `Daily at ${fmtTime(S.body.remindTime || "08:00")}`, monthly: `Monthly at ${fmtTime(S.body.remindTime || "08:00")}` }[S.body.remind || "off"];
 }
@@ -1241,11 +1296,14 @@ $("#gCancel").onclick = () => { $("#goalSheet").hidden = true; };
 $("#goalSheet").addEventListener("click", e => { if (e.target.id === "goalSheet") $("#goalSheet").hidden = true; });
 
 /* Log sheet */
-function openWeigh() {
+let weighEditing = null, wActId = null;
+function openWeigh(entry) {
+  weighEditing = entry ? entry.id : null;
   const last = bodyEntries().slice(-1)[0];
-  $("#wWeight").value = last ? last.weight : (S.body.start || "");
-  $("#wDate").value = today();
-  $("#wLast").textContent = last ? `Last: ${kg(last.weight)} on ${dayLabel(last.date).date}` : "";
+  $("#weighTitle").textContent = entry ? "Edit weigh-in" : "Log your weight";
+  $("#wWeight").value = entry ? entry.weight : last ? last.weight : (S.body.start || "");
+  $("#wDate").value = entry ? entry.date : today();
+  $("#wLast").textContent = entry ? "" : last ? `Last: ${kg(last.weight)} on ${dayLabel(last.date).date}` : "";
   $("#weighSheet").hidden = false;
   setTimeout(() => $("#wWeight").select(), 60);
 }
@@ -1254,6 +1312,20 @@ $("#weighForm").addEventListener("submit", e => {
   const w = Math.round(+$("#wWeight").value * 10) / 10, date = $("#wDate").value || today();
   if (!(w >= 20 && w <= 400)) { toast("Enter a weight between 20 and 400 kg"); return; }
   const list = S.body.entries = S.body.entries || [];
+  if (weighEditing) {
+    const ent = list.find(x => x.id === weighEditing);
+    if (ent) {
+      S.body.entries = list.filter(x => x === ent || x.date !== date); // one weigh-in per day
+      ent.weight = w; ent.date = date;
+      const first = bodyEntries()[0];
+      if (first === ent) { S.body.start = w; S.body.startDate = date; }
+    }
+    weighEditing = null;
+    $("#weighSheet").hidden = true;
+    saveLocal(); render();
+    toast(`Weigh-in updated: ${kg(w)} on ${dayLabel(date).date}`);
+    return;
+  }
   const before = bodyEntries().filter(x => x.date < date).slice(-1)[0];
   const same = list.find(x => x.date === date);
   if (same) same.weight = w; else list.push({ id: newId(), date, weight: w });
@@ -1266,7 +1338,24 @@ $("#weighForm").addEventListener("submit", e => {
   else if (plan) msg += ` · ${kg(Math.abs(plan.target - w))} to go`;
   toast(msg);
 });
-$("#wCancel").onclick = () => { $("#weighSheet").hidden = true; };
+$("#wCancel").onclick = () => { $("#weighSheet").hidden = true; weighEditing = null; };
+function openWeighActions(id) {
+  const e = S.body.entries.find(x => x.id === id); if (!e) return;
+  wActId = id;
+  $("#wActTitle").textContent = kg(e.weight);
+  const L = dayLabel(e.date);
+  $("#wActSub").textContent = `${L.rel}, ${L.date}${bodyEntries()[0] === e ? " · your starting weigh-in" : ""}`;
+  $("#wActSheet").hidden = false;
+}
+const closeWAct = () => { $("#wActSheet").hidden = true; wActId = null; };
+$("#wActCancel").onclick = closeWAct;
+$("#wActSheet").addEventListener("click", e => { if (e.target.id === "wActSheet") closeWAct(); });
+$("#wActEdit").onclick = () => { const e = S.body.entries.find(x => x.id === wActId); closeWAct(); if (e) openWeigh(e); };
+$("#wActDelete").onclick = () => {
+  const e = S.body.entries.find(x => x.id === wActId); closeWAct(); if (!e) return;
+  S.body.entries = S.body.entries.filter(x => x !== e); saveLocal(); render();
+  toast(`Deleted ${kg(e.weight)} on ${dayLabel(e.date).date}`, () => { S.body.entries.push(e); saveLocal(); render(); });
+};
 $("#weighSheet").addEventListener("click", e => { if (e.target.id === "weighSheet") $("#weighSheet").hidden = true; });
 
 $("#setupBody").innerHTML = bodyMarkup(0.55, "mini");
@@ -1619,12 +1708,7 @@ document.addEventListener("click", e => {
   if (b.id === "addLevel") { const last = waterTimes().slice(-1)[0] || "18:00"; const h = Math.min(23, +last.slice(0, 2) + 2); $("#lvlTime").value = `${pad(h)}:00`; $("#lvlSheet").hidden = false; return; }
   if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
   if (b.id === "bodySetupBtn" || b.id === "bodyGoalBtn" || b.id === "bodyRemindBtn") return openGoal();
-  if (b.dataset.delweight) {
-    const e = S.body.entries.find(x => x.id === b.dataset.delweight); if (!e) return;
-    S.body.entries = S.body.entries.filter(x => x !== e); saveLocal(); render();
-    toast(`Deleted ${kg(e.weight)}`, () => { S.body.entries.push(e); saveLocal(); render(); });
-    return;
-  }
+  if (b.dataset.wentry) return openWeighActions(b.dataset.wentry);
   if (b.dataset.mshift) { view.month = shiftMonth(view.month, +b.dataset.mshift); return render(); }
   if (b.dataset.tx) return openTx(S.money.find(x => x.id === b.dataset.tx));
   if (b.dataset.edit) return openTask(S.tasks.find(x => x.id === b.dataset.edit));
@@ -1637,7 +1721,7 @@ document.addEventListener("click", e => {
     toast("Added 3 example tasks. Tap one to edit or delete it.");
   }
 });
-$("#fab").onclick = () => view.tab === "money" ? openTx(null) : view.tab === "body" ? openWeigh() : openTask(null);
+$("#fab").onclick = () => view.tab === "money" ? openTx(null) : view.tab === "body" ? openWeigh(null) : openTask(null);
 
 /* ---------- settings ---------- */
 function applyTheme() {
@@ -1686,6 +1770,7 @@ applyTheme();
 saveLocal();
 applyPending();
 try { const t = sessionStorage.getItem("daybell-tab"); if (t) view.tab = t; } catch (e) {}
+applyFeatures();
 $("#foodMeal").value = guessMeal();
 syncSettingsUI();
 showTab(view.tab);

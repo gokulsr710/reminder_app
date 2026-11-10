@@ -14,6 +14,8 @@ A personal Android app for planning your day and tracking what you eat.
 - **Money effects:** saving income drops coins and notes into a piggy bank (which fills with gold to show how much money is left) with a cash register sound; saving an expense sends them flying out with a whoosh. The totals count to their new values. The sound can be switched off in Settings.
 - **Export:** save a month or all-time money report as a **PDF** or an **Excel (.xlsx)** file. Both contain the transactions as a table, the totals, and a spending-by-category summary. You choose where on the phone to save it.
 
+Turn features on or off in **Settings → Features**. Only the ones you turn on appear in the app. Turning one off also stops its reminders, and its data is kept for when you turn it back on.
+
 ## Install
 
 1. Download [`apk/Dayco.apk`](apk/Dayco.apk) on your Android phone (Android 8.0 or newer) and open it. Allow "install unknown apps" when asked.
