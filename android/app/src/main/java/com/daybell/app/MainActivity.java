@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -121,6 +123,15 @@ public class MainActivity extends Activity {
                 + "</head><body>" + body + "</body></html>";
     }
 
+    /** Back closes the open note or form first; only then does it leave the app. */
+    @SuppressWarnings("deprecation")
+    @Override public void onBackPressed() {
+        if (web == null) { super.onBackPressed(); return; }
+        web.evaluateJavascript("window.daybellBack ? window.daybellBack() : false", handled -> {
+            if (!"true".equals(handled)) MainActivity.super.onBackPressed();
+        });
+    }
+
     @Override protected void onResume() {
         super.onResume();
         if (web != null) web.evaluateJavascript("window.daybellResume && window.daybellResume()", null);
@@ -234,6 +245,19 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void exportReport(String fmt, String name, String json) {
             runOnUiThread(() -> startExport(fmt, name, json));
+        }
+        @JavascriptInterface public void shareText(String subject, String text) {
+            runOnUiThread(() -> {
+                Intent send = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text);
+                if (subject != null && !subject.isEmpty()) send.putExtra(Intent.EXTRA_SUBJECT, subject);
+                try { startActivity(Intent.createChooser(send, "Share note")); } catch (Exception ignored) {}
+            });
+        }
+        @JavascriptInterface public void copyText(String text) {
+            runOnUiThread(() -> {
+                ClipboardManager cm = getSystemService(ClipboardManager.class);
+                if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("Dayco note", text));
+            });
         }
         @JavascriptInterface public String takePending() { return Store.takePending(MainActivity.this); }
         @JavascriptInterface public void testAlarm() { Scheduler.scheduleTest(MainActivity.this); }

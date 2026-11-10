@@ -6,8 +6,8 @@ android {
         applicationId "com.daybell.app"
         minSdk 26
         targetSdk 35
-        versionCode 16
-        versionName "2.5"
+        versionCode 17
+        versionName "2.6"
     }
     // Signing details live in keystore.properties (not committed). Without it, release builds are unsigned.
     def ksFile = rootProject.file("keystore.properties")

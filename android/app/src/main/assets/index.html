@@ -5,19 +5,19 @@
 /* Layout: one-column phone app — sticky header, scrolling tab panel, fixed bottom tab bar, bottom sheets for forms and alarms */
 :root{
   --bg:#F2F2F1; --surface:#FFFFFF; --sunk:#E8E8E6; --ink:#161616; --muted:#666664; --line:#DCDCDA;
-  --task:#F15A0F; --task-soft:#FDE4D6; --task-ink:#C2410C; --pos:#16803C; --cal:#B7791F; --cal-soft:#FAEFD9; --on-cal:#FFFFFF; --money:#F15A0F; --money-soft:#FDE4D6; --on-money:#FFFFFF; --water:#1C7FE0; --water-hi:#5CB6FF; --water-soft:#DCEBFB; --fig:#F2742A; --fig-hi:#FFC49C; --danger:#B83A32; --on-accent:#FFFFFF;
+  --task:#F15A0F; --task-soft:#FDE4D6; --task-ink:#C2410C; --pos:#16803C; --cal:#B7791F; --cal-soft:#FAEFD9; --on-cal:#FFFFFF; --money:#F15A0F; --money-soft:#FDE4D6; --on-money:#FFFFFF; --water:#1C7FE0; --water-hi:#5CB6FF; --water-soft:#DCEBFB; --fig:#F2742A; --fig-hi:#FFC49C; --n-red:#FAD4CF; --n-orange:#FDE2C4; --n-yellow:#FFF1AE; --n-green:#DDF1C8; --n-teal:#CDEEE7; --n-blue:#D4E6F8; --n-purple:#E3D8F6; --n-pink:#F8D5E4; --n-brown:#EADBCB; --n-grey:#E4E4E2; --danger:#B83A32; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.10);
   --display:"Bricolage Grotesque", "Figtree", system-ui, sans-serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#121212; --surface:#1E1E1E; --sunk:#282828; --ink:#F2F2F2; --muted:#9E9E9E; --line:#303030;
-  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --fig:#C9480C; --fig-hi:#FF9A5C; --danger:#FF6B5E; --on-accent:#FFFFFF;
+  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --fig:#C9480C; --fig-hi:#FF9A5C; --n-red:#5C2B29; --n-orange:#614A19; --n-yellow:#5E5718; --n-green:#345920; --n-teal:#16504B; --n-blue:#2D555E; --n-purple:#42275E; --n-pink:#5B2245; --n-brown:#442F19; --n-grey:#3C3F43; --danger:#FF6B5E; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#121212; --surface:#1E1E1E; --sunk:#282828; --ink:#F2F2F2; --muted:#9E9E9E; --line:#303030;
-  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --fig:#C9480C; --fig-hi:#FF9A5C; --danger:#FF6B5E; --on-accent:#FFFFFF;
+  --task:#F2600F; --task-soft:#3A1E10; --task-ink:#FF7A33; --pos:#34C759; --cal:#F5B342; --cal-soft:#3A2C12; --on-cal:#1A1A1A; --money:#F2600F; --money-soft:#3A1E10; --on-money:#FFFFFF; --water:#2B8EF0; --water-hi:#7CC6FF; --water-soft:#14263A; --fig:#C9480C; --fig-hi:#FF9A5C; --n-red:#5C2B29; --n-orange:#614A19; --n-yellow:#5E5718; --n-green:#345920; --n-teal:#16504B; --n-blue:#2D555E; --n-purple:#42275E; --n-pink:#5B2245; --n-brown:#442F19; --n-grey:#3C3F43; --danger:#FF6B5E; --on-accent:#FFFFFF;
   --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -25,7 +25,7 @@
 html,body{background:var(--bg)}
 body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-button,input,select{font:inherit;color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--task-ink);outline-offset:2px}
 .num{font-variant-numeric:tabular-nums}
@@ -101,7 +101,7 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .fab.cal{background:var(--cal)}
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(7,1fr)}
 nav.tabs button{border:0;background:transparent;padding:10px 0 12px;display:grid;justify-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
 nav.tabs button[aria-selected="true"]{color:var(--ink)}
 nav.tabs button[aria-selected="true"] svg{color:var(--task-ink)}
@@ -109,6 +109,77 @@ nav.tabs button[data-tab="cal"][aria-selected="true"] svg{color:var(--cal)}
 nav.tabs button[data-tab="money"][aria-selected="true"] svg{color:var(--money)}
 nav.tabs button[data-tab="water"][aria-selected="true"] svg{color:var(--water)}
 nav.tabs button{font-size:11px}
+nav.tabs button svg{width:22px;height:22px}
+/* Notes */
+body.noscroll{overflow:hidden}
+.ntop{display:flex;gap:8px;align-items:center;margin-top:4px}
+.nsearch{flex:1;min-width:0;position:relative}
+.nsearch input[type=search]{padding-left:40px;border-radius:999px;background:var(--surface)}
+.nsearch svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.nchips{display:flex;gap:6px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
+.nchips::-webkit-scrollbar{display:none}
+.nchip{flex:none;display:flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--muted)}
+.nchip svg{width:14px;height:14px}
+.nchip.on{background:var(--task);border-color:var(--task);color:var(--on-accent)}
+.nsec{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 4px 8px}
+.ngrid{columns:2;column-gap:10px}
+.ngrid.list{columns:1}
+.ncard{display:flex;flex-direction:column;gap:6px;width:100%;break-inside:avoid;margin:0 0 10px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:var(--surface);position:relative;overflow:hidden}
+.ncard b{font-size:15.5px;font-weight:700;padding-right:20px;overflow-wrap:anywhere}
+.ntext{font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:10;-webkit-box-orient:vertical;overflow:hidden}
+.ntext.muted,.muted{color:var(--muted)}
+.nchk{display:grid;gap:3px;font-size:14px}
+.nchk span{display:flex;gap:7px;align-items:flex-start;overflow-wrap:anywhere}
+.nchk i{flex:none;width:13px;height:13px;border:1.6px solid currentColor;border-radius:3px;margin-top:3px;opacity:.6}
+.nchk .more{color:var(--muted);font-size:12.5px}
+.npin{position:absolute;top:10px;right:10px;color:var(--ink);opacity:.75}
+.npin svg{width:16px;height:16px}
+.nmeta{display:flex;flex-wrap:wrap;gap:5px}
+.nlab{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px;background:color-mix(in srgb,var(--ink) 9%,transparent);color:var(--ink);border:0}
+.nlab svg{width:12px;height:12px}
+.nlab.rem.done{text-decoration:line-through;opacity:.6}
+.ntrash{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);margin-top:8px}
+.nc-default{background:var(--surface)}
+.nc-red{background:var(--n-red)}.nc-orange{background:var(--n-orange)}.nc-yellow{background:var(--n-yellow)}.nc-green{background:var(--n-green)}.nc-teal{background:var(--n-teal)}
+.nc-blue{background:var(--n-blue)}.nc-purple{background:var(--n-purple)}.nc-pink{background:var(--n-pink)}.nc-brown{background:var(--n-brown)}.nc-grey{background:var(--n-grey)}
+.ncard:not(.nc-default){border-color:transparent}
+.neditor{position:fixed;inset:0;z-index:22;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.neditor.nc-default{background:var(--bg)}
+.nebar,.netool{display:flex;align-items:center;gap:2px;padding:6px max(8px,env(safe-area-inset-left,0px)) 6px max(8px,env(safe-area-inset-right,0px));flex:none}
+.nebar button,.netool button{width:44px;height:44px;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;color:var(--ink)}
+.nebar button.on,.netool button.on{color:var(--task-ink);background:color-mix(in srgb,var(--task) 16%,transparent)}
+.nebar .sp,.netool .sp{flex:1}
+.nebody{flex:1;overflow-y:auto;padding:4px max(18px,env(safe-area-inset-right,0px)) 20px max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:6px;max-width:680px;width:100%;margin:0 auto}
+#neTitle{border:0;background:transparent;width:100%;font-family:var(--display);font-size:24px;font-weight:700;padding:6px 0;min-height:0}
+#neText{border:0;background:transparent;font-family:var(--body);font-size:16px;line-height:1.55;resize:none;padding:4px 0;min-height:160px;outline:none;width:100%}
+#neTitle:focus-visible,#neText:focus-visible{outline:none}
+.nemeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.nemeta .nlab{font-size:12.5px;padding:5px 10px}
+#neEdited{font-size:12px;color:var(--muted);padding-right:10px}
+.nitem{display:flex;align-items:center;gap:8px}
+.nitem .nbox{width:22px;height:22px;flex:none;border:2px solid var(--muted);border-radius:5px;background:transparent;display:grid;place-items:center;color:var(--on-accent);padding:0}
+.nitem.done .nbox{background:var(--muted);border-color:var(--muted)}
+.nitem .nitext{flex:1;border:0;background:transparent;font-size:16px;padding:8px 0;min-height:0}
+.nitem.done .nitext{text-decoration:line-through;color:var(--muted)}
+.nitem .x{width:34px;height:34px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px;flex:none}
+.naddi{border:0;background:transparent;color:var(--muted);font-weight:600;text-align:left;padding:10px 0 10px 30px}
+.ndone{font-size:13px;color:var(--muted);font-weight:700;margin:10px 0 2px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+.nepanel{flex:none;background:var(--surface);border-top:1px solid var(--line);padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));display:grid;gap:10px;max-height:46vh;overflow-y:auto}
+.nptitle{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.nswatches{display:flex;flex-wrap:wrap;gap:10px}
+.nsw{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);padding:0}
+.nsw.nc-default{background:var(--surface);background-image:linear-gradient(135deg,transparent 46%,var(--muted) 46%,var(--muted) 54%,transparent 54%)}
+.nsw.on{border-color:var(--task);box-shadow:0 0 0 2px var(--task)}
+.nlabels{display:grid;gap:2px}
+.nlrow{display:flex;align-items:center;gap:10px;padding:8px 2px;font-size:15px}
+.nlrow input{width:20px;height:20px;accent-color:var(--task)}
+.nnewlab{display:flex;gap:8px}
+.nnewlab input{flex:1}
+.nmenu{display:grid}
+.nmenu button{border:0;background:transparent;text-align:left;padding:12px 4px;font-size:15px;font-weight:600;border-bottom:1px solid var(--line)}
+.nmenu button:last-child{border-bottom:0}
+.dangertxt{color:var(--danger)}
+.nstat{font-size:12px;color:var(--muted)}
 /* Body */
 .bodycard{display:flex;align-items:center;gap:14px;background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
 .bodycard.complete{box-shadow:0 0 0 2px var(--pos),var(--shadow)}
@@ -277,7 +348,7 @@ nav.tabs button{font-size:11px}
 .row > *{min-width:0}
 .field{display:grid;gap:5px;flex:1 1 120px}
 .field label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
-input[type=text],input[type=number],input[type=date],input[type=time],select{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;min-height:44px}
+input[type=text],input[type=search],input[type=number],input[type=date],input[type=time],select,.nnewlab input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;min-height:44px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .qchip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 11px;font-size:13px}
 .qchip b{color:var(--cal);font-weight:700}
@@ -477,6 +548,16 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
     <div class="list" id="moneyList"></div>
   </section>
 
+  <!-- NOTES -->
+  <section id="tab-notes" hidden>
+    <div class="ntop">
+      <div class="nsearch"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="noteSearch" placeholder="Search your notes" aria-label="Search notes" autocomplete="off"></div>
+      <button class="iconbtn" id="noteLayout" aria-label="Change layout"></button>
+    </div>
+    <div class="nchips" id="noteChips"></div>
+    <div id="noteList"></div>
+  </section>
+
   <!-- SETTINGS -->
   <section id="tab-set" hidden>
     <div class="sechead" style="margin-top:8px"><h2>Appearance</h2></div>
@@ -533,6 +614,7 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
     <button role="tab" data-tab="water" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7c3 3.6 6.5 7.6 6.5 11.3a6.5 6.5 0 0 1-13 0c0-3.7 3.5-7.7 6.5-11.3z"/></svg>Water</button>
     <button role="tab" data-tab="body" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.3"/><path d="M8.5 8.5h7l-.8 6h-1.6L13 21h-2l-.1-6.5H9.3z"/><path d="M8.5 8.5 6 13M15.5 8.5 18 13"/></svg>Body</button>
     <button role="tab" data-tab="money" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2.5"/><path d="M2 10h20"/><path d="M16 15h2"/><path d="M6 6V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>Money</button>
+    <button role="tab" data-tab="notes" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M8 13h8M8 17h5"/></svg>Notes</button>
     <button role="tab" data-tab="set" aria-selected="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
   </div>
 </nav>
@@ -597,6 +679,38 @@ input[type=text],input[type=number],input[type=date],input[type=time],select{wid
       <button type="submit" class="btn primary">Save goal</button>
     </div>
   </form>
+</div>
+
+<!-- Note editor -->
+<div class="neditor" id="noteEditor" hidden role="dialog" aria-label="Note">
+  <div class="nebar">
+    <button id="neBack" aria-label="Save and go back"></button><span class="sp"></span>
+    <button id="nePin"></button><button id="neRemind" aria-label="Reminder"></button><button id="neArchive"></button><button id="neMore" aria-label="More options"></button>
+  </div>
+  <div class="nebody">
+    <input id="neTitle" placeholder="Title" maxlength="200" aria-label="Title" autocomplete="off">
+    <textarea id="neText" placeholder="Note" aria-label="Note text"></textarea>
+    <div id="neList" hidden></div>
+    <div class="nemeta" id="neMeta"></div>
+  </div>
+  <div class="nepanel" id="nePanel" hidden></div>
+  <div class="netool">
+    <button id="neCheck" aria-label="Checklist"></button><button id="neColor" aria-label="Colour"></button><button id="neLabel" aria-label="Labels"></button>
+    <span class="sp"></span><span id="neEdited"></span>
+  </div>
+</div>
+
+<!-- Trashed note actions -->
+<div class="scrim" id="nActSheet" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="nActTitle">
+    <h2 id="nActTitle"></h2>
+    <p class="note" style="margin:0" id="nActSub"></p>
+    <div class="actions">
+      <button type="button" class="btn danger" id="nActDelete">Delete for good</button>
+      <button type="button" class="btn primary" id="nActRestore">Restore</button>
+    </div>
+    <button type="button" class="btn ghost" id="nActCancel" style="border-radius:999px">Cancel</button>
+  </div>
 </div>
 
 <!-- Weigh-in actions -->
@@ -704,11 +818,12 @@ const FEATURES = [
   { id: "cal", name: "Calories", desc: "Food log and daily calorie goal" },
   { id: "water", name: "Water", desc: "Water bottle tracker and drink reminders" },
   { id: "body", name: "Body", desc: "Weight goal and body transformation" },
-  { id: "money", name: "Money", desc: "Expenses, income, budget and reports" }
+  { id: "money", name: "Money", desc: "Expenses, income, budget and reports" },
+  { id: "notes", name: "Notes", desc: "Notes and checklists with labels, colours and reminders" }
 ];
 
 /* ---------- state ---------- */
-const S = { tasks: [], meals: [], money: [], water: {}, body: { entries: [] }, settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true, waterSound: true, moneySound: true } };
+const S = { tasks: [], meals: [], money: [], water: {}, body: { entries: [] }, notes: [], noteLabels: [], settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true, waterSound: true, moneySound: true } };
 const view = { tab: "tasks", taskDay: today(), calDay: today(), month: today().slice(0, 7), waterDay: today() };
 
 /* Repeating tasks: one record holds the schedule, completion is tracked per date. */
@@ -731,13 +846,13 @@ const LS = "daybell-v1";
 function loadLocal() {
   try {
     const r = JSON.parse(localStorage.getItem(LS) || "null");
-    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; Object.assign(S.settings, r.settings || {}); }
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; S.notes = r.notes || []; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
   } catch (e) {}
 }
 const NATIVE = window.DaybellNative || null;
 function saveLocal() {
-  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, water: S.water, body: S.body, settings: S.settings })); } catch (e) {}
-  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: (featureOn("tasks") ? S.tasks : []).concat(featureOn("water") ? waterAlarmTasks() : [], featureOn("body") ? bodyAlarmTasks() : []), settings: S.settings })); } catch (e) {}
+  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, water: S.water, body: S.body, notes: S.notes, noteLabels: S.noteLabels, settings: S.settings })); } catch (e) {}
+  if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: (featureOn("tasks") ? S.tasks : []).concat(featureOn("water") ? waterAlarmTasks() : [], featureOn("body") ? bodyAlarmTasks() : [], featureOn("notes") ? noteAlarmTasks() : []), settings: S.settings })); } catch (e) {}
 }
 /* Actions taken on the Android alarm screen while the app was closed. */
 let openWeighAfterResume = false;
@@ -748,6 +863,7 @@ function applyPending() {
   acts.forEach(a => {
     if (a.type !== "done") return;
     if (a.id === "body-weighin") { openWeighAfterResume = true; return; }
+    if (String(a.id).startsWith("note-")) { const n = S.notes.find(x => x.id === a.id.slice(5)); if (n) { n.reminderDone = true; saveLocal(); } return; }
     if (String(a.id).startsWith("water-")) { const tm = a.id.slice(6, 8) + ":" + a.id.slice(8, 10); setWater(a.day, tm, true); return; }
     const t = S.tasks.find(x => x.id === a.id); if (!t) return;
     const c = plain(t);
@@ -869,6 +985,7 @@ function render() {
   if (view.tab === "money") renderMoney();
   if (view.tab === "water") renderWater();
   if (view.tab === "body") renderBody();
+  if (view.tab === "notes") renderNotes();
 }
 
 const featureOn = id => (S.settings.features || {})[id] !== false;
@@ -901,11 +1018,11 @@ function showTab(tab) {
   if (tab !== "set" && !featureOn(tab)) tab = (FEATURES.find(f => featureOn(f.id)) || { id: "set" }).id;
   view.tab = tab;
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
-  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set"; $("#tab-money").hidden = tab !== "money"; $("#tab-water").hidden = tab !== "water"; $("#tab-body").hidden = tab !== "body";
+  $("#tab-tasks").hidden = tab !== "tasks"; $("#tab-cal").hidden = tab !== "cal"; $("#tab-set").hidden = tab !== "set"; $("#tab-money").hidden = tab !== "money"; $("#tab-water").hidden = tab !== "water"; $("#tab-body").hidden = tab !== "body"; $("#tab-notes").hidden = tab !== "notes";
   const fab = $("#fab");
-  fab.hidden = tab !== "tasks" && tab !== "money" && tab !== "body";
+  fab.hidden = !["tasks", "money", "body", "notes"].includes(tab);
   fab.classList.toggle("money", tab === "money");
-  fab.querySelector("span").textContent = tab === "money" ? "Add entry" : tab === "body" ? "Log weight" : "New task";
+  fab.querySelector("span").textContent = tab === "money" ? "Add entry" : tab === "body" ? "Log weight" : tab === "notes" ? "New note" : "New task";
   if (tab === "set") { syncSettingsUI(); renderFeatureList(); }
   try { sessionStorage.setItem("daybell-tab", tab); } catch (e) {}
   render(); window.scrollTo(0, 0);
@@ -1444,6 +1561,291 @@ $("#weighSheet").addEventListener("click", e => { if (e.target.id === "weighShee
 
 $("#setupBody").innerHTML = bodyMarkup(0.55, "mini");
 
+/* ---------- notes ---------- */
+const NOTE_COLORS = [["default", "Default"], ["red", "Coral"], ["orange", "Peach"], ["yellow", "Sand"], ["green", "Mint"], ["teal", "Sage"],
+  ["blue", "Fog"], ["purple", "Storm"], ["pink", "Dusk"], ["brown", "Clay"], ["grey", "Chalk"]];
+const ICON = {
+  pin: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 4H6l4-4z"/><path d="M12 14v7"/></svg>',
+  pinOn: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 4H6l4-4z"/><path d="M12 14v7" fill="none"/></svg>',
+  bell: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+  archive: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4"/></svg>',
+  unarchive: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M12 18v-6M9.5 14.5 12 12l2.5 2.5"/></svg>',
+  more: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>',
+  back: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>',
+  check: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></svg>',
+  palette: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.9 1.8-1.9 0-.5-.2-.9-.5-1.3-.3-.3-.5-.8-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-7.8-9-7.8z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor"/><circle cx="10.5" cy="7" r="1.2" fill="currentColor"/><circle cx="15" cy="7.5" r="1.2" fill="currentColor"/></svg>',
+  label: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4" fill="currentColor"/></svg>',
+  grid: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>',
+  list: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="6.5" rx="1.5"/><rect x="3" y="13.5" width="18" height="6.5" rx="1.5"/></svg>',
+  x: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
+};
+let noteFilter = "notes", noteQuery = "", curNote = null, notePanel = null, noteSaveT = null;
+const noteBody = n => n.checklist ? (n.items || []).map(i => (i.done ? "[x] " : "[ ] ") + i.text).join("\n") : (n.body || "");
+const noteEmpty = n => !(n.title || "").trim() && !(n.checklist ? (n.items || []).some(i => i.text.trim()) : (n.body || "").trim());
+const noteTitle = n => (n.title || "").trim() || (n.checklist ? ((n.items || [])[0] || {}).text : (n.body || "").split("\n")[0]) || "Untitled note";
+function allLabels() {
+  const set = new Set(S.noteLabels || []);
+  S.notes.forEach(n => (n.labels || []).forEach(l => set.add(l)));
+  return [...set].sort((a, b) => a.localeCompare(b));
+}
+function purgeTrash() { const cut = Date.now() - 30 * 864e5; S.notes = S.notes.filter(n => !n.trashed || n.trashed > cut); }
+function fmtWhen(ts) {
+  const d = new Date(ts), t = today(), day = ymd(d);
+  const time = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  return day === t ? time : day === addDays(t, -1) ? `Yesterday ${time}` : d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric" });
+}
+const remLabel = r => `${dayLabel(r.date).rel === "Today" || dayLabel(r.date).rel === "Tomorrow" ? dayLabel(r.date).rel : dayLabel(r.date).date}, ${fmtTime(r.time)}`;
+
+function noteCard(n) {
+  let body = "";
+  if (n.checklist) {
+    const items = n.items || [], open = items.filter(i => !i.done), done = items.filter(i => i.done);
+    body = `<span class="nchk">${open.slice(0, 8).map(i => `<span><i></i>${esc(i.text)}</span>`).join("")}${open.length > 8 ? `<span class="more">+ ${open.length - 8} more</span>` : ""}${done.length ? `<span class="more">+ ${done.length} checked item${done.length > 1 ? "s" : ""}</span>` : ""}</span>`;
+  } else if ((n.body || "").trim()) body = `<span class="ntext">${esc(n.body.length > 600 ? n.body.slice(0, 600) + "…" : n.body)}</span>`;
+  const meta = (n.labels || []).map(l => `<span class="nlab">${esc(l)}</span>`).join("") +
+    (n.reminder ? `<span class="nlab rem ${n.reminderDone ? "done" : ""}">${ICON.bell}${esc(remLabel(n.reminder))}</span>` : "");
+  return `<button class="ncard nc-${n.color || "default"}" data-note="${n.id}">${n.pinned ? `<span class="npin">${ICON.pinOn}</span>` : ""}${(n.title || "").trim() ? `<b>${esc(n.title)}</b>` : ""}${body}${meta ? `<span class="nmeta">${meta}</span>` : ""}${!(n.title || "").trim() && !body ? `<span class="ntext muted">Empty note</span>` : ""}</button>`;
+}
+function renderNotes() {
+  purgeTrash();
+  const labels = allLabels();
+  if (noteFilter.startsWith("label:") && !labels.includes(noteFilter.slice(6))) noteFilter = "notes";
+  const chips = [["notes", "Notes"], ["reminders", "Reminders"], ...labels.map(l => ["label:" + l, l]), ["archive", "Archive"], ["trash", "Trash"]];
+  $("#noteChips").innerHTML = chips.map(([k, l]) => `<button class="nchip ${noteFilter === k ? "on" : ""}" data-nfilter="${esc(k)}">${k.startsWith("label:") ? ICON.label : ""}${esc(l)}</button>`).join("");
+  const grid = (S.settings.noteLayout || "grid") === "grid";
+  $("#noteLayout").innerHTML = grid ? ICON.list : ICON.grid;
+  $("#noteLayout").setAttribute("aria-label", grid ? "Show as list" : "Show as grid");
+  let list = S.notes.filter(n => noteFilter === "trash" ? n.trashed : !n.trashed && (noteFilter === "archive" ? n.archived : !n.archived));
+  if (noteFilter === "reminders") list = list.filter(n => n.reminder);
+  if (noteFilter.startsWith("label:")) list = list.filter(n => (n.labels || []).includes(noteFilter.slice(6)));
+  const q = noteQuery.trim().toLowerCase();
+  if (q) list = list.filter(n => ((n.title || "") + "\n" + noteBody(n) + "\n" + (n.labels || []).join(" ")).toLowerCase().includes(q));
+  list.sort((a, b) => (b.edited || 0) - (a.edited || 0));
+  const usePins = noteFilter === "notes" || noteFilter.startsWith("label:") || noteFilter === "reminders";
+  const pinned = usePins ? list.filter(n => n.pinned) : [], others = list.filter(n => !pinned.includes(n));
+  const cls = `ngrid ${grid ? "" : "list"}`;
+  let html = "";
+  if (noteFilter === "trash" && list.length) html += `<div class="ntrash"><span>Notes in Trash are deleted after 30 days.</span><button class="btn small ghost" id="emptyTrash">Empty trash</button></div>`;
+  if (pinned.length) html += `<div class="nsec">Pinned</div><div class="${cls}">${pinned.map(noteCard).join("")}</div>`;
+  if (others.length) html += (pinned.length ? `<div class="nsec">Others</div>` : "") + `<div class="${cls}">${others.map(noteCard).join("")}</div>`;
+  if (!list.length) {
+    const msg = q ? ["No matching notes", `Nothing found for “${esc(noteQuery.trim())}”.`]
+      : { notes: ["No notes yet", "Tap “New note” to write something down, or make a checklist."], reminders: ["No reminders", "Notes with a reminder show up here."],
+          archive: ["Archive is empty", "Archived notes stay out of the way but are kept here."], trash: ["Trash is empty", "Deleted notes stay here for 30 days."] }[noteFilter] || ["No notes with this label", "Add the label to a note from the note's label button."];
+    html = `<div class="empty"><strong>${msg[0]}</strong>${msg[1]}</div>`;
+  }
+  $("#noteList").innerHTML = html;
+}
+
+/* Editor */
+function saveNoteSoon() { clearTimeout(noteSaveT); noteSaveT = setTimeout(() => saveLocal(), 400); }
+function touch() { if (!curNote) return; curNote.edited = Date.now(); $("#neEdited").textContent = `Edited ${fmtWhen(curNote.edited)}`; saveNoteSoon(); }
+function autoGrow() { const t = $("#neText"); t.style.height = "auto"; t.style.height = Math.max(160, t.scrollHeight) + "px"; }
+function openNote(n) {
+  if (!n) { n = { id: newId(), title: "", body: "", items: [], checklist: false, color: "default", pinned: false, archived: false, labels: noteFilter.startsWith("label:") ? [noteFilter.slice(6)] : [], reminder: null, created: Date.now(), edited: Date.now() }; S.notes.push(n); n._new = true; }
+  curNote = n; notePanel = null;
+  $("#neTitle").value = n.title || "";
+  $("#neText").value = n.body || "";
+  paintEditor();
+  $("#noteEditor").hidden = false;
+  document.body.classList.add("noscroll");
+  requestAnimationFrame(autoGrow);
+  if (n._new) setTimeout(() => $("#neText").focus(), 80);
+}
+function paintEditor() {
+  const n = curNote; if (!n) return;
+  const ed = $("#noteEditor");
+  ed.className = `neditor nc-${n.color || "default"}`;
+  $("#nePin").innerHTML = n.pinned ? ICON.pinOn : ICON.pin; $("#nePin").setAttribute("aria-label", n.pinned ? "Unpin" : "Pin");
+  $("#neArchive").innerHTML = n.archived ? ICON.unarchive : ICON.archive; $("#neArchive").setAttribute("aria-label", n.archived ? "Unarchive" : "Archive");
+  $("#neRemind").classList.toggle("on", !!n.reminder);
+  $("#neCheck").classList.toggle("on", !!n.checklist);
+  $("#neText").hidden = !!n.checklist;
+  $("#neList").hidden = !n.checklist;
+  if (n.checklist) renderItems();
+  $("#neMeta").innerHTML = (n.labels || []).map(l => `<button class="nlab" data-nelabel-rm="${esc(l)}">${esc(l)} ${ICON.x}</button>`).join("") +
+    (n.reminder ? `<button class="nlab rem ${n.reminderDone ? "done" : ""}" data-nepanel="remind">${ICON.bell}${esc(remLabel(n.reminder))}</button>` : "");
+  $("#neEdited").textContent = `Edited ${fmtWhen(n.edited || Date.now())}`;
+  paintPanel();
+}
+function renderItems(focusId, caretEnd) {
+  const items = curNote.items || (curNote.items = []);
+  const open = items.filter(i => !i.done), done = items.filter(i => i.done);
+  const row = i => `<div class="nitem ${i.done ? "done" : ""}"><button class="nbox" data-nitem-toggle="${i.id}" aria-label="${i.done ? "Uncheck" : "Check"} item">${i.done ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>' : ""}</button><input class="nitext" data-nitem="${i.id}" value="${esc(i.text)}" placeholder="List item" enterkeyhint="next"><button class="x" data-nitem-del="${i.id}" aria-label="Remove item">${ICON.x}</button></div>`;
+  $("#neList").innerHTML = open.map(row).join("") + `<button class="naddi" id="neAddItem">+ List item</button>` +
+    (done.length ? `<div class="ndone">${done.length} checked item${done.length > 1 ? "s" : ""}</div>${done.map(row).join("")}` : "");
+  if (focusId) { const el = document.querySelector(`[data-nitem="${focusId}"]`); if (el) { el.focus(); if (caretEnd) el.setSelectionRange(el.value.length, el.value.length); } }
+}
+function setChecklist(on) {
+  if (!!curNote.checklist === on) return;
+  if (on) {
+    const lines = (curNote.body || "").split("\n").map(s => s.replace(/^\s*([-*•]|\[ ?\]|\[x\])\s*/i, "")).filter(s => s.trim());
+    curNote.items = lines.map(text => ({ id: newId(), text, done: false }));
+    if (!curNote.items.length) curNote.items = [{ id: newId(), text: "", done: false }];
+  } else {
+    curNote.body = (curNote.items || []).map(i => i.text).filter(Boolean).join("\n");
+    $("#neText").value = curNote.body;
+  }
+  curNote.checklist = on; touch(); paintEditor();
+  if (on) { const first = curNote.items.find(i => !i.done); if (first) renderItems(first.id, true); } else { autoGrow(); $("#neText").focus(); }
+}
+function paintPanel() {
+  const p = $("#nePanel"), n = curNote;
+  p.hidden = !notePanel;
+  if (!notePanel) return;
+  if (notePanel === "color") {
+    p.innerHTML = `<div class="nptitle">Colour</div><div class="nswatches">${NOTE_COLORS.map(([c, name]) => `<button class="nsw nc-${c} ${(n.color || "default") === c ? "on" : ""}" data-ncolor="${c}" aria-label="${name}" title="${name}"></button>`).join("")}</div>`;
+  } else if (notePanel === "label") {
+    const labels = allLabels();
+    p.innerHTML = `<div class="nptitle">Labels</div><div class="nlabels">${labels.map(l => `<label class="nlrow"><input type="checkbox" data-nlabel="${esc(l)}" ${(n.labels || []).includes(l) ? "checked" : ""}><span>${esc(l)}</span></label>`).join("") || `<span class="muted">No labels yet.</span>`}</div>
+      <form class="nnewlab" id="nNewLabel"><input id="nNewLabelIn" maxlength="30" placeholder="New label, e.g. Work"><button class="btn small primary">Add</button></form>`;
+  } else if (notePanel === "remind") {
+    const r = n.reminder || {}, dt = new Date(Date.now() + 3600e3);
+    p.innerHTML = `<div class="nptitle">Reminder</div><div class="row"><div class="field"><label for="nRemDate">Date</label><input type="date" id="nRemDate" value="${r.date || today()}"></div><div class="field"><label for="nRemTime">Time</label><input type="time" id="nRemTime" value="${r.time || pad(dt.getHours()) + ":00"}"></div></div>
+      <div class="actions">${n.reminder ? `<button type="button" class="btn danger" id="nRemDel">Remove</button>` : ""}<button type="button" class="btn primary" id="nRemSave">Set reminder</button></div>`;
+  } else if (notePanel === "more") {
+    const words = ((n.title || "") + " " + noteBody(n).replace(/\[[ x]\] /g, "")).trim().split(/\s+/).filter(Boolean).length;
+    p.innerHTML = `<div class="nmenu">
+      <button data-nact="copy">Make a copy</button><button data-nact="text">Copy text</button><button data-nact="share">Share</button>
+      <button data-nact="delete" class="dangertxt">Delete note</button></div>
+      <div class="nstat">${words} word${words === 1 ? "" : "s"} · ${noteBody(n).length + (n.title || "").length} characters · Created ${fmtWhen(n.created || n.edited)}</div>`;
+  }
+}
+function togglePanel(name) { notePanel = notePanel === name ? null : name; paintPanel(); }
+function closeNote() {
+  if (!curNote) return;
+  clearTimeout(noteSaveT);
+  const n = curNote; curNote = null; notePanel = null;
+  $("#noteEditor").hidden = true; document.body.classList.remove("noscroll");
+  if (n.checklist) n.items = (n.items || []).filter(i => i.text.trim());
+  if (noteEmpty(n)) { S.notes = S.notes.filter(x => x !== n); if (!n._new) toast("Empty note deleted"); }
+  delete n._new;
+  saveLocal(); render();
+}
+function trashNote(n) {
+  n.trashed = Date.now(); n.pinned = false;
+  if (curNote === n) { curNote = null; notePanel = null; $("#noteEditor").hidden = true; document.body.classList.remove("noscroll"); }
+  saveLocal(); render();
+  toast("Note moved to Trash", () => { delete n.trashed; saveLocal(); render(); });
+}
+function copyText(text) {
+  if (NATIVE && NATIVE.copyText) { NATIVE.copyText(text); toast("Copied to clipboard"); return; }
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => toast("Copied to clipboard"), () => toast("Couldn't copy here"));
+}
+
+/* Editor events */
+$("#neTitle").addEventListener("input", e => { curNote.title = e.target.value; touch(); });
+$("#neText").addEventListener("input", e => { curNote.body = e.target.value; autoGrow(); touch(); });
+$("#neList").addEventListener("input", e => {
+  const id = e.target.dataset.nitem; if (!id) return;
+  const it = curNote.items.find(i => i.id === id); if (it) { it.text = e.target.value; touch(); }
+});
+$("#neList").addEventListener("keydown", e => {
+  const id = e.target.dataset.nitem; if (!id) return;
+  const items = curNote.items, idx = items.findIndex(i => i.id === id), it = items[idx];
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const pos = e.target.selectionStart, rest = it.text.slice(pos);
+    it.text = it.text.slice(0, pos);
+    const ni = { id: newId(), text: rest, done: it.done };
+    items.splice(idx + 1, 0, ni); touch(); renderItems(ni.id);
+    const el = document.querySelector(`[data-nitem="${ni.id}"]`); if (el) el.setSelectionRange(0, 0);
+  } else if (e.key === "Backspace" && e.target.selectionStart === 0 && e.target.selectionEnd === 0) {
+    const same = items.filter(i => i.done === it.done), k = same.indexOf(it);
+    if (k <= 0 && it.text) return;
+    e.preventDefault();
+    const prev = same[k - 1];
+    if (prev) prev.text += it.text;
+    items.splice(idx, 1); touch(); renderItems(prev ? prev.id : (items.find(i => !i.done) || {}).id, true);
+  }
+});
+$("#noteEditor").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || !curNote) return;
+  const n = curNote;
+  if (b.id === "neBack") return closeNote();
+  if (b.id === "nePin") { n.pinned = !n.pinned; if (n.pinned) n.archived = false; touch(); paintEditor(); return toast(n.pinned ? "Pinned" : "Unpinned"); }
+  if (b.id === "neArchive") { n.archived = !n.archived; if (n.archived) n.pinned = false; touch(); const was = n.archived; closeNote(); return toast(was ? "Note archived" : "Note unarchived", () => { n.archived = !was; saveLocal(); render(); }); }
+  if (b.id === "neRemind" || b.dataset.nepanel === "remind") return togglePanel("remind");
+  if (b.id === "neMore") return togglePanel("more");
+  if (b.id === "neColor") return togglePanel("color");
+  if (b.id === "neLabel") return togglePanel("label");
+  if (b.id === "neCheck") return setChecklist(!n.checklist);
+  if (b.dataset.ncolor) { n.color = b.dataset.ncolor; touch(); return paintEditor(); }
+  if (b.dataset.nelabelRm) { n.labels = (n.labels || []).filter(l => l !== b.dataset.nelabelRm); touch(); return paintEditor(); }
+  if (b.dataset.nitemToggle) { const it = n.items.find(i => i.id === b.dataset.nitemToggle); if (it) { it.done = !it.done; touch(); renderItems(); } return; }
+  if (b.dataset.nitemDel) { n.items = n.items.filter(i => i.id !== b.dataset.nitemDel); touch(); return renderItems(); }
+  if (b.id === "neAddItem") { const ni = { id: newId(), text: "", done: false }; const lastOpen = n.items.map(i => i.done).lastIndexOf(false); n.items.splice(lastOpen + 1, 0, ni); touch(); return renderItems(ni.id); }
+  if (b.id === "nRemSave") {
+    const date = $("#nRemDate").value, time = $("#nRemTime").value;
+    if (!date || !time) return toast("Pick a date and time");
+    n.reminder = { date, time }; n.reminderDone = false; notePanel = null; touch(); paintEditor();
+    return toast(`Reminder set for ${remLabel(n.reminder)}`);
+  }
+  if (b.id === "nRemDel") { n.reminder = null; n.reminderDone = false; notePanel = null; touch(); paintEditor(); return toast("Reminder removed"); }
+  if (b.dataset.nact === "copy") {
+    const c = JSON.parse(JSON.stringify(n)); c.id = newId(); c.created = c.edited = Date.now(); c.pinned = false; c.title = (c.title || "") + (c.title ? " (copy)" : ""); c.reminder = null;
+    (c.items || []).forEach(i => { i.id = newId(); });
+    delete c._new; S.notes.push(c); closeNote(); return toast("Copy made");
+  }
+  if (b.dataset.nact === "text") { notePanel = null; paintPanel(); return copyText([(n.title || "").trim(), noteBody(n)].filter(Boolean).join("\n\n")); }
+  if (b.dataset.nact === "share") {
+    notePanel = null; paintPanel();
+    const text = noteBody(n), subject = (n.title || "").trim();
+    if (NATIVE && NATIVE.shareText) return NATIVE.shareText(subject, [subject, text].filter(Boolean).join("\n\n"));
+    if (navigator.share) return navigator.share({ title: subject, text }).catch(() => {});
+    return copyText([subject, text].filter(Boolean).join("\n\n"));
+  }
+  if (b.dataset.nact === "delete") return trashNote(n);
+});
+$("#noteEditor").addEventListener("change", e => {
+  const l = e.target.dataset && e.target.dataset.nlabel; if (!l || !curNote) return;
+  const set = new Set(curNote.labels || []); e.target.checked ? set.add(l) : set.delete(l);
+  curNote.labels = [...set]; touch(); paintEditor();
+});
+$("#noteEditor").addEventListener("submit", e => {
+  if (e.target.id !== "nNewLabel") return;
+  e.preventDefault();
+  const name = $("#nNewLabelIn").value.trim().replace(/\s+/g, " "); if (!name) return;
+  S.noteLabels = [...new Set([...(S.noteLabels || []), name])];
+  curNote.labels = [...new Set([...(curNote.labels || []), name])]; touch(); paintEditor();
+  toast(`Label “${name}” added`);
+});
+
+/* List events */
+$("#noteSearch").addEventListener("input", e => { noteQuery = e.target.value; renderNotes(); });
+$("#noteLayout").onclick = () => { S.settings.noteLayout = (S.settings.noteLayout || "grid") === "grid" ? "list" : "grid"; saveLocal(); renderNotes(); };
+
+/* Trash actions */
+let nActId = null;
+function openNoteActions(n) {
+  nActId = n.id;
+  $("#nActTitle").textContent = noteTitle(n);
+  $("#nActSub").textContent = `Deleted ${fmtWhen(n.trashed)}. It will be removed for good after 30 days.`;
+  $("#nActSheet").hidden = false;
+}
+const closeNAct = () => { $("#nActSheet").hidden = true; nActId = null; };
+$("#nActCancel").onclick = closeNAct;
+$("#nActSheet").addEventListener("click", e => { if (e.target.id === "nActSheet") closeNAct(); });
+$("#nActRestore").onclick = () => { const n = S.notes.find(x => x.id === nActId); closeNAct(); if (n) { delete n.trashed; saveLocal(); render(); toast("Note restored"); } };
+$("#nActDelete").onclick = () => { const n = S.notes.find(x => x.id === nActId); closeNAct(); if (n) { S.notes = S.notes.filter(x => x !== n); saveLocal(); render(); toast("Note deleted for good"); } };
+
+/* Note reminders ring through the phone's alarm system. */
+function noteAlarmTasks() {
+  return S.notes.filter(n => n.reminder && !n.trashed).map(n => ({
+    id: "note-" + n.id, title: noteTitle(n).slice(0, 80), date: n.reminder.date, time: n.reminder.time,
+    lead: 0, repeat: "none", done: !!n.reminderDone
+  }));
+}
+
+/* Phone Back button: close what's open on top before leaving the app. */
+window.daybellBack = () => {
+  if (curNote) { if (notePanel) { notePanel = null; paintPanel(); } else closeNote(); return true; }
+  const open = [...document.querySelectorAll(".scrim")].filter(el => !el.hidden);
+  if (open.length) { open[open.length - 1].hidden = true; return true; }
+  return false;
+};
+["neBack", "neMore", "neCheck", "neColor", "neLabel", "neRemind"].forEach(id => { $("#" + id).innerHTML = ICON[{ neBack: "back", neMore: "more", neCheck: "check", neColor: "palette", neLabel: "label", neRemind: "bell" }[id]]; });
+
 /* ---------- money ---------- */
 const CATS = {
   expense: ["Food", "Groceries", "Transport", "Bills", "Rent", "Shopping", "Health", "Education", "Entertainment", "Family", "Other"],
@@ -1791,6 +2193,12 @@ document.addEventListener("click", e => {
   }
   if (b.id === "addLevel") { const last = waterTimes().slice(-1)[0] || "18:00"; const h = Math.min(23, +last.slice(0, 2) + 2); $("#lvlTime").value = `${pad(h)}:00`; $("#lvlSheet").hidden = false; return; }
   if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
+  if (b.dataset.nfilter) { noteFilter = b.dataset.nfilter; return renderNotes(); }
+  if (b.dataset.note) { const n = S.notes.find(x => x.id === b.dataset.note); if (!n) return; return n.trashed ? openNoteActions(n) : openNote(n); }
+  if (b.id === "emptyTrash") {
+    const gone = S.notes.filter(n => n.trashed); S.notes = S.notes.filter(n => !n.trashed); saveLocal(); render();
+    return toast(`Deleted ${gone.length} note${gone.length === 1 ? "" : "s"} for good`, () => { S.notes.push(...gone); saveLocal(); render(); });
+  }
   if (b.id === "bodySetupBtn" || b.id === "bodyGoalBtn" || b.id === "bodyRemindBtn") return openGoal();
   if (b.id === "bmiAdd") return openGoal(true);
   if (b.dataset.wentry) return openWeighActions(b.dataset.wentry);
@@ -1806,7 +2214,7 @@ document.addEventListener("click", e => {
     toast("Added 3 example tasks. Tap one to edit or delete it.");
   }
 });
-$("#fab").onclick = () => view.tab === "money" ? openTx(null) : view.tab === "body" ? openWeigh(null) : openTask(null);
+$("#fab").onclick = () => view.tab === "money" ? openTx(null) : view.tab === "body" ? openWeigh(null) : view.tab === "notes" ? openNote(null) : openTask(null);
 
 /* ---------- settings ---------- */
 function applyTheme() {
