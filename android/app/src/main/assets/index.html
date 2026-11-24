@@ -95,6 +95,18 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .btn{border:0;border-radius:14px;padding:12px 18px;font-weight:700;background:var(--sunk);color:var(--ink)}
 .btn.primary{background:var(--task);color:var(--on-accent);border-radius:999px}
 .sheet .actions .btn{border-radius:999px}
+.kmode{text-transform:none;letter-spacing:0;font-weight:700;color:var(--cal)}
+.kmode button{border:0;background:transparent;color:var(--cal);font:inherit;text-decoration:underline;padding:0}
+.autocal{background:var(--bg);border-radius:12px;padding:8px 12px;display:grid;gap:2px}
+.acrow{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:3px 0}
+.acrow span{min-width:0;overflow-wrap:anywhere}
+.acrow em{font-style:normal;color:var(--muted);font-size:12px}
+.acrow b{flex:none}
+.acrow.miss span,.acrow.miss b{color:var(--danger)}
+.acrow.tot{border-top:1px solid var(--line);margin-top:2px;padding-top:6px;font-weight:700}
+.achint{font-size:12px;color:var(--muted);margin:0}
+#foodSuggest .qchip em{font-style:normal;color:var(--muted);font-size:11.5px}
+.food .ak{font-size:10.5px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 6px;margin-left:6px;vertical-align:1px}
 .btn.cal{background:var(--cal);color:var(--on-cal);border-radius:999px}
 .btn.ghost{background:transparent;border:1px solid var(--line)}
 .btn.danger{background:transparent;color:var(--danger);border:1px solid var(--line)}
@@ -457,14 +469,17 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
 
     <form class="addfood" id="foodForm" autocomplete="off">
       <div class="row">
-        <div class="field" style="flex:2 1 160px"><label for="foodName">Food</label><input type="text" id="foodName" placeholder="e.g. Oats with banana" required maxlength="60"></div>
-        <div class="field" style="flex:1 1 90px"><label for="foodKcal">kcal</label><input type="number" id="foodKcal" inputmode="numeric" min="1" max="5000" placeholder="350" required></div>
+        <div class="field" style="flex:2 1 160px"><label for="foodName">Food</label><input type="text" id="foodName" placeholder="e.g. 2 roti, dal, 1 bowl rice" required maxlength="120"></div>
+        <div class="field" style="flex:1 1 90px"><label for="foodKcal">kcal <span class="kmode" id="kcalMode"></span></label><input type="number" id="foodKcal" inputmode="numeric" min="1" max="9999" placeholder="Auto"></div>
       </div>
       <div class="row">
         <div class="field"><label for="foodMeal">Meal</label>
           <select id="foodMeal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
         <button class="btn cal" type="submit" style="align-self:end;flex:1 1 120px;min-height:44px">Add food</button>
       </div>
+      <div class="chips" id="foodSuggest" hidden></div>
+      <div class="autocal" id="autoCal" hidden></div>
+      <p class="achint">Type foods with amounts, like “3 idli, sambar” or “100 g paneer”. Calories are worked out for you; type a number in kcal to enter it yourself.</p>
     </form>
     <div class="sechead"><h2>Food log</h2><span id="calCount"></span></div>
     <div class="list" id="mealList"></div>
@@ -826,7 +841,7 @@ const FEATURES = [
 ];
 
 /* ---------- state ---------- */
-const S = { tasks: [], meals: [], money: [], water: {}, body: { entries: [] }, notes: [], noteLabels: [], settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true, waterSound: true, moneySound: true } };
+const S = { tasks: [], meals: [], myFoods: {}, money: [], water: {}, body: { entries: [] }, notes: [], noteLabels: [], settings: { kind: "settings", id: "settings", sound: true, voice: true, vibrate: true, lead: 5, goal: 2000, theme: "system", currency: "₹", budget: 0, waterTimes: ["09:00", "12:00", "18:00"], waterRemind: true, waterSound: true, moneySound: true } };
 const view = { tab: "tasks", taskDay: today(), calDay: today(), month: today().slice(0, 7), waterDay: today() };
 
 /* Repeating tasks: one record holds the schedule, completion is tracked per date. */
@@ -849,12 +864,12 @@ const LS = "daybell-v1";
 function loadLocal() {
   try {
     const r = JSON.parse(localStorage.getItem(LS) || "null");
-    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; S.notes = r.notes || []; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; S.notes = r.notes || []; S.myFoods = r.myFoods || {}; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
   } catch (e) {}
 }
 const NATIVE = window.DaybellNative || null;
 function saveLocal() {
-  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, water: S.water, body: S.body, notes: S.notes, noteLabels: S.noteLabels, settings: S.settings })); } catch (e) {}
+  try { localStorage.setItem(LS, JSON.stringify({ tasks: S.tasks, meals: S.meals, money: S.money, water: S.water, body: S.body, notes: S.notes, noteLabels: S.noteLabels, myFoods: S.myFoods, settings: S.settings })); } catch (e) {}
   if (NATIVE) try { NATIVE.sync(JSON.stringify({ tasks: (featureOn("tasks") ? S.tasks : []).concat(featureOn("water") ? waterAlarmTasks() : [], featureOn("body") ? bodyAlarmTasks() : [], featureOn("notes") ? noteAlarmTasks() : []), settings: S.settings })); } catch (e) {}
 }
 /* Actions taken on the Android alarm screen while the app was closed. */
@@ -978,7 +993,7 @@ function renderCal() {
   const groups = ["Breakfast", "Lunch", "Dinner", "Snack"];
   $("#mealList").innerHTML = groups.map(g => {
     const items = list.filter(m => m.meal === g), sum = items.reduce((s, m) => s + (+m.kcal || 0), 0);
-    return `<div class="meal"><h3><span>${g}</span><span class="num">${sum ? sum.toLocaleString() + " kcal" : ""}</span></h3>${items.length ? items.map(m => `<div class="food"><span class="n">${esc(m.name)}</span><span class="k num">${(+m.kcal).toLocaleString()}</span><button class="x" data-delmeal="${m.id}" aria-label="Remove ${esc(m.name)}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`).join("") : `<div class="none">Nothing logged</div>`}</div>`;
+    return `<div class="meal"><h3><span>${g}</span><span class="num">${sum ? sum.toLocaleString() + " kcal" : ""}</span></h3>${items.length ? items.map(m => `<div class="food"><span class="n">${esc(m.name)}${m.auto ? `<span class="ak" title="${esc((m.items || []).map(i => i.label + " " + i.name + " " + i.kcal).join(", "))}">auto</span>` : ""}</span><span class="k num">${(+m.kcal).toLocaleString()}</span><button class="x" data-delmeal="${m.id}" aria-label="Remove ${esc(m.name)}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`).join("") : `<div class="none">Nothing logged</div>`}</div>`;
   }).join("");
 }
 
@@ -1081,11 +1096,31 @@ function toggleTask(id) {
 /* ---------- meals ---------- */
 $("#foodForm").addEventListener("submit", e => {
   e.preventDefault();
-  const name = $("#foodName").value.trim(), kcal = Math.round(+$("#foodKcal").value);
-  if (!name || !(kcal > 0)) return;
-  put("meal", { id: newId(), name, kcal, meal: $("#foodMeal").value, date: view.calDay, at: Date.now() });
-  $("#foodName").value = ""; $("#foodKcal").value = "";
-  toast(`Added ${kcal} kcal`);
+  const name = $("#foodName").value.trim(); if (!name) return;
+  const res = autoCalories(name);
+  let kcal, auto = false;
+  if (calManual) kcal = Math.round(+$("#foodKcal").value);
+  else {
+    if (res.unknown.length) { toast(`Not in the food list: ${res.unknown.join(", ")}. Type the total kcal yourself.`); $("#foodKcal").focus(); return; }
+    kcal = res.total; auto = true;
+  }
+  if (!(kcal > 0)) { toast("Enter the calories in the kcal box"); $("#foodKcal").focus(); return; }
+  const meal = { id: newId(), name, kcal, meal: $("#foodMeal").value, date: view.calDay, at: Date.now(), auto };
+  if (auto) meal.items = res.items.map(i => ({ name: i.name, label: i.label, kcal: i.kcal }));
+  put("meal", meal);
+  // Remember a single food entered by hand, so it's worked out automatically next time.
+  let learned = "";
+  if (!auto && res.parts === 1) {
+    const p = parsePart(name);
+    if (p && p.food) {
+      const per = Math.round(kcal / (p.qty || 1)), key = normFood(p.food);
+      const shown = p.qty === 1 && !p.unit ? name : p.food.trim();
+      S.myFoods = Object.assign({}, S.myFoods, { [key]: { name: shown, kcal: per, unit: p.unit || "serving" } });
+      saveLocal(); learned = ` · saved “${shown}” as ${per} kcal per ${p.unit || "serving"}`;
+    }
+  }
+  $("#foodName").value = ""; $("#foodKcal").value = ""; calManual = false; refreshAutoCal();
+  toast(`Added ${kcal} kcal${learned}`);
 });
 function guessMeal() { const h = new Date().getHours(); return h < 11 ? "Breakfast" : h < 16 ? "Lunch" : h < 21 ? "Dinner" : "Snack"; }
 
@@ -2179,6 +2214,252 @@ $("#exForm").addEventListener("submit", e => {
   $("#exSheet").hidden = true;
 });
 window.daybellExported = (ok, msg) => toast(msg || (ok ? "Saved" : "Not saved"));
+
+/* ---------- automatic calories ----------
+   Built-in list of common foods: "names|aliases", kcal per unit, unit, grams (or ml) per unit.
+   Values are typical home-style portions and are estimates. */
+const FOOD_DB_RAW = [
+  // breads
+  ["roti|chapati|chapathi|phulka|fulka|rotli", 110, "piece", 40], ["tandoori roti", 130, "piece", 45],
+  ["paratha|plain paratha|parantha", 230, "piece", 70], ["aloo paratha|aloo parantha|potato paratha", 300, "piece", 110],
+  ["paneer paratha", 320, "piece", 110], ["gobi paratha", 260, "piece", 110], ["methi paratha|thepla", 180, "piece", 60],
+  ["poori|puri|poories|puris", 100, "piece", 25], ["naan", 260, "piece", 90], ["butter naan", 320, "piece", 95],
+  ["garlic naan", 300, "piece", 95], ["kulcha|amritsari kulcha", 280, "piece", 90], ["bhatura|bhature", 300, "piece", 80],
+  ["bread|white bread|bread slice", 70, "slice", 27], ["brown bread|whole wheat bread", 65, "slice", 27],
+  ["toast|butter toast", 110, "slice", 30], ["pav|bun|ladi pav", 120, "piece", 40],
+  // rice & grains
+  ["rice|white rice|steamed rice|plain rice|chawal|boiled rice", 195, "bowl", 150], ["brown rice", 165, "bowl", 150],
+  ["jeera rice", 240, "bowl", 150], ["pulao|veg pulao|pulav", 250, "bowl", 150], ["curd rice|dahi rice", 220, "bowl", 180],
+  ["lemon rice", 250, "bowl", 150], ["khichdi|khichri", 200, "bowl", 180], ["fried rice|veg fried rice", 450, "plate", 250],
+  ["chicken fried rice", 520, "plate", 250], ["veg biryani|vegetable biryani", 400, "plate", 280],
+  ["chicken biryani|biryani", 500, "plate", 300], ["mutton biryani", 580, "plate", 300], ["egg biryani", 450, "plate", 280],
+  ["oats|oatmeal|porridge", 150, "bowl", 200], ["oats with milk|milk oats", 250, "bowl", 250],
+  ["cornflakes|corn flakes|cornflakes with milk", 200, "bowl", 200], ["muesli", 230, "bowl", 200], ["daliya|dalia|broken wheat", 180, "bowl", 200],
+  // south indian & snacks
+  ["idli|idly", 58, "piece", 40], ["dosa|plain dosa|sada dosa", 170, "piece", 90], ["masala dosa", 300, "piece", 150],
+  ["rava dosa", 200, "piece", 100], ["uttapam|uthappam", 220, "piece", 120], ["medu vada|vada|vadai", 100, "piece", 35],
+  ["upma|rava upma|sooji upma", 250, "bowl", 200], ["vermicelli upma|vermicilli upma|semiya upma|semiya|vermicelli|seviyan", 250, "bowl", 200],
+  ["poha|pohe|aval", 250, "plate", 200], ["pongal|ven pongal", 300, "bowl", 200], ["appam", 120, "piece", 60],
+  ["sambar|sambhar", 130, "bowl", 200], ["rasam", 60, "bowl", 200],
+  ["coconut chutney", 70, "serving", 30], ["chutney|green chutney|tomato chutney|mint chutney", 40, "serving", 30],
+  ["samosa", 260, "piece", 100], ["kachori", 190, "piece", 50], ["pakora|pakoda|bhajji|bajji|bhaji", 45, "piece", 15],
+  ["bread pakora", 200, "piece", 80], ["vada pav|wada pav", 300, "piece", 140], ["pav bhaji", 450, "plate", 300],
+  ["pani puri|golgappa|gol gappa|puchka", 200, "plate", 150], ["bhel puri|bhel", 250, "plate", 150], ["sev puri", 300, "plate", 150],
+  ["dhokla|khaman", 50, "piece", 30], ["dabeli", 300, "piece", 140], ["momos|momo|veg momos", 35, "piece", 30],
+  ["chicken momos", 45, "piece", 30], ["spring roll", 150, "piece", 60], ["maggi|instant noodles", 350, "pack", 75],
+  ["noodles|chowmein|hakka noodles", 400, "plate", 250], ["manchurian|veg manchurian", 300, "bowl", 200],
+  ["sandwich|veg sandwich", 250, "piece", 150], ["grilled sandwich|cheese sandwich|grilled cheese sandwich", 350, "piece", 150],
+  ["papad|papadum|appalam", 40, "piece", 12], ["pickle|achar", 30, "serving", 10], ["namkeen|mixture|bhujia", 160, "handful", 30],
+  ["chips|potato chips|wafers", 160, "packet", 30], ["biscuit|biscuits|marie biscuit", 40, "piece", 9], ["cookie|cookies", 80, "piece", 16],
+  ["rusk", 45, "piece", 11], ["makhana|fox nuts", 110, "bowl", 30], ["popcorn", 110, "bowl", 25],
+  // dals & curries
+  ["dal|daal|dhal|plain dal|toor dal|moong dal|masoor dal", 150, "bowl", 180], ["dal tadka|dal fry", 180, "bowl", 180],
+  ["dal makhani", 300, "bowl", 180], ["rajma|rajma masala|kidney beans", 240, "bowl", 180],
+  ["chole|chana|chana masala|chhole|chickpea curry", 270, "bowl", 180], ["kadhi|kadi|kadhi pakora", 180, "bowl", 180],
+  ["paneer curry|paneer sabzi|paneer gravy", 320, "bowl", 180], ["paneer butter masala|butter paneer|paneer makhani", 400, "bowl", 180],
+  ["palak paneer|saag paneer", 280, "bowl", 180], ["shahi paneer", 380, "bowl", 180], ["matar paneer|mutter paneer", 300, "bowl", 180],
+  ["kadai paneer|kadhai paneer", 330, "bowl", 180], ["paneer tikka", 350, "plate", 150], ["paneer bhurji", 300, "bowl", 150],
+  ["aloo gobi|aloo gobhi", 170, "bowl", 150], ["aloo sabzi|potato curry|aloo curry|aloo", 180, "bowl", 150],
+  ["aloo matar|aloo mutter", 200, "bowl", 150], ["bhindi|okra|bhindi masala|bhindi fry", 150, "bowl", 150],
+  ["mix veg|mixed veg|mixed vegetable|mixed vegetables", 160, "bowl", 150], ["baingan bharta|baingan|brinjal", 150, "bowl", 150],
+  ["cabbage sabzi|patta gobi", 110, "bowl", 150], ["sabzi|sabji|vegetable curry|veg curry|subzi", 150, "bowl", 150],
+  ["malai kofta", 400, "bowl", 180], ["soya chunks|soya curry|nutrela", 180, "bowl", 150],
+  // eggs, meat, fish
+  ["egg|boiled egg|anda", 78, "piece", 50], ["omelette|omelet|egg omelette", 190, "piece", 120], ["fried egg|egg fry", 90, "piece", 46],
+  ["egg bhurji|scrambled egg|scrambled eggs", 220, "serving", 120], ["egg curry|anda curry", 250, "bowl", 200],
+  ["chicken|chicken breast|grilled chicken", 165, "serving", 100], ["chicken curry", 300, "bowl", 200],
+  ["butter chicken|murgh makhani", 450, "bowl", 200], ["chicken tikka", 300, "plate", 150], ["tandoori chicken", 260, "piece", 150],
+  ["chicken 65", 350, "plate", 150], ["chilli chicken", 380, "plate", 200], ["fried chicken", 300, "piece", 120],
+  ["chicken nuggets|nuggets", 45, "piece", 18], ["mutton curry|mutton|goat curry", 450, "bowl", 200], ["keema|kheema", 350, "bowl", 180],
+  ["fish curry", 250, "bowl", 200], ["fish fry|fried fish", 220, "piece", 100], ["prawns|prawn curry|shrimp", 250, "bowl", 180],
+  ["shawarma", 450, "roll", 250], ["kathi roll|frankie|egg roll|chicken roll", 350, "roll", 200],
+  // fast food
+  ["pizza|pizza slice", 285, "slice", 107], ["burger|veg burger", 350, "piece", 150], ["chicken burger", 450, "piece", 180],
+  ["french fries|fries|finger chips", 365, "serving", 115], ["pasta|red sauce pasta", 400, "plate", 250],
+  ["white sauce pasta|alfredo pasta", 500, "plate", 250], ["hot dog", 280, "piece", 100], ["garlic bread", 150, "slice", 40],
+  // dairy & drinks
+  ["curd|dahi|yogurt|yoghurt", 90, "bowl", 150], ["raita", 100, "bowl", 150], ["buttermilk|chaas|chaach|mattha", 40, "glass", 250],
+  ["lassi|sweet lassi", 250, "glass", 250], ["milk|glass of milk", 150, "glass", 250], ["toned milk", 120, "glass", 250],
+  ["tea|chai|milk tea|masala chai", 70, "cup", 150], ["black tea|green tea|lemon tea", 5, "cup", 200],
+  ["coffee|milk coffee|filter coffee", 80, "cup", 150], ["black coffee|americano", 5, "cup", 200], ["cold coffee", 220, "glass", 250],
+  ["cold drink|soft drink|soda|cola|coke|pepsi|sprite", 140, "can", 330], ["juice|fruit juice|orange juice", 110, "glass", 250],
+  ["sugarcane juice", 180, "glass", 250], ["mango shake|mango milkshake", 250, "glass", 250], ["banana shake|banana milkshake", 250, "glass", 250],
+  ["milkshake|shake", 250, "glass", 250], ["coconut water|tender coconut", 45, "glass", 250], ["lemonade|nimbu pani|lemon water|shikanji", 60, "glass", 250],
+  ["beer", 150, "bottle", 330], ["protein shake|whey|whey protein", 120, "scoop", 30], ["horlicks|bournvita|boost", 180, "glass", 250],
+  ["paneer|cottage cheese", 265, "serving", 100], ["tofu", 76, "serving", 100], ["cheese|cheese slice", 70, "slice", 20],
+  ["butter", 100, "tbsp", 14], ["ghee", 45, "tsp", 5], ["oil|cooking oil", 120, "tbsp", 14], ["sugar", 20, "tsp", 5],
+  ["jam", 55, "tbsp", 20], ["peanut butter", 95, "tbsp", 16], ["honey", 64, "tbsp", 21],
+  // fruits & nuts
+  ["banana|kela", 105, "piece", 118], ["apple|seb", 95, "piece", 180], ["orange|santra", 60, "piece", 130], ["mango|aam", 150, "piece", 200],
+  ["papaya", 60, "bowl", 150], ["watermelon|tarbooz", 45, "bowl", 150], ["grapes|angoor", 70, "bowl", 100], ["guava|amrood", 60, "piece", 100],
+  ["pomegranate|anar", 130, "piece", 160], ["pear|nashpati", 100, "piece", 180], ["chikoo|sapota|chiku", 80, "piece", 100],
+  ["pineapple", 80, "bowl", 160], ["muskmelon|kharbuja", 55, "bowl", 160], ["kiwi", 42, "piece", 70], ["strawberry|strawberries", 50, "bowl", 150],
+  ["fruit salad|fruits|mixed fruit", 100, "bowl", 180], ["dates|khajur", 25, "piece", 8], ["almonds|badam", 7, "piece", 1.2],
+  ["cashew|cashews|kaju", 9, "piece", 1.6], ["walnut|walnuts|akhrot", 26, "piece", 4], ["peanuts|groundnuts|mungfali", 170, "handful", 30],
+  ["raisins|kishmish", 40, "tbsp", 14], ["dry fruits|nuts|mixed nuts", 170, "handful", 30], ["sprouts|moong sprouts", 100, "bowl", 100],
+  ["salad|green salad|veg salad", 50, "bowl", 150], ["soup|veg soup|tomato soup", 100, "bowl", 200], ["sweet corn|corn|bhutta", 130, "cup", 150],
+  ["boiled potato|potato", 110, "piece", 150],
+  // sweets
+  ["gulab jamun", 150, "piece", 50], ["rasgulla|rasagulla|rosogolla|rasgolla", 120, "piece", 50], ["rasmalai|ras malai", 180, "piece", 70],
+  ["jalebi|jilebi", 150, "piece", 35], ["kheer|payasam|rice kheer", 250, "bowl", 150], ["gajar halwa|carrot halwa", 300, "bowl", 120],
+  ["halwa|sooji halwa|sheera", 300, "bowl", 120], ["ladoo|laddu|laddoo|besan ladoo|motichoor ladoo", 180, "piece", 40],
+  ["barfi|burfi", 120, "piece", 30], ["kaju katli|kaju barfi", 60, "piece", 15], ["peda", 90, "piece", 25], ["sandesh", 100, "piece", 35],
+  ["ice cream|icecream", 140, "scoop", 70], ["kulfi", 180, "piece", 70], ["chocolate|dairy milk", 210, "bar", 40],
+  ["cake|pastry|cake slice", 350, "slice", 90], ["brownie", 230, "piece", 55], ["donut|doughnut", 250, "piece", 60], ["muffin|cupcake", 300, "piece", 80]
+];
+const FOOD_DB = FOOD_DB_RAW.map(([names, kcal, unit, g]) => { const a = names.split("|"); return { name: a[0], aliases: a, kcal, unit, g }; });
+
+/* Portion words people type, and roughly how many grams/ml each holds when converting between portions. */
+const UNIT_WORDS = {
+  g: "g", gm: "g", gms: "g", gram: "g", grams: "g", gr: "g", kg: "kg", ml: "ml", l: "l", litre: "l", liter: "l",
+  piece: "piece", pieces: "piece", pc: "piece", pcs: "piece", no: "piece", nos: "piece", whole: "piece",
+  bowl: "bowl", bowls: "bowl", katori: "bowl", katoris: "bowl", cup: "cup", cups: "cup", mug: "cup",
+  plate: "plate", plates: "plate", glass: "glass", glasses: "glass", slice: "slice", slices: "slice",
+  scoop: "scoop", scoops: "scoop", tbsp: "tbsp", tablespoon: "tbsp", tablespoons: "tbsp", spoon: "tbsp", spoons: "tbsp",
+  tsp: "tsp", teaspoon: "tsp", teaspoons: "tsp", handful: "handful", handfuls: "handful", can: "can", cans: "can",
+  bottle: "bottle", bottles: "bottle", packet: "packet", packets: "packet", pack: "pack", packs: "pack",
+  roll: "roll", rolls: "roll", serving: "serving", servings: "serving", portion: "serving", bar: "bar", bars: "bar"
+};
+const PLATE_PIECES = { momos: 6, "chicken momos": 6, pakora: 6, "chicken nuggets": 6, dhokla: 4, idli: 2, "medu vada": 2, poori: 4, roti: 3 };
+const UNIT_G = { bowl: 150, cup: 200, plate: 300, glass: 250, tbsp: 15, tsp: 5, handful: 30, can: 330, bottle: 500, scoop: 70 };
+const NUM_WORDS = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+  half: 0.5, quarter: 0.25, single: 1, double: 2, couple: 2, few: 3 };
+
+const normFood = s => s.toLowerCase().replace(/[^a-z0-9.\/½¼¾ ]+/g, " ").replace(/\s+/g, " ").trim();
+const singular = w => w.length > 4 && w.endsWith("es") && !w.endsWith("ses") ? w.slice(0, -2) : w.length > 3 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w;
+function lev(a, b) {
+  if (Math.abs(a.length - b.length) > 2) return 9;
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+function myFoodList() {
+  return Object.values(S.myFoods || {}).map(f => ({ name: f.name, aliases: [normFood(f.name)], kcal: f.kcal, unit: f.unit || "serving", g: 0, mine: true }));
+}
+/* Best match for a piece of text: exact name, then whole-word name inside the text, then a close spelling. */
+function matchFood(text) {
+  const t = normFood(text), ts = t.split(" ").map(singular).join(" ");
+  if (!t) return null;
+  let best = null, bestScore = 0;
+  const consider = (f, score) => { if (score > bestScore) { best = f; bestScore = score; } };
+  for (const f of myFoodList().concat(FOOD_DB)) {
+    for (const al of f.aliases) {
+      const as = al.split(" ").map(singular).join(" ");
+      const bonus = f.mine ? 5 : 0;
+      if (t === al || ts === as) { consider(f, 1000 + bonus); continue; }
+      const re = new RegExp(`(^| )${as.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}( |$)`);
+      if (re.test(ts)) consider(f, 200 + as.length * 4 + bonus);
+      else if (t.length >= 4 && as.startsWith(ts)) consider(f, 120 + ts.length + bonus);
+      else if (t.length >= 4) { const d = lev(ts, as); if (d <= (as.length >= 8 ? 2 : 1)) consider(f, 100 - d * 10 + bonus); }
+    }
+  }
+  matchFood.score = bestScore;
+  return best;
+}
+/* "2 roti", "1/2 bowl rice", "100 g paneer", "half plate biryani" -> quantity, unit, food. */
+function parsePart(raw) {
+  let s = normFood(raw).replace(/½/g, " 0.5 ").replace(/¼/g, " 0.25 ").replace(/¾/g, " 0.75 ").replace(/\s+/g, " ").trim();
+  if (!s) return null;
+  let qty = null, unit = null;
+  let m = s.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)\s*(.*)$/);
+  if (m) { qty = +m[1] / +m[2]; s = m[3]; }
+  else if ((m = s.match(/^(\d+(?:\.\d+)?)\s*([a-z]+)?\s*(.*)$/))) {
+    qty = +m[1]; s = ((m[2] || "") + " " + m[3]).trim();
+  } else {
+    const w = s.split(" ")[0];
+    if (NUM_WORDS[w] != null) { qty = NUM_WORDS[w]; s = s.slice(w.length).trim(); }
+  }
+  // "of" and a portion word, e.g. "bowl of dal", "2 cups of tea"
+  const words = s.split(" ");
+  if (UNIT_WORDS[words[0]]) { unit = UNIT_WORDS[words[0]]; words.shift(); if (words[0] === "of") words.shift(); }
+  // portion written after the food, e.g. "rice 1 bowl", "paneer 100g"
+  let food = words.join(" ");
+  const tail = food.match(/^(.*?)\s+(\d+(?:\.\d+)?)\s*([a-z]+)?$/);
+  if (tail && (!tail[3] || UNIT_WORDS[tail[3]])) { food = tail[1]; qty = qty ?? +tail[2]; unit = unit || (tail[3] ? UNIT_WORDS[tail[3]] : null); }
+  if (qty == null) qty = 1;
+  if (unit === "kg") { unit = "g"; qty *= 1000; } if (unit === "l") { unit = "ml"; qty *= 1000; }
+  return { raw: raw.trim(), qty, unit, food: food.trim() };
+}
+function kcalFor(p, f) {
+  const u = p.unit;
+  if (!u || u === f.unit || (u === "piece" && ["piece", "roll", "bar", "slice"].includes(f.unit)) || (["pack", "packet"].includes(u) && ["pack", "packet"].includes(f.unit)) || (u === "serving" && !f.g))
+    return { kcal: p.qty * f.kcal, label: `${fmtQty(p.qty)} ${unitName(f.unit, p.qty)}` };
+  if ((u === "g" || u === "ml") && f.g) return { kcal: p.qty * f.kcal / f.g, label: `${fmtQty(p.qty)} ${u}` };
+  if (u === "plate" && f.unit === "piece") { const n = PLATE_PIECES[f.name] || 2; return { kcal: p.qty * n * f.kcal, label: `${fmtQty(p.qty)} ${unitName("plate", p.qty)} (${fmtQty(p.qty * n)} pcs)` }; }
+  if (UNIT_G[u] && f.g) return { kcal: p.qty * UNIT_G[u] * f.kcal / f.g, label: `${fmtQty(p.qty)} ${unitName(u, p.qty)}` };
+  return { kcal: p.qty * f.kcal, label: `${fmtQty(p.qty)} ${unitName(f.unit, p.qty)}` };
+}
+const fmtQty = q => Number.isInteger(q) ? String(q) : q === 0.5 ? "½" : q === 0.25 ? "¼" : String(Math.round(q * 100) / 100);
+const unitName = (u, q) => q === 1 || q < 1 || ["g", "ml", "tbsp", "tsp"].includes(u) ? u : u === "glass" ? "glasses" : u === "serving" ? "servings" : u + "s";
+/* Split what was typed into foods and add them up. */
+function autoCalories(text) {
+  // Split on commas first; split on "and"/"with" only when the whole phrase isn't one known dish ("oats with milk").
+  const parts = [];
+  for (const chunk of text.split(/,|\+|&|;|\n/).map(s => s.trim()).filter(Boolean)) {
+    const p = parsePart(chunk);
+    if (p && p.food && matchFood(p.food) && matchFood.score >= 1000) parts.push(chunk);
+    else parts.push(...chunk.split(/\band\b|\bwith\b|\baur\b/i).map(s => s.trim()).filter(Boolean));
+  }
+  const items = [], unknown = [];
+  for (const raw of parts) {
+    const p = parsePart(raw); if (!p || !p.food) continue;
+    const f = matchFood(p.food);
+    if (!f) { unknown.push(raw); continue; }
+    const k = kcalFor(p, f);
+    items.push({ name: f.name, label: k.label, kcal: Math.round(k.kcal), mine: !!f.mine });
+  }
+  return { items, unknown, total: items.reduce((s, i) => s + i.kcal, 0), parts: parts.length };
+}
+function suggestFoods(text) {
+  const last = text.split(/,|\+|&|;|\n|\band\b|\bwith\b/i).pop();
+  const p = parsePart(last || ""); if (!p || p.food.length < 2) return [];
+  const q = normFood(p.food);
+  const list = myFoodList().concat(FOOD_DB), out = [];
+  for (const f of list) {
+    const hit = f.aliases.find(a => a.startsWith(q)) || f.aliases.find(a => a.includes(q));
+    if (hit && !out.includes(f)) out.push(f);
+    if (out.length >= 6) break;
+  }
+  return out.filter(f => !f.aliases.includes(q) || out.length > 1).slice(0, 5);
+}
+
+/* Food form: automatic by default; typing a number in kcal switches that entry to manual. */
+let calManual = false, calAuto = null;
+const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
+function refreshAutoCal() {
+  const text = $("#foodName").value;
+  calAuto = text.trim() ? autoCalories(text) : null;
+  const box = $("#autoCal");
+  if (!calAuto || (!calAuto.items.length && !calAuto.unknown.length)) { box.hidden = true; if (!calManual) $("#foodKcal").value = ""; }
+  else {
+    box.hidden = false;
+    box.innerHTML = calAuto.items.map(i => `<div class="acrow"><span>${esc(capFirst(i.name))} <em>${esc(i.label)}${i.mine ? " · my food" : ""}</em></span><b class="num">${i.kcal}</b></div>`).join("") +
+      calAuto.unknown.map(u => `<div class="acrow miss"><span>${esc(u)} <em>not in the food list${calManual ? "" : " · enter kcal yourself"}</em></span><b>?</b></div>`).join("") +
+      (calAuto.items.length > 1 ? `<div class="acrow tot"><span>Total</span><b class="num">${calAuto.total}</b></div>` : "");
+    if (!calManual) $("#foodKcal").value = calAuto.items.length ? calAuto.total : "";
+  }
+  $("#kcalMode").innerHTML = calManual ? `Manual · <button type="button" id="useAuto">use auto</button>` : calAuto && calAuto.items.length ? "Auto" : "";
+  const sug = suggestFoods(text);
+  $("#foodSuggest").innerHTML = sug.map(f => `<button type="button" class="qchip" data-fsug="${esc(f.name)}">${esc(capFirst(f.name))} <b class="num">${f.kcal}</b><em>/${esc(f.unit)}</em></button>`).join("");
+  $("#foodSuggest").hidden = !sug.length;
+}
+$("#foodName").addEventListener("input", refreshAutoCal);
+$("#foodKcal").addEventListener("input", () => { calManual = $("#foodKcal").value.trim() !== ""; if (!calManual) refreshAutoCal(); else $("#kcalMode").innerHTML = `Manual · <button type="button" id="useAuto">use auto</button>`; });
+$("#foodForm").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.id === "useAuto") { calManual = false; refreshAutoCal(); return; }
+  if (b.dataset.fsug) {
+    const inp = $("#foodName"), parts = inp.value.split(/(,|\+|&|;|\band\b|\bwith\b)/i);
+    const last = parts.pop(), p = parsePart(last) || { qty: 1 };
+    const lead = (last.match(/^\s*/) || [""])[0];
+    const qtyTxt = (last.match(/^\s*((?:\d+(?:\.\d+)?(?:\s*\/\s*\d+)?|a|an|one|two|three|four|five|half)\s*(?:[a-z]+\s+(?:of\s+)?)?)/i) || ["", ""])[1];
+    const unitOk = qtyTxt && UNIT_WORDS[(qtyTxt.trim().split(/\s+/)[1] || "").toLowerCase()];
+    parts.push(lead + (qtyTxt && (unitOk || /^\s*[\d½]|^\s*(a|an|one|two|three|four|five|half)\s/i.test(qtyTxt)) ? qtyTxt.replace(/\s*$/, " ") : "") + b.dataset.fsug);
+    inp.value = parts.join(""); inp.focus(); refreshAutoCal();
+  }
+});
 
 /* ---------- toast ---------- */
 let toastT;
