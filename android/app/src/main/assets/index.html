@@ -63,7 +63,10 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .stats div{font-size:12px;color:var(--muted)}
 .stats strong{display:block;font-size:17px;color:var(--ink)}
 
-.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-block:16px 6px}
+.week{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin-block:16px 6px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scroll-behavior:auto}
+.week::-webkit-scrollbar{display:none}
+.wk{flex:0 0 100%;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;scroll-snap-align:start;scroll-snap-stop:always;padding:2px 1px 8px}
+.wk .wkm{grid-column:1/-1;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;text-align:center;margin-bottom:-2px}
 .wd{border:0;background:transparent;padding:6px 0;border-radius:12px;display:grid;justify-items:center;gap:5px;color:var(--muted);font-size:11px;font-weight:600}
 .wd .bar{width:10px;height:38px;border-radius:6px;background:var(--sunk);position:relative;overflow:hidden}
 .wd .bar i{position:absolute;left:0;right:0;bottom:0;border-radius:6px}
@@ -133,13 +136,13 @@ body.noscroll{overflow:hidden}
 .nsearch svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
 .nchips{display:flex;gap:6px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
 .nchips::-webkit-scrollbar{display:none}
-.nchip{flex:none;display:flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--muted)}
+.nchip{-webkit-touch-callout:none;user-select:none;flex:none;display:flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--muted)}
 .nchip svg{width:14px;height:14px}
 .nchip.on{background:var(--task);border-color:var(--task);color:var(--on-accent)}
 .nsec{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 4px 8px}
 .ngrid{columns:2;column-gap:10px}
 .ngrid.list{columns:1}
-.ncard{display:flex;flex-direction:column;gap:6px;width:100%;break-inside:avoid;margin:0 0 10px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:var(--surface);position:relative;overflow:hidden}
+.ncard{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;display:flex;flex-direction:column;gap:6px;width:100%;break-inside:avoid;margin:0 0 10px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:var(--surface);position:relative;overflow:hidden}
 .ncard b{font-size:15.5px;font-weight:700;padding-right:20px;overflow-wrap:anywhere}
 .ntext{font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:10;-webkit-box-orient:vertical;overflow:hidden}
 .ntext.muted,.muted{color:var(--muted)}
@@ -186,7 +189,10 @@ body.noscroll{overflow:hidden}
 .nsw.nc-default{background:var(--surface);background-image:linear-gradient(135deg,transparent 46%,var(--muted) 46%,var(--muted) 54%,transparent 54%)}
 .nsw.on{border-color:var(--task);box-shadow:0 0 0 2px var(--task)}
 .nlabels{display:grid;gap:2px}
-.nlrow{display:flex;align-items:center;gap:10px;padding:8px 2px;font-size:15px}
+.nlrow{display:flex;align-items:center;gap:10px;padding:4px 2px;font-size:15px}
+.nlrow label{flex:1;display:flex;align-items:center;gap:10px;padding:4px 0}
+.nldel{width:38px;height:38px;border:0;background:transparent;color:var(--muted);border-radius:10px;display:grid;place-items:center}
+.nmenu .on{color:var(--task-ink)}
 .nlrow input{width:20px;height:20px;accent-color:var(--task)}
 .nnewlab{display:flex;gap:8px}
 .nnewlab input{flex:1}
@@ -282,7 +288,7 @@ body.noscroll{overflow:hidden}
 @keyframes wave2{from{transform:translate(0,-4px)}to{transform:translate(-90px,-4px)}}
 .bubbles circle{fill:#fff;opacity:0;animation:bub 4.2s ease-in infinite}
 @keyframes bub{0%{opacity:0;transform:translateY(0)}20%{opacity:.55}100%{opacity:0;transform:translateY(-30px)}}
-#bottle.empty .bubbles{display:none}
+#bottle.bempty .bubbles{display:none}
 .stream{fill:var(--water-hi);opacity:0;transform-origin:50% 0;transform:scaleY(0)}
 #bottle.pouring .stream{animation:pour 1.5s ease-out}
 @keyframes pour{0%{opacity:.9;transform:scaleY(0)}25%{opacity:.9;transform:scaleY(1)}75%{opacity:.8;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
@@ -425,7 +431,6 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
       <img class="logo" src="data:image/png;base64,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" alt="">
       <span>Dayco<small>Your daily companion</small></span>
     </div>
-    <div class="pill ok"><i></i><span>Saved on this phone</span></div>
   </header>
 
   <!-- TASKS -->
@@ -444,7 +449,7 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
       </div>
     </div>
     <div class="week" id="taskWeek"></div>
-    <div class="weeklbl">Tasks done this week</div>
+    <div class="weeklbl">Tasks done · swipe for other weeks</div>
     <div class="sechead"><h2>Schedule</h2><span id="taskCount"></span></div>
     <div class="list" id="taskList"></div>
   </section>
@@ -456,6 +461,8 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
       <h1 id="calDayTitle"></h1>
       <button class="iconbtn" data-shift="1" data-for="cal" aria-label="Next day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
     </div>
+    <div class="week" id="calWeek"></div>
+    <div class="weeklbl">Calories vs goal · swipe for other weeks</div>
     <div class="summary">
       <div class="ring" id="calRing"></div>
       <div class="sumtext">
@@ -464,8 +471,6 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
         <div class="stats" id="calStats"></div>
       </div>
     </div>
-    <div class="week" id="calWeek"></div>
-    <div class="weeklbl">Calories vs goal this week</div>
 
     <form class="addfood" id="foodForm" autocomplete="off">
       <div class="row">
@@ -492,7 +497,9 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
       <h1 id="waterDayTitle"></h1>
       <button class="iconbtn" data-shift="1" data-for="water" aria-label="Next day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
     </div>
-    <div class="sechead" style="margin-top:0"><h2>Water consumption today</h2></div>
+    <div class="week" id="waterWeek"></div>
+    <div class="weeklbl">Water by day · swipe for other weeks</div>
+    <div class="sechead"><h2>Water consumption today</h2></div>
     <div class="wcard">
       <svg id="bottle" viewBox="0 0 200 360" role="img" aria-label="Water bottle showing how much you've drunk today"></svg>
       <div class="wside">
@@ -500,8 +507,6 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
         <div class="lvls" id="waterLevels"></div>
       </div>
     </div>
-    <div class="week" id="waterWeek"></div>
-    <div class="weeklbl">Water this week</div>
     <div class="set wopts">
       <div class="srow"><div class="l"><strong>Water reminders</strong><span>Rings at each level's time, even when the app is closed</span></div>
         <label class="switch"><input type="checkbox" id="waterRemind" aria-label="Water reminders"><span></span></label></div>
@@ -703,7 +708,7 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
 <div class="neditor" id="noteEditor" hidden role="dialog" aria-label="Note">
   <div class="nebar">
     <button id="neBack" aria-label="Save and go back"></button><span class="sp"></span>
-    <button id="nePin"></button><button id="neRemind" aria-label="Reminder"></button><button id="neArchive"></button><button id="neMore" aria-label="More options"></button>
+    <button id="nePin"></button><button id="neRemind" aria-label="Reminder"></button><button id="neMore" aria-label="More options"></button>
   </div>
   <div class="nebody">
     <input id="neTitle" placeholder="Title" maxlength="200" aria-label="Title" autocomplete="off">
@@ -715,6 +720,16 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
   <div class="netool">
     <button id="neCheck" aria-label="Checklist"></button><button id="neColor" aria-label="Colour"></button><button id="neLabel" aria-label="Labels"></button>
     <span class="sp"></span><span id="neEdited"></span>
+  </div>
+</div>
+
+<!-- Long-press menu for notes and labels -->
+<div class="scrim" id="nMenuSheet" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="nMenuTitle">
+    <h2 id="nMenuTitle"></h2>
+    <p class="note" style="margin:0" id="nMenuSub"></p>
+    <div class="nmenu" id="nMenuList"></div>
+    <button type="button" class="btn ghost" id="nMenuCancel" style="border-radius:999px">Cancel</button>
   </div>
 </div>
 
@@ -864,7 +879,7 @@ const LS = "daybell-v1";
 function loadLocal() {
   try {
     const r = JSON.parse(localStorage.getItem(LS) || "null");
-    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; S.notes = r.notes || []; S.myFoods = r.myFoods || {}; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; S.notes = (r.notes || []).map(n => (n.archived && delete n.archived, n)); S.myFoods = r.myFoods || {}; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
   } catch (e) {}
 }
 const NATIVE = window.DaybellNative || null;
@@ -931,16 +946,31 @@ function weekDays(sel) {
   const mon = addDays(sel, -dow);
   return Array.from({ length: 7 }, (_, i) => addDays(mon, i));
 }
+/* Date strip: pages of weeks you can swipe through; tapping a day selects it. */
 function weekStrip(el, sel, valueFn, color, which) {
-  const t = today();
-  el.innerHTML = weekDays(sel).map(day => {
+  const t = today(), first = weekDays(sel)[0];
+  const keepScroll = el.dataset.sel === sel && el.dataset.wk;
+  const prevLeft = el.scrollLeft;
+  const BEFORE = 26, AFTER = 8; // weeks either side of the selected one
+  const weeks = [];
+  for (let w = -BEFORE; w <= AFTER; w++) weeks.push(weekDays(addDays(first, w * 7)));
+  el.innerHTML = weeks.map(days => {
+    const d0 = parseYmd(days[0]), d6 = parseYmd(days[6]);
+    const span = d0.getMonth() === d6.getMonth() ? d0.toLocaleDateString(undefined, { month: "long", year: "numeric" })
+      : `${d0.toLocaleDateString(undefined, { month: "short" })} – ${d6.toLocaleDateString(undefined, { month: "short", year: "numeric" })}`;
+    return `<div class="wk"><div class="wkm">${esc(span)}</div>${dayButtons(days)}</div>`;
+  }).join("");
+  el.dataset.sel = sel; el.dataset.wk = "1";
+  const target = BEFORE * el.clientWidth;
+  el.scrollLeft = keepScroll ? prevLeft : target;
+  function dayButtons(days) { return days.map(day => {
     const v = valueFn(day); const d = parseYmd(day);
     const over = which === "cal" && v > 1;
     return `<button class="wd ${day === sel ? "sel" : ""} ${day === t ? "today" : ""}" data-day="${day}" data-for="${which}" aria-label="${d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" })}">
       <span>${d.toLocaleDateString(undefined, { weekday: "narrow" })}</span>
       <span class="bar"><i style="height:${Math.round(Math.min(1, v) * 100)}%;background:${over ? "var(--danger)" : color}"></i></span>
       <span class="dn num">${d.getDate()}</span></button>`;
-  }).join("");
+  }).join(""); }
 }
 function relChip(t, day) {
   if (isDone(t, day)) return `<span class="chip soon">Done</span>`;
@@ -1192,7 +1222,7 @@ function drawBottle(n, filled) {
   }
   const g = $("#wfill");
   g.style.transform = `translateY(${filled ? y : B_BOT + 12}px)`;
-  svg.classList.toggle("empty", !filled);
+  svg.classList.toggle("bempty", !filled);
   if (lastFill >= 0 && filled > lastFill) {
     svg.classList.remove("pouring"); void svg.getBoundingClientRect(); svg.classList.add("pouring");
     clearTimeout(drawBottle.t); drawBottle.t = setTimeout(() => svg.classList.remove("pouring"), 1500);
@@ -1615,6 +1645,7 @@ const ICON = {
   label: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4" fill="currentColor"/></svg>',
   grid: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>',
   list: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="6.5" rx="1.5"/><rect x="3" y="13.5" width="18" height="6.5" rx="1.5"/></svg>',
+  trash: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>',
   x: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
 };
 let noteFilter = "notes", noteQuery = "", curNote = null, notePanel = null, noteSaveT = null;
@@ -1648,12 +1679,13 @@ function renderNotes() {
   purgeTrash();
   const labels = allLabels();
   if (noteFilter.startsWith("label:") && !labels.includes(noteFilter.slice(6))) noteFilter = "notes";
-  const chips = [["notes", "Notes"], ["reminders", "Reminders"], ...labels.map(l => ["label:" + l, l]), ["archive", "Archive"], ["trash", "Trash"]];
+  const chips = [["notes", "Notes"], ["reminders", "Reminders"], ...labels.map(l => ["label:" + l, l]), ["trash", "Trash"]];
   $("#noteChips").innerHTML = chips.map(([k, l]) => `<button class="nchip ${noteFilter === k ? "on" : ""}" data-nfilter="${esc(k)}">${k.startsWith("label:") ? ICON.label : ""}${esc(l)}</button>`).join("");
   const grid = (S.settings.noteLayout || "grid") === "grid";
   $("#noteLayout").innerHTML = grid ? ICON.list : ICON.grid;
   $("#noteLayout").setAttribute("aria-label", grid ? "Show as list" : "Show as grid");
-  let list = S.notes.filter(n => noteFilter === "trash" ? n.trashed : !n.trashed && (noteFilter === "archive" ? n.archived : !n.archived));
+  if (noteFilter === "archive") noteFilter = "notes";
+  let list = S.notes.filter(n => noteFilter === "trash" ? n.trashed : !n.trashed);
   if (noteFilter === "reminders") list = list.filter(n => n.reminder);
   if (noteFilter.startsWith("label:")) list = list.filter(n => (n.labels || []).includes(noteFilter.slice(6)));
   const q = noteQuery.trim().toLowerCase();
@@ -1695,7 +1727,6 @@ function paintEditor() {
   const ed = $("#noteEditor");
   ed.className = `neditor nc-${n.color || "default"}`;
   $("#nePin").innerHTML = n.pinned ? ICON.pinOn : ICON.pin; $("#nePin").setAttribute("aria-label", n.pinned ? "Unpin" : "Pin");
-  $("#neArchive").innerHTML = n.archived ? ICON.unarchive : ICON.archive; $("#neArchive").setAttribute("aria-label", n.archived ? "Unarchive" : "Archive");
   $("#neRemind").classList.toggle("on", !!n.reminder);
   $("#neCheck").classList.toggle("on", !!n.checklist);
   $("#neText").hidden = !!n.checklist;
@@ -1735,7 +1766,7 @@ function paintPanel() {
     p.innerHTML = `<div class="nptitle">Colour</div><div class="nswatches">${NOTE_COLORS.map(([c, name]) => `<button class="nsw nc-${c} ${(n.color || "default") === c ? "on" : ""}" data-ncolor="${c}" aria-label="${name}" title="${name}"></button>`).join("")}</div>`;
   } else if (notePanel === "label") {
     const labels = allLabels();
-    p.innerHTML = `<div class="nptitle">Labels</div><div class="nlabels">${labels.map(l => `<label class="nlrow"><input type="checkbox" data-nlabel="${esc(l)}" ${(n.labels || []).includes(l) ? "checked" : ""}><span>${esc(l)}</span></label>`).join("") || `<span class="muted">No labels yet.</span>`}</div>
+    p.innerHTML = `<div class="nptitle">Labels</div><div class="nlabels">${labels.map(l => `<div class="nlrow"><label><input type="checkbox" data-nlabel="${esc(l)}" ${(n.labels || []).includes(l) ? "checked" : ""}><span>${esc(l)}</span></label><button type="button" class="nldel" data-nldel="${esc(l)}" aria-label="Delete label ${esc(l)}">${ICON.trash}</button></div>`).join("") || `<span class="muted">No labels yet.</span>`}</div>
       <form class="nnewlab" id="nNewLabel"><input id="nNewLabelIn" maxlength="30" placeholder="New label, e.g. Work"><button class="btn small primary">Add</button></form>`;
   } else if (notePanel === "remind") {
     const r = n.reminder || {}, dt = new Date(Date.now() + 3600e3);
@@ -1810,14 +1841,14 @@ $("#noteEditor").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || !curNote) return;
   const n = curNote;
   if (b.id === "neBack") return closeNote();
-  if (b.id === "nePin") { n.pinned = !n.pinned; if (n.pinned) n.archived = false; touch(); paintEditor(); return toast(n.pinned ? "Pinned" : "Unpinned"); }
-  if (b.id === "neArchive") { n.archived = !n.archived; if (n.archived) n.pinned = false; touch(); const was = n.archived; closeNote(); return toast(was ? "Note archived" : "Note unarchived", () => { n.archived = !was; saveLocal(); render(); }); }
+  if (b.id === "nePin") { n.pinned = !n.pinned; touch(); paintEditor(); return toast(n.pinned ? "Pinned" : "Unpinned"); }
   if (b.id === "neRemind" || b.dataset.nepanel === "remind") return togglePanel("remind");
   if (b.id === "neMore") return togglePanel("more");
   if (b.id === "neColor") return togglePanel("color");
   if (b.id === "neLabel") return togglePanel("label");
   if (b.id === "neCheck") return setChecklist(!n.checklist);
   if (b.dataset.ncolor) { n.color = b.dataset.ncolor; touch(); return paintEditor(); }
+  if (b.dataset.nldel) return deleteLabel(b.dataset.nldel);
   if (b.dataset.nelabelRm) { n.labels = (n.labels || []).filter(l => l !== b.dataset.nelabelRm); touch(); return paintEditor(); }
   if (b.dataset.nitemToggle) { const it = n.items.find(i => i.id === b.dataset.nitemToggle); if (it) { it.done = !it.done; touch(); renderItems(); } return; }
   if (b.dataset.nitemDel) { n.items = n.items.filter(i => i.id !== b.dataset.nitemDel); touch(); return renderItems(); }
@@ -1861,6 +1892,69 @@ $("#noteEditor").addEventListener("submit", e => {
 /* List events */
 $("#noteSearch").addEventListener("input", e => { noteQuery = e.target.value; renderNotes(); });
 $("#noteLayout").onclick = () => { S.settings.noteLayout = (S.settings.noteLayout || "grid") === "grid" ? "list" : "grid"; saveLocal(); renderNotes(); };
+
+/* Long press: a note opens Pin / Make a copy / Delete; a label chip opens Delete label. */
+let menuFor = null, pressT = null, pressXY = null, suppressClick = false;
+function openNoteMenu(n) {
+  if (n.trashed) return openNoteActions(n);
+  menuFor = { note: n.id };
+  $("#nMenuTitle").textContent = noteTitle(n);
+  $("#nMenuSub").textContent = `Edited ${fmtWhen(n.edited || n.created)}`;
+  $("#nMenuList").innerHTML = `<button data-nm="pin">${n.pinned ? "Unpin" : "Pin to top"}</button><button data-nm="open">Open</button><button data-nm="copy">Make a copy</button><button data-nm="delete" class="dangertxt">Delete note</button>`;
+  $("#nMenuSheet").hidden = false;
+}
+function openLabelMenu(l) {
+  menuFor = { label: l };
+  const count = S.notes.filter(n => !n.trashed && (n.labels || []).includes(l)).length;
+  $("#nMenuTitle").textContent = `Label “${l}”`;
+  $("#nMenuSub").textContent = `${count === 1 ? "1 note has" : count + " notes have"} this label. Deleting the label keeps the notes.`;
+  $("#nMenuList").innerHTML = `<button data-nm="dellabel" class="dangertxt">Delete label</button>`;
+  $("#nMenuSheet").hidden = false;
+}
+const closeNMenu = () => { $("#nMenuSheet").hidden = true; menuFor = null; };
+$("#nMenuCancel").onclick = closeNMenu;
+$("#nMenuSheet").addEventListener("click", e => {
+  if (e.target.id === "nMenuSheet") return closeNMenu();
+  const b = e.target.closest("[data-nm]"); if (!b || !menuFor) return;
+  const what = b.dataset.nm, m = menuFor; closeNMenu();
+  if (what === "dellabel") return deleteLabel(m.label);
+  const n = S.notes.find(x => x.id === m.note); if (!n) return;
+  if (what === "pin") { n.pinned = !n.pinned; n.edited = Date.now(); saveLocal(); render(); return toast(n.pinned ? "Pinned" : "Unpinned"); }
+  if (what === "open") return openNote(n);
+  if (what === "copy") {
+    const c = JSON.parse(JSON.stringify(n)); c.id = newId(); c.created = c.edited = Date.now(); c.pinned = false; c.reminder = null;
+    c.title = (c.title || "") + (c.title ? " (copy)" : ""); (c.items || []).forEach(i => { i.id = newId(); });
+    S.notes.push(c); saveLocal(); render(); return toast("Copy made");
+  }
+  if (what === "delete") return trashNote(n);
+});
+function deleteLabel(l) {
+  const had = S.notes.filter(n => (n.labels || []).includes(l)).map(n => n.id), was = [...(S.noteLabels || [])];
+  S.notes.forEach(n => { if (n.labels) n.labels = n.labels.filter(x => x !== l); });
+  S.noteLabels = (S.noteLabels || []).filter(x => x !== l);
+  if (noteFilter === "label:" + l) noteFilter = "notes";
+  saveLocal(); render(); if (curNote) paintEditor();
+  toast(`Label “${l}” deleted`, () => {
+    S.noteLabels = was; S.notes.forEach(n => { if (had.includes(n.id)) n.labels = [...new Set([...(n.labels || []), l])]; });
+    saveLocal(); render(); if (curNote) paintEditor();
+  });
+}
+function longPressTarget(el) { return el && (el.closest(".ncard") || el.closest(".nchip[data-nfilter^='label:']")); }
+function fireLongPress(el) {
+  suppressClick = true; setTimeout(() => { suppressClick = false; }, 600);
+  try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
+  if (el.classList.contains("ncard")) { const n = S.notes.find(x => x.id === el.dataset.note); if (n) openNoteMenu(n); }
+  else openLabelMenu(el.dataset.nfilter.slice(6));
+}
+$("#tab-notes").addEventListener("pointerdown", e => {
+  const el = longPressTarget(e.target); if (!el) return;
+  pressXY = [e.clientX, e.clientY]; clearTimeout(pressT);
+  pressT = setTimeout(() => { pressT = null; fireLongPress(el); }, 480);
+});
+const cancelPress = e => { if (!pressT) return; if (e.type === "pointermove" && pressXY && Math.hypot(e.clientX - pressXY[0], e.clientY - pressXY[1]) < 10) return; clearTimeout(pressT); pressT = null; };
+["pointerup", "pointercancel", "pointermove"].forEach(t => $("#tab-notes").addEventListener(t, cancelPress));
+$("#tab-notes").addEventListener("contextmenu", e => { if (longPressTarget(e.target)) e.preventDefault(); });
+$("#tab-notes").addEventListener("click", e => { if (suppressClick) { e.stopPropagation(); e.preventDefault(); suppressClick = false; } }, true);
 
 /* Trash actions */
 let nActId = null;
