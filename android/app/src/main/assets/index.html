@@ -196,7 +196,7 @@ body.noscroll{overflow:hidden}
 .nitem .x{width:34px;height:34px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px;flex:none}
 .naddi{border:0;background:transparent;color:var(--muted);font-weight:600;text-align:left;padding:10px 0 10px 30px}
 .ndone{font-size:13px;color:var(--muted);font-weight:700;margin:10px 0 2px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--ink) 12%,transparent)}
-.nepanel{flex:none;background:var(--surface);border-top:1px solid var(--line);padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));display:grid;gap:10px;max-height:46vh;overflow-y:auto}
+.nepanel{animation:panelUp .18s ease-out;flex:none;background:var(--surface);border-top:1px solid var(--line);padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));display:grid;gap:10px;max-height:46vh;overflow-y:auto}
 .nptitle{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .nswatches{display:flex;flex-wrap:wrap;gap:10px}
 .nsw{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);padding:0}
@@ -418,6 +418,7 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
 /* Sheets */
 .scrim{position:fixed;inset:0;z-index:20;background:rgba(8,14,11,.5);display:flex;align-items:flex-end;justify-content:center}
 .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:grid;gap:14px;max-height:92%;overflow:auto;animation:up .22s ease}
+@keyframes panelUp{from{transform:translateY(24px);opacity:.3}}
 @keyframes up{from{transform:translateY(30px);opacity:.4}}
 .sheet h2{margin:0;font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.01em}
 .sheet .actions{display:flex;gap:8px;flex-wrap:wrap}
@@ -1375,13 +1376,12 @@ $("#lvlForm").addEventListener("submit", e => {
     S.settings.waterTimes = times.map(x => x === old ? t : x).sort();
     Object.keys(S.water).forEach(d => { S.water[d] = (S.water[d] || []).map(x => x === old ? t : x); }); // keep what's already ticked
     $("#lvlSheet").hidden = true; saveSettings(true);
-    return toast(`Moved ${fmtTime(old)} to ${fmtTime(t)}`);
+    return;
   }
   if (times.includes(t)) { toast(`There's already a level at ${fmtTime(t)}`); return; }
   S.settings.waterTimes = [...times, t].sort();
   $("#lvlSheet").hidden = true;
   saveSettings(true);
-  toast(`Added a 1 L level at ${fmtTime(t)}`);
 });
 $("#waterSound").onchange = e => {
   S.settings.waterSound = e.target.checked; saveSettings(true);
@@ -1847,6 +1847,12 @@ function paintPanel() {
   }
 }
 function togglePanel(name) { notePanel = notePanel === name ? null : name; paintPanel(); }
+/* Tapping the note itself (title, text, list, empty space) slides an open panel down. */
+document.addEventListener("pointerdown", e => {
+  if (!curNote || !notePanel) return;
+  if (e.target.closest("#nePanel") || e.target.closest(".netool") || e.target.closest(".nebar")) return;
+  if (e.target.closest("#noteEditor")) { notePanel = null; paintPanel(); }
+});
 function closeNote() {
   if (!curNote) return;
   clearTimeout(noteSaveT);
@@ -1951,8 +1957,8 @@ $("#noteEditor").addEventListener("submit", e => {
   e.preventDefault();
   const name = $("#nNewLabelIn").value.trim().replace(/\s+/g, " "); if (!name) return;
   S.noteLabels = [...new Set([...(S.noteLabels || []), name])];
-  curNote.labels = [...new Set([...(curNote.labels || []), name])]; touch(); paintEditor();
-  toast(`Label “${name}” added`);
+  curNote.labels = [...new Set([...(curNote.labels || []), name])]; touch();
+  notePanel = null; paintEditor();
 });
 
 /* List events */
@@ -2734,7 +2740,7 @@ document.addEventListener("click", e => {
   const dayKey = f => f === "cal" ? "calDay" : f === "water" ? "waterDay" : "taskDay";
   if (b.dataset.shift) { const k = dayKey(b.dataset.for); view[k] = addDays(view[k], +b.dataset.shift); return render(); }
   if (b.dataset.day) { view[dayKey(b.dataset.for)] = b.dataset.day; return render(); }
-  if (b.dataset.water) { const t = b.dataset.water; const was = waterDone(view.waterDay).includes(t); setWater(view.waterDay, t, !was); if (!was) toast(`1 L done at ${fmtTime(t)}`); return; }
+  if (b.dataset.water) { const t = b.dataset.water; const was = waterDone(view.waterDay).includes(t); setWater(view.waterDay, t, !was); return; }
   if (b.dataset.unlevel) {
     const t = b.dataset.unlevel, before = [...waterTimes()];
     if (before.length <= WATER_MIN) return;
