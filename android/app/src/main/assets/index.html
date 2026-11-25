@@ -73,7 +73,8 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .wd .dn{font-size:13px;color:var(--ink)}
 .wd.sel{background:var(--surface);box-shadow:var(--shadow)}
 .wd.today .dn{text-decoration:underline;text-underline-offset:3px}
-.weeklbl{font-size:11px;color:var(--muted);text-align:center;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.weeklbl{font-size:11px;color:var(--muted);text-align:center;letter-spacing:.06em;text-transform:uppercase;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;min-height:28px}
+.todaybtn{border:0;border-radius:999px;background:var(--task);color:var(--on-accent);font:700 12px var(--body);letter-spacing:0;text-transform:none;padding:6px 12px}
 
 .sechead{display:flex;align-items:baseline;justify-content:space-between;margin-block:22px 10px}
 .sechead h2{font-family:var(--display);font-size:17px;font-weight:600;margin:0}
@@ -171,7 +172,8 @@ body.noscroll{overflow:hidden}
 #neTitle{border:0;background:transparent;width:100%;font-family:var(--display);font-size:24px;font-weight:700;padding:6px 0;min-height:0}
 #neText{border:0;background:transparent;font-family:var(--body);font-size:16px;line-height:1.55;resize:none;padding:4px 0;min-height:160px;outline:none;width:100%}
 #neTitle:focus-visible,#neText:focus-visible{outline:none}
-.nemeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.nemeta{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 0}
+.nemeta:empty{display:none}
 .nemeta .nlab{font-size:12.5px;padding:5px 10px}
 #neEdited{font-size:12px;color:var(--muted);padding-right:10px}
 .nitem{display:flex;align-items:center;gap:8px}
@@ -299,7 +301,8 @@ body.noscroll{overflow:hidden}
 .lvl{display:flex;align-items:center;gap:10px;padding:8px 6px 8px 8px;border-radius:14px;background:var(--bg)}
 .lvl .chk{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:transparent;flex:none;display:grid;place-items:center;color:transparent}
 .lvl.done .chk{background:var(--water);border-color:var(--water);color:#fff}
-.lvl .lt{flex:1;min-width:0;display:grid;line-height:1.25}
+.lvl .lt{flex:1;min-width:0;display:grid;line-height:1.25;border:0;background:transparent;text-align:left;padding:0}
+.lvl .lt b svg{color:var(--muted);vertical-align:-1px}
 .lvl .lt b{font-weight:700;font-size:15px}
 .lvl .lt span{font-size:12px;color:var(--muted)}
 .lvl .x{width:28px;height:28px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px;flex:none}
@@ -449,7 +452,7 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
       </div>
     </div>
     <div class="week" id="taskWeek"></div>
-    <div class="weeklbl">Tasks done · swipe for other weeks</div>
+    <div class="weeklbl"><span>Tasks done · swipe for other weeks</span><button class="todaybtn" data-today="task" hidden>Back to today</button></div>
     <div class="sechead"><h2>Schedule</h2><span id="taskCount"></span></div>
     <div class="list" id="taskList"></div>
   </section>
@@ -462,7 +465,7 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
       <button class="iconbtn" data-shift="1" data-for="cal" aria-label="Next day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
     </div>
     <div class="week" id="calWeek"></div>
-    <div class="weeklbl">Calories vs goal · swipe for other weeks</div>
+    <div class="weeklbl"><span>Calories vs goal · swipe for other weeks</span><button class="todaybtn" data-today="cal" hidden>Back to today</button></div>
     <div class="summary">
       <div class="ring" id="calRing"></div>
       <div class="sumtext">
@@ -498,7 +501,7 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
       <button class="iconbtn" data-shift="1" data-for="water" aria-label="Next day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
     </div>
     <div class="week" id="waterWeek"></div>
-    <div class="weeklbl">Water by day · swipe for other weeks</div>
+    <div class="weeklbl"><span>Water by day · swipe for other weeks</span><button class="todaybtn" data-today="water" hidden>Back to today</button></div>
     <div class="sechead"><h2>Water consumption today</h2></div>
     <div class="wcard">
       <svg id="bottle" viewBox="0 0 200 360" role="img" aria-label="Water bottle showing how much you've drunk today"></svg>
@@ -669,11 +672,12 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
 <div class="scrim" id="lvlSheet" hidden>
   <form class="sheet" id="lvlForm" role="dialog" aria-labelledby="lvlTitle">
     <h2 id="lvlTitle">Add a water level</h2>
-    <p class="note" style="margin:0">Each level is 1 L. You'll get a reminder at this time every day.</p>
+    <p class="note" style="margin:0" id="lvlNote">Each level is 1 L. You'll get a reminder at this time every day.</p>
     <div class="field"><label for="lvlTime">Reminder time</label><input type="time" id="lvlTime" required></div>
     <div class="actions">
+      <button type="button" class="btn danger" id="lvlDelete" hidden>Remove</button>
       <button type="button" class="btn ghost" id="lvlCancel">Cancel</button>
-      <button type="submit" class="btn primary">Add level</button>
+      <button type="submit" class="btn primary" id="lvlSave">Add level</button>
     </div>
   </form>
 </div>
@@ -708,13 +712,13 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
 <div class="neditor" id="noteEditor" hidden role="dialog" aria-label="Note">
   <div class="nebar">
     <button id="neBack" aria-label="Save and go back"></button><span class="sp"></span>
-    <button id="nePin"></button><button id="neRemind" aria-label="Reminder"></button><button id="neMore" aria-label="More options"></button>
+    <button id="nePin"></button><button id="neMore" aria-label="More options"></button>
   </div>
   <div class="nebody">
+    <div class="nemeta" id="neMeta"></div>
     <input id="neTitle" placeholder="Title" maxlength="200" aria-label="Title" autocomplete="off">
     <textarea id="neText" placeholder="Note" aria-label="Note text"></textarea>
     <div id="neList" hidden></div>
-    <div class="nemeta" id="neMeta"></div>
   </div>
   <div class="nepanel" id="nePanel" hidden></div>
   <div class="netool">
@@ -879,7 +883,7 @@ const LS = "daybell-v1";
 function loadLocal() {
   try {
     const r = JSON.parse(localStorage.getItem(LS) || "null");
-    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; S.notes = (r.notes || []).map(n => (n.archived && delete n.archived, n)); S.myFoods = r.myFoods || {}; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; S.notes = (r.notes || []).map(n => { delete n.archived; delete n.reminder; delete n.reminderDone; return n; }); S.myFoods = r.myFoods || {}; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
   } catch (e) {}
 }
 const NATIVE = window.DaybellNative || null;
@@ -960,9 +964,27 @@ function weekStrip(el, sel, valueFn, color, which) {
       : `${d0.toLocaleDateString(undefined, { month: "short" })} – ${d6.toLocaleDateString(undefined, { month: "short", year: "numeric" })}`;
     return `<div class="wk"><div class="wkm">${esc(span)}</div>${dayButtons(days)}</div>`;
   }).join("");
-  el.dataset.sel = sel; el.dataset.wk = "1";
+  el.dataset.sel = sel; el.dataset.wk = "1"; el.dataset.for = which;
   const target = BEFORE * el.clientWidth;
   el.scrollLeft = keepScroll ? prevLeft : target;
+  const lbl = el.nextElementSibling, tb = lbl && lbl.querySelector(".todaybtn");
+  if (tb) tb.hidden = sel === t;
+  // Swiping to another week moves the selected date to the same weekday there, so the date above follows.
+  if (!el.dataset.swipe) {
+    el.dataset.swipe = "1";
+    let st = null;
+    el.addEventListener("scroll", () => {
+      clearTimeout(st);
+      st = setTimeout(() => {
+        const w = el.clientWidth; if (!w) return;
+        const idx = Math.round(el.scrollLeft / w);
+        if (idx === BEFORE || Math.abs(el.scrollLeft - idx * w) > 2) return;
+        const key = el.dataset.for === "cal" ? "calDay" : el.dataset.for === "water" ? "waterDay" : "taskDay";
+        view[key] = addDays(el.dataset.sel, (idx - BEFORE) * 7);
+        render();
+      }, 140);
+    }, { passive: true });
+  }
   function dayButtons(days) { return days.map(day => {
     const v = valueFn(day); const d = parseYmd(day);
     const over = which === "cal" && v > 1;
@@ -1246,7 +1268,7 @@ function renderWater() {
     if (!isDone && day === today()) chip = t <= hm ? `<span class="chip late">Due</span>` : "";
     return `<div class="lvl ${isDone ? "done" : ""}">
       <button class="chk" data-water="${t}" aria-label="${isDone ? "Undo" : "Mark done"}: level ${i + 1} at ${fmtTime(t)}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></button>
-      <div class="lt"><b class="num">${fmtTime(t)}</b><span>Level ${i + 1} · 1 L ${chip}</span></div>
+      <button class="lt" data-editlevel="${t}" aria-label="Change the ${fmtTime(t)} level time"><b class="num">${fmtTime(t)} <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></b><span>Level ${i + 1} · 1 L ${chip}</span></button>
       ${n > WATER_MIN ? `<button class="x" data-unlevel="${t}" aria-label="Remove the ${fmtTime(t)} level"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>` : ""}
     </div>`;
   }).join("") + (n < WATER_MAX ? `<button class="btn small ghost addlvl" id="addLevel">+ Add level</button>` : "");
@@ -1305,10 +1327,37 @@ function playPour(fullness) {
 /* add-level sheet */
 $("#lvlCancel").onclick = () => { $("#lvlSheet").hidden = true; };
 $("#lvlSheet").addEventListener("click", e => { if (e.target.id === "lvlSheet") $("#lvlSheet").hidden = true; });
+let lvlEditing = null;
+function openLevelSheet(time) {
+  lvlEditing = time || null;
+  const times = waterTimes();
+  $("#lvlTitle").textContent = time ? "Change level time" : "Add a water level";
+  $("#lvlNote").textContent = time ? `Level ${times.indexOf(time) + 1} · 1 L. The reminder moves to the new time every day.` : "Each level is 1 L. You'll get a reminder at this time every day.";
+  $("#lvlSave").textContent = time ? "Save" : "Add level";
+  $("#lvlDelete").hidden = !time || times.length <= WATER_MIN;
+  if (time) $("#lvlTime").value = time;
+  else { const last = times.slice(-1)[0] || "18:00"; $("#lvlTime").value = `${pad(Math.min(23, +last.slice(0, 2) + 2))}:00`; }
+  $("#lvlSheet").hidden = false;
+}
+$("#lvlDelete").onclick = () => {
+  const t = lvlEditing, before = [...waterTimes()]; $("#lvlSheet").hidden = true;
+  if (!t || before.length <= WATER_MIN) return;
+  S.settings.waterTimes = before.filter(x => x !== t); saveSettings(true);
+  toast(`Removed the ${fmtTime(t)} level`, () => { S.settings.waterTimes = before; saveSettings(true); });
+};
 $("#lvlForm").addEventListener("submit", e => {
   e.preventDefault();
   const t = $("#lvlTime").value; if (!t) return;
   const times = waterTimes();
+  if (lvlEditing) {
+    const old = lvlEditing; lvlEditing = null;
+    if (t === old) { $("#lvlSheet").hidden = true; return; }
+    if (times.includes(t)) { toast(`There's already a level at ${fmtTime(t)}`); return; }
+    S.settings.waterTimes = times.map(x => x === old ? t : x).sort();
+    Object.keys(S.water).forEach(d => { S.water[d] = (S.water[d] || []).map(x => x === old ? t : x); }); // keep what's already ticked
+    $("#lvlSheet").hidden = true; saveSettings(true);
+    return toast(`Moved ${fmtTime(old)} to ${fmtTime(t)}`);
+  }
   if (times.includes(t)) { toast(`There's already a level at ${fmtTime(t)}`); return; }
   S.settings.waterTimes = [...times, t].sort();
   $("#lvlSheet").hidden = true;
@@ -1671,27 +1720,26 @@ function noteCard(n) {
     const items = n.items || [], open = items.filter(i => !i.done), done = items.filter(i => i.done);
     body = `<span class="nchk">${open.slice(0, 8).map(i => `<span><i></i>${esc(i.text)}</span>`).join("")}${open.length > 8 ? `<span class="more">+ ${open.length - 8} more</span>` : ""}${done.length ? `<span class="more">+ ${done.length} checked item${done.length > 1 ? "s" : ""}</span>` : ""}</span>`;
   } else if ((n.body || "").trim()) body = `<span class="ntext">${esc(n.body.length > 600 ? n.body.slice(0, 600) + "…" : n.body)}</span>`;
-  const meta = (n.labels || []).map(l => `<span class="nlab">${esc(l)}</span>`).join("") +
-    (n.reminder ? `<span class="nlab rem ${n.reminderDone ? "done" : ""}">${ICON.bell}${esc(remLabel(n.reminder))}</span>` : "");
+  const meta = (n.labels || []).map(l => `<span class="nlab">${esc(l)}</span>`).join("");
   return `<button class="ncard nc-${n.color || "default"}" data-note="${n.id}">${n.pinned ? `<span class="npin">${ICON.pinOn}</span>` : ""}${(n.title || "").trim() ? `<b>${esc(n.title)}</b>` : ""}${body}${meta ? `<span class="nmeta">${meta}</span>` : ""}${!(n.title || "").trim() && !body ? `<span class="ntext muted">Empty note</span>` : ""}</button>`;
 }
 function renderNotes() {
   purgeTrash();
   const labels = allLabels();
   if (noteFilter.startsWith("label:") && !labels.includes(noteFilter.slice(6))) noteFilter = "notes";
-  const chips = [["notes", "Notes"], ["reminders", "Reminders"], ...labels.map(l => ["label:" + l, l]), ["trash", "Trash"]];
+  if (noteFilter === "reminders") noteFilter = "notes";
+  const chips = [["notes", "Notes"], ...labels.map(l => ["label:" + l, l]), ["trash", "Trash"]];
   $("#noteChips").innerHTML = chips.map(([k, l]) => `<button class="nchip ${noteFilter === k ? "on" : ""}" data-nfilter="${esc(k)}">${k.startsWith("label:") ? ICON.label : ""}${esc(l)}</button>`).join("");
   const grid = (S.settings.noteLayout || "grid") === "grid";
   $("#noteLayout").innerHTML = grid ? ICON.list : ICON.grid;
   $("#noteLayout").setAttribute("aria-label", grid ? "Show as list" : "Show as grid");
   if (noteFilter === "archive") noteFilter = "notes";
   let list = S.notes.filter(n => noteFilter === "trash" ? n.trashed : !n.trashed);
-  if (noteFilter === "reminders") list = list.filter(n => n.reminder);
   if (noteFilter.startsWith("label:")) list = list.filter(n => (n.labels || []).includes(noteFilter.slice(6)));
   const q = noteQuery.trim().toLowerCase();
   if (q) list = list.filter(n => ((n.title || "") + "\n" + noteBody(n) + "\n" + (n.labels || []).join(" ")).toLowerCase().includes(q));
   list.sort((a, b) => (b.edited || 0) - (a.edited || 0));
-  const usePins = noteFilter === "notes" || noteFilter.startsWith("label:") || noteFilter === "reminders";
+  const usePins = noteFilter === "notes" || noteFilter.startsWith("label:");
   const pinned = usePins ? list.filter(n => n.pinned) : [], others = list.filter(n => !pinned.includes(n));
   const cls = `ngrid ${grid ? "" : "list"}`;
   let html = "";
@@ -1727,13 +1775,11 @@ function paintEditor() {
   const ed = $("#noteEditor");
   ed.className = `neditor nc-${n.color || "default"}`;
   $("#nePin").innerHTML = n.pinned ? ICON.pinOn : ICON.pin; $("#nePin").setAttribute("aria-label", n.pinned ? "Unpin" : "Pin");
-  $("#neRemind").classList.toggle("on", !!n.reminder);
   $("#neCheck").classList.toggle("on", !!n.checklist);
   $("#neText").hidden = !!n.checklist;
   $("#neList").hidden = !n.checklist;
   if (n.checklist) renderItems();
-  $("#neMeta").innerHTML = (n.labels || []).map(l => `<button class="nlab" data-nelabel-rm="${esc(l)}">${esc(l)} ${ICON.x}</button>`).join("") +
-    (n.reminder ? `<button class="nlab rem ${n.reminderDone ? "done" : ""}" data-nepanel="remind">${ICON.bell}${esc(remLabel(n.reminder))}</button>` : "");
+  $("#neMeta").innerHTML = (n.labels || []).map(l => `<button class="nlab" data-nelabel-rm="${esc(l)}" aria-label="Remove label ${esc(l)} from this note">${ICON.label}${esc(l)} ${ICON.x}</button>`).join("");
   $("#neEdited").textContent = `Edited ${fmtWhen(n.edited || Date.now())}`;
   paintPanel();
 }
@@ -1900,22 +1946,50 @@ function openNoteMenu(n) {
   menuFor = { note: n.id };
   $("#nMenuTitle").textContent = noteTitle(n);
   $("#nMenuSub").textContent = `Edited ${fmtWhen(n.edited || n.created)}`;
-  $("#nMenuList").innerHTML = `<button data-nm="pin">${n.pinned ? "Unpin" : "Pin to top"}</button><button data-nm="open">Open</button><button data-nm="copy">Make a copy</button><button data-nm="delete" class="dangertxt">Delete note</button>`;
+  $("#nMenuList").innerHTML = `<button data-nm="pin">${n.pinned ? "Unpin" : "Pin to top"}</button><button data-nm="open">Open</button><button data-nm="labels">Add to label…</button><button data-nm="copy">Make a copy</button><button data-nm="delete" class="dangertxt">Delete note</button>`;
+  $("#nMenuCancel").textContent = "Cancel";
   $("#nMenuSheet").hidden = false;
 }
+function showLabelPicker(n) {
+  const labels = allLabels();
+  $("#nMenuTitle").textContent = "Add to label";
+  $("#nMenuSub").textContent = `Choose labels for “${noteTitle(n)}”.`;
+  $("#nMenuList").innerHTML = labels.map(l => `<button data-nmlabel="${esc(l)}" class="${(n.labels || []).includes(l) ? "on" : ""}">${(n.labels || []).includes(l) ? "✓ " : ""}${esc(l)}</button>`).join("") +
+    `<form class="nnewlab" id="nmNewLabel" style="margin-top:8px"><input id="nmNewLabelIn" maxlength="30" placeholder="New label, e.g. Work"><button class="btn small primary">Add</button></form>`;
+  $("#nMenuCancel").textContent = "Done";
+}
+$("#nMenuSheet").addEventListener("submit", e => {
+  if (e.target.id !== "nmNewLabel") return;
+  e.preventDefault();
+  const name = $("#nmNewLabelIn").value.trim().replace(/\s+/g, " "); if (!name || !menuFor) return;
+  const n = S.notes.find(x => x.id === menuFor.note); if (!n) return;
+  S.noteLabels = [...new Set([...(S.noteLabels || []), name])];
+  n.labels = [...new Set([...(n.labels || []), name])]; n.edited = Date.now(); saveLocal(); render();
+  showLabelPicker(n); toast(`Added to “${name}”`);
+});
 function openLabelMenu(l) {
   menuFor = { label: l };
   const count = S.notes.filter(n => !n.trashed && (n.labels || []).includes(l)).length;
   $("#nMenuTitle").textContent = `Label “${l}”`;
   $("#nMenuSub").textContent = `${count === 1 ? "1 note has" : count + " notes have"} this label. Deleting the label keeps the notes.`;
   $("#nMenuList").innerHTML = `<button data-nm="dellabel" class="dangertxt">Delete label</button>`;
+  $("#nMenuCancel").textContent = "Cancel";
   $("#nMenuSheet").hidden = false;
 }
 const closeNMenu = () => { $("#nMenuSheet").hidden = true; menuFor = null; };
 $("#nMenuCancel").onclick = closeNMenu;
 $("#nMenuSheet").addEventListener("click", e => {
   if (e.target.id === "nMenuSheet") return closeNMenu();
+  const tl = e.target.closest("[data-nmlabel]");
+  if (tl && menuFor && menuFor.note) {
+    const n = S.notes.find(x => x.id === menuFor.note); if (!n) return;
+    const l = tl.dataset.nmlabel, set = new Set(n.labels || []);
+    set.has(l) ? set.delete(l) : set.add(l); n.labels = [...set]; n.edited = Date.now(); saveLocal(); render();
+    return showLabelPicker(n);
+  }
+  if (e.target.closest("#nmNewLabel button")) return;
   const b = e.target.closest("[data-nm]"); if (!b || !menuFor) return;
+  if (b.dataset.nm === "labels") { const n = S.notes.find(x => x.id === menuFor.note); if (n) showLabelPicker(n); return; }
   const what = b.dataset.nm, m = menuFor; closeNMenu();
   if (what === "dellabel") return deleteLabel(m.label);
   const n = S.notes.find(x => x.id === m.note); if (!n) return;
@@ -1972,6 +2046,7 @@ $("#nActDelete").onclick = () => { const n = S.notes.find(x => x.id === nActId);
 
 /* Note reminders ring through the phone's alarm system. */
 function noteAlarmTasks() {
+  return []; // notes no longer have reminders
   return S.notes.filter(n => n.reminder && !n.trashed).map(n => ({
     id: "note-" + n.id, title: noteTitle(n).slice(0, 80), date: n.reminder.date, time: n.reminder.time,
     lead: 0, repeat: "none", done: !!n.reminderDone
@@ -1985,7 +2060,7 @@ window.daybellBack = () => {
   if (open.length) { open[open.length - 1].hidden = true; return true; }
   return false;
 };
-["neBack", "neMore", "neCheck", "neColor", "neLabel", "neRemind"].forEach(id => { $("#" + id).innerHTML = ICON[{ neBack: "back", neMore: "more", neCheck: "check", neColor: "palette", neLabel: "label", neRemind: "bell" }[id]]; });
+["neBack", "neMore", "neCheck", "neColor", "neLabel"].forEach(id => { $("#" + id).innerHTML = ICON[{ neBack: "back", neMore: "more", neCheck: "check", neColor: "palette", neLabel: "label" }[id]]; });
 
 /* ---------- money ---------- */
 const CATS = {
@@ -2578,7 +2653,9 @@ document.addEventListener("click", e => {
     toast(`Removed the ${fmtTime(t)} level`, () => { S.settings.waterTimes = before; saveSettings(true); });
     return;
   }
-  if (b.id === "addLevel") { const last = waterTimes().slice(-1)[0] || "18:00"; const h = Math.min(23, +last.slice(0, 2) + 2); $("#lvlTime").value = `${pad(h)}:00`; $("#lvlSheet").hidden = false; return; }
+  if (b.id === "addLevel") return openLevelSheet(null);
+  if (b.dataset.editlevel) return openLevelSheet(b.dataset.editlevel);
+  if (b.dataset.today) { view[dayKey(b.dataset.today)] = today(); return render(); }
   if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
   if (b.dataset.nfilter) { noteFilter = b.dataset.nfilter; return renderNotes(); }
   if (b.dataset.note) { const n = S.notes.find(x => x.id === b.dataset.note); if (!n) return; return n.trashed ? openNoteActions(n) : openNote(n); }
