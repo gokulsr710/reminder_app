@@ -144,6 +144,18 @@ body.noscroll{overflow:hidden}
 .ngrid{columns:2;column-gap:10px}
 .ngrid.list{columns:1}
 .ncard{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;display:flex;flex-direction:column;gap:6px;width:100%;break-inside:avoid;margin:0 0 10px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:var(--surface);position:relative;overflow:hidden}
+.nselbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;display:flex;align-items:center;gap:8px;background:var(--task);color:var(--on-accent);border-radius:16px;padding:6px 8px;margin-top:4px}
+.nselbar button{border:0;background:transparent;color:inherit;font:700 13.5px var(--body);padding:8px 10px;border-radius:10px;display:grid;place-items:center}
+.nselbar b{font-size:16px}
+.nselbar .sp{flex:1}
+.nselacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:6px;margin-top:8px}
+.nselacts button{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 4px;font:700 12.5px var(--body);color:var(--ink);display:grid;justify-items:center;gap:3px}
+.nselacts button svg{width:18px;height:18px}
+.nselacts button.dangertxt{color:var(--danger)}
+.nselacts button:disabled{opacity:.4}
+.ncard.picked{box-shadow:0 0 0 2.5px var(--task);border-color:transparent}
+.ncard .ncheck{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;background:var(--task);color:var(--on-accent);display:grid;place-items:center}
+.ncard.picked b,.ncard.picked .ntext,.ncard.picked .nchk{padding-left:22px}
 .ncard b{font-size:15.5px;font-weight:700;padding-right:20px;overflow-wrap:anywhere}
 .ntext{font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:10;-webkit-box-orient:vertical;overflow:hidden}
 .ntext.muted,.muted{color:var(--muted)}
@@ -576,6 +588,12 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
 
   <!-- NOTES -->
   <section id="tab-notes" hidden>
+    <div class="nselbar" id="nSelBar" hidden>
+      <button id="nSelClose" aria-label="Cancel selection"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <b id="nSelCount"></b><span class="sp"></span>
+      <button id="nSelAll">Select all</button>
+    </div>
+    <div class="nselacts" id="nSelActs" hidden></div>
     <div class="ntop">
       <div class="nsearch"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="noteSearch" placeholder="Search your notes" aria-label="Search notes" autocomplete="off"></div>
       <button class="iconbtn" id="noteLayout" aria-label="Change layout"></button>
@@ -1085,6 +1103,7 @@ document.addEventListener("change", e => {
   toast(on ? `${name} turned on` : `${name} turned off. Its data is kept.`);
 });
 function showTab(tab) {
+  if (typeof noteSel !== "undefined" && noteSel && tab !== "notes") { noteSel = null; paintNoteSel(); }
   if (tab !== "set" && !featureOn(tab)) tab = (FEATURES.find(f => featureOn(f.id)) || { id: "set" }).id;
   view.tab = tab;
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
@@ -1697,7 +1716,7 @@ const ICON = {
   trash: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>',
   x: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
 };
-let noteFilter = "notes", noteQuery = "", curNote = null, notePanel = null, noteSaveT = null;
+let noteSel = null, noteFilter = "notes", noteQuery = "", curNote = null, notePanel = null, noteSaveT = null;
 const noteBody = n => n.checklist ? (n.items || []).map(i => (i.done ? "[x] " : "[ ] ") + i.text).join("\n") : (n.body || "");
 const noteEmpty = n => !(n.title || "").trim() && !(n.checklist ? (n.items || []).some(i => i.text.trim()) : (n.body || "").trim());
 const noteTitle = n => (n.title || "").trim() || (n.checklist ? ((n.items || [])[0] || {}).text : (n.body || "").split("\n")[0]) || "Untitled note";
@@ -1721,7 +1740,8 @@ function noteCard(n) {
     body = `<span class="nchk">${open.slice(0, 8).map(i => `<span><i></i>${esc(i.text)}</span>`).join("")}${open.length > 8 ? `<span class="more">+ ${open.length - 8} more</span>` : ""}${done.length ? `<span class="more">+ ${done.length} checked item${done.length > 1 ? "s" : ""}</span>` : ""}</span>`;
   } else if ((n.body || "").trim()) body = `<span class="ntext">${esc(n.body.length > 600 ? n.body.slice(0, 600) + "…" : n.body)}</span>`;
   const meta = (n.labels || []).map(l => `<span class="nlab">${esc(l)}</span>`).join("");
-  return `<button class="ncard nc-${n.color || "default"}" data-note="${n.id}">${n.pinned ? `<span class="npin">${ICON.pinOn}</span>` : ""}${(n.title || "").trim() ? `<b>${esc(n.title)}</b>` : ""}${body}${meta ? `<span class="nmeta">${meta}</span>` : ""}${!(n.title || "").trim() && !body ? `<span class="ntext muted">Empty note</span>` : ""}</button>`;
+  const picked = noteSel && noteSel.has(n.id);
+  return `<button class="ncard nc-${n.color || "default"} ${picked ? "picked" : ""}" data-note="${n.id}" aria-pressed="${picked ? "true" : "false"}">${picked ? '<span class="ncheck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>' : ""}${n.pinned ? `<span class="npin">${ICON.pinOn}</span>` : ""}${(n.title || "").trim() ? `<b>${esc(n.title)}</b>` : ""}${body}${meta ? `<span class="nmeta">${meta}</span>` : ""}${!(n.title || "").trim() && !body ? `<span class="ntext muted">Empty note</span>` : ""}</button>`;
 }
 function renderNotes() {
   purgeTrash();
@@ -1946,26 +1966,91 @@ function openNoteMenu(n) {
   menuFor = { note: n.id };
   $("#nMenuTitle").textContent = noteTitle(n);
   $("#nMenuSub").textContent = `Edited ${fmtWhen(n.edited || n.created)}`;
-  $("#nMenuList").innerHTML = `<button data-nm="pin">${n.pinned ? "Unpin" : "Pin to top"}</button><button data-nm="open">Open</button><button data-nm="labels">Add to label…</button><button data-nm="copy">Make a copy</button><button data-nm="delete" class="dangertxt">Delete note</button>`;
+  $("#nMenuList").innerHTML = `<button data-nm="open">Open</button><button data-nm="pin">${n.pinned ? "Unpin" : "Pin to top"}</button><button data-nm="select">Select multiple</button><button data-nm="labels">Add to label…</button><button data-nm="copy">Make a copy</button><button data-nm="delete" class="dangertxt">Delete note</button>`;
   $("#nMenuCancel").textContent = "Cancel";
   $("#nMenuSheet").hidden = false;
 }
-function showLabelPicker(n) {
-  const labels = allLabels();
+function showLabelPicker(arg) {
+  const ns = (Array.isArray(arg) ? arg : [arg]).filter(Boolean);
+  menuFor = { notes: ns.map(n => n.id) };
+  const labels = allLabels(), has = l => ns.length && ns.every(n => (n.labels || []).includes(l));
   $("#nMenuTitle").textContent = "Add to label";
-  $("#nMenuSub").textContent = `Choose labels for “${noteTitle(n)}”.`;
-  $("#nMenuList").innerHTML = labels.map(l => `<button data-nmlabel="${esc(l)}" class="${(n.labels || []).includes(l) ? "on" : ""}">${(n.labels || []).includes(l) ? "✓ " : ""}${esc(l)}</button>`).join("") +
+  $("#nMenuSub").textContent = ns.length === 1 ? `Choose labels for “${noteTitle(ns[0])}”.` : `Choose labels for ${ns.length} notes.`;
+  $("#nMenuList").innerHTML = labels.map(l => `<button data-nmlabel="${esc(l)}" class="${has(l) ? "on" : ""}">${has(l) ? "✓ " : ""}${esc(l)}</button>`).join("") +
     `<form class="nnewlab" id="nmNewLabel" style="margin-top:8px"><input id="nmNewLabelIn" maxlength="30" placeholder="New label, e.g. Work"><button class="btn small primary">Add</button></form>`;
   $("#nMenuCancel").textContent = "Done";
 }
 $("#nMenuSheet").addEventListener("submit", e => {
   if (e.target.id !== "nmNewLabel") return;
   e.preventDefault();
-  const name = $("#nmNewLabelIn").value.trim().replace(/\s+/g, " "); if (!name || !menuFor) return;
-  const n = S.notes.find(x => x.id === menuFor.note); if (!n) return;
+  const name = $("#nmNewLabelIn").value.trim().replace(/\s+/g, " "); if (!name || !menuFor || !menuFor.notes) return;
+  const ns = S.notes.filter(x => menuFor.notes.includes(x.id)); if (!ns.length) return;
   S.noteLabels = [...new Set([...(S.noteLabels || []), name])];
-  n.labels = [...new Set([...(n.labels || []), name])]; n.edited = Date.now(); saveLocal(); render();
-  showLabelPicker(n); toast(`Added to “${name}”`);
+  ns.forEach(n => { n.labels = [...new Set([...(n.labels || []), name])]; n.edited = Date.now(); }); saveLocal(); render();
+  showLabelPicker(ns); toast(`Added to “${name}”`);
+});
+/* Multi-select: long-press a note, tap more, then act on all of them. */
+const SEL_ICON = {
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 4H6l4-4z"/><path d="M12 14v7"/></svg>',
+  label: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4" fill="currentColor"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+  restore: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>'
+};
+function startNoteSel(id) { noteSel = new Set(id ? [id] : []); paintNoteSel(); renderNotes(); }
+function endNoteSel() { if (!noteSel) return; noteSel = null; paintNoteSel(); renderNotes(); }
+function toggleNoteSel(id) {
+  if (!noteSel) return startNoteSel(id);
+  noteSel.has(id) ? noteSel.delete(id) : noteSel.add(id);
+  if (!noteSel.size) return endNoteSel();
+  paintNoteSel(); renderNotes();
+}
+function selectedNotes() { return noteSel ? S.notes.filter(n => noteSel.has(n.id)) : []; }
+function paintNoteSel() {
+  const on = !!noteSel, ns = selectedNotes();
+  $("#nSelBar").hidden = !on; $("#nSelActs").hidden = !on;
+  document.querySelector("#tab-notes .ntop").hidden = on;
+  if (view.tab === "notes") $("#fab").hidden = on;
+  if (!on) return;
+  $("#nSelCount").textContent = `${ns.length} selected`;
+  const inTrash = noteFilter === "trash";
+  const allPinned = ns.length && ns.every(n => n.pinned);
+  $("#nSelActs").innerHTML = inTrash
+    ? `<button data-sel="restore">${SEL_ICON.restore}Restore</button><button data-sel="purge" class="dangertxt">${SEL_ICON.trash}Delete for good</button>`
+    : `<button data-sel="pin">${SEL_ICON.pin}${allPinned ? "Unpin" : "Pin"}</button><button data-sel="label">${SEL_ICON.label}Label</button><button data-sel="copy">${SEL_ICON.copy}Copy</button><button data-sel="delete" class="dangertxt">${SEL_ICON.trash}Delete</button>`;
+}
+$("#nSelClose").onclick = endNoteSel;
+$("#nSelAll").onclick = () => {
+  const visible = [...document.querySelectorAll("#noteList .ncard")].map(c => c.dataset.note);
+  const all = visible.every(id => noteSel.has(id));
+  noteSel = new Set(all ? [] : visible);
+  if (!noteSel.size) return endNoteSel();
+  paintNoteSel(); renderNotes();
+};
+$("#nSelActs").addEventListener("click", e => {
+  const b = e.target.closest("[data-sel]"); if (!b || !noteSel) return;
+  const ns = selectedNotes(), k = b.dataset.sel, count = `${ns.length} note${ns.length === 1 ? "" : "s"}`;
+  if (k === "label") return showLabelPicker(ns), $("#nMenuSheet").hidden = false;
+  if (k === "pin") {
+    const pin = !ns.every(n => n.pinned); ns.forEach(n => { n.pinned = pin; n.edited = Date.now(); });
+    endNoteSel(); saveLocal(); render(); return toast(`${pin ? "Pinned" : "Unpinned"} ${count}`);
+  }
+  if (k === "copy") {
+    ns.forEach(n => { const c = JSON.parse(JSON.stringify(n)); c.id = newId(); c.created = c.edited = Date.now(); c.pinned = false;
+      c.title = (c.title || "") + (c.title ? " (copy)" : ""); (c.items || []).forEach(i => { i.id = newId(); }); S.notes.push(c); });
+    endNoteSel(); saveLocal(); render(); return toast(`Copied ${count}`);
+  }
+  if (k === "delete") {
+    const ids = ns.map(n => n.id), now = Date.now();
+    ns.forEach(n => { n.trashed = now; n.pinned = false; });
+    endNoteSel(); saveLocal(); render();
+    return toast(`Moved ${count} to Trash`, () => { S.notes.forEach(n => { if (ids.includes(n.id)) delete n.trashed; }); saveLocal(); render(); });
+  }
+  if (k === "restore") { ns.forEach(n => { delete n.trashed; }); endNoteSel(); saveLocal(); render(); return toast(`Restored ${count}`); }
+  if (k === "purge") {
+    const gone = ns; S.notes = S.notes.filter(n => !noteSel.has(n.id)); endNoteSel(); saveLocal(); render();
+    return toast(`Deleted ${count} for good`, () => { S.notes.push(...gone); saveLocal(); render(); });
+  }
 });
 function openLabelMenu(l) {
   menuFor = { label: l };
@@ -1981,11 +2066,12 @@ $("#nMenuCancel").onclick = closeNMenu;
 $("#nMenuSheet").addEventListener("click", e => {
   if (e.target.id === "nMenuSheet") return closeNMenu();
   const tl = e.target.closest("[data-nmlabel]");
-  if (tl && menuFor && menuFor.note) {
-    const n = S.notes.find(x => x.id === menuFor.note); if (!n) return;
-    const l = tl.dataset.nmlabel, set = new Set(n.labels || []);
-    set.has(l) ? set.delete(l) : set.add(l); n.labels = [...set]; n.edited = Date.now(); saveLocal(); render();
-    return showLabelPicker(n);
+  if (tl && menuFor && menuFor.notes) {
+    const ns = S.notes.filter(x => menuFor.notes.includes(x.id)); if (!ns.length) return;
+    const l = tl.dataset.nmlabel, all = ns.every(n => (n.labels || []).includes(l));
+    ns.forEach(n => { const set = new Set(n.labels || []); all ? set.delete(l) : set.add(l); n.labels = [...set]; n.edited = Date.now(); });
+    saveLocal(); render();
+    return showLabelPicker(ns);
   }
   if (e.target.closest("#nmNewLabel button")) return;
   const b = e.target.closest("[data-nm]"); if (!b || !menuFor) return;
@@ -1995,6 +2081,7 @@ $("#nMenuSheet").addEventListener("click", e => {
   const n = S.notes.find(x => x.id === m.note); if (!n) return;
   if (what === "pin") { n.pinned = !n.pinned; n.edited = Date.now(); saveLocal(); render(); return toast(n.pinned ? "Pinned" : "Unpinned"); }
   if (what === "open") return openNote(n);
+  if (what === "select") return startNoteSel(n.id);
   if (what === "copy") {
     const c = JSON.parse(JSON.stringify(n)); c.id = newId(); c.created = c.edited = Date.now(); c.pinned = false; c.reminder = null;
     c.title = (c.title || "") + (c.title ? " (copy)" : ""); (c.items || []).forEach(i => { i.id = newId(); });
@@ -2015,12 +2102,13 @@ function deleteLabel(l) {
 }
 function longPressTarget(el) { return el && (el.closest(".ncard") || el.closest(".nchip[data-nfilter^='label:']")); }
 function fireLongPress(el) {
-  suppressClick = true; setTimeout(() => { suppressClick = false; }, 600);
+  suppressClick = true; // ignore only the tap that ends this long press
   try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
-  if (el.classList.contains("ncard")) { const n = S.notes.find(x => x.id === el.dataset.note); if (n) openNoteMenu(n); }
+  if (el.classList.contains("ncard")) { if (noteSel) toggleNoteSel(el.dataset.note); else startNoteSel(el.dataset.note); }
   else openLabelMenu(el.dataset.nfilter.slice(6));
 }
 $("#tab-notes").addEventListener("pointerdown", e => {
+  suppressClick = false; // a new touch is a new tap
   const el = longPressTarget(e.target); if (!el) return;
   pressXY = [e.clientX, e.clientY]; clearTimeout(pressT);
   pressT = setTimeout(() => { pressT = null; fireLongPress(el); }, 480);
@@ -2055,6 +2143,7 @@ function noteAlarmTasks() {
 
 /* Phone Back button: close what's open on top before leaving the app. */
 window.daybellBack = () => {
+  if (noteSel && $("#nMenuSheet").hidden) { endNoteSel(); return true; }
   if (curNote) { if (notePanel) { notePanel = null; paintPanel(); } else closeNote(); return true; }
   const open = [...document.querySelectorAll(".scrim")].filter(el => !el.hidden);
   if (open.length) { open[open.length - 1].hidden = true; return true; }
@@ -2657,8 +2746,12 @@ document.addEventListener("click", e => {
   if (b.dataset.editlevel) return openLevelSheet(b.dataset.editlevel);
   if (b.dataset.today) { view[dayKey(b.dataset.today)] = today(); return render(); }
   if (b.dataset.toggle) return toggleTask(b.dataset.toggle);
-  if (b.dataset.nfilter) { noteFilter = b.dataset.nfilter; return renderNotes(); }
-  if (b.dataset.note) { const n = S.notes.find(x => x.id === b.dataset.note); if (!n) return; return n.trashed ? openNoteActions(n) : openNote(n); }
+  if (b.dataset.nfilter) { noteFilter = b.dataset.nfilter; if (noteSel) { noteSel = null; paintNoteSel(); } return renderNotes(); }
+  if (b.dataset.note) {
+    const n = S.notes.find(x => x.id === b.dataset.note); if (!n) return;
+    if (noteSel) return toggleNoteSel(n.id);
+    return openNoteMenu(n);
+  }
   if (b.id === "emptyTrash") {
     const gone = S.notes.filter(n => n.trashed); S.notes = S.notes.filter(n => !n.trashed); saveLocal(); render();
     return toast(`Deleted ${gone.length} note${gone.length === 1 ? "" : "s"} for good`, () => { S.notes.push(...gone); saveLocal(); render(); });
