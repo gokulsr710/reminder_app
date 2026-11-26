@@ -199,7 +199,7 @@ body.noscroll{overflow:hidden}
 .nitem .x{width:34px;height:34px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px;flex:none}
 .naddi{border:0;background:transparent;color:var(--muted);font-weight:600;text-align:left;padding:10px 0 10px 30px}
 .ndone{font-size:13px;color:var(--muted);font-weight:700;margin:10px 0 2px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--ink) 12%,transparent)}
-.nepanel{animation:panelUp .18s ease-out;flex:none;background:var(--surface);border-top:1px solid var(--line);padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));display:grid;gap:10px;max-height:46vh;overflow-y:auto}
+.nepanel{animation:panelDown .18s ease-out;flex:none;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow);padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));display:grid;gap:10px;max-height:46vh;overflow-y:auto}
 .nptitle{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .nswatches{display:flex;flex-wrap:wrap;gap:10px}
 .nsw{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);padding:0}
@@ -421,7 +421,7 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
 /* Sheets */
 .scrim{position:fixed;inset:0;z-index:20;background:rgba(8,14,11,.5);display:flex;align-items:flex-end;justify-content:center}
 .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:grid;gap:14px;max-height:92%;overflow:auto;animation:up .22s ease}
-@keyframes panelUp{from{transform:translateY(24px);opacity:.3}}
+@keyframes panelDown{from{transform:translateY(-16px);opacity:.3}}
 @keyframes up{from{transform:translateY(30px);opacity:.4}}
 .sheet h2{margin:0;font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.01em}
 .sheet .actions{display:flex;gap:8px;flex-wrap:wrap}
@@ -734,19 +734,16 @@ input[type=text],input[type=search],input[type=number],input[type=date],input[ty
 <div class="neditor" id="noteEditor" hidden role="dialog" aria-label="Note">
   <div class="nebar">
     <button id="neBack" aria-label="Save and go back"></button><span class="sp"></span>
-    <button id="nePin"></button><button id="neMore" aria-label="More options"></button>
+    <button id="neCheck" aria-label="Checklist"></button><button id="neColor" aria-label="Colour"></button><button id="neLabel" aria-label="Labels"></button><button id="nePin"></button><button id="neMore" aria-label="More options"></button>
   </div>
+  <div class="nepanel" id="nePanel" hidden></div>
   <div class="nebody">
     <div class="nemeta" id="neMeta"></div>
     <input id="neTitle" placeholder="Title" maxlength="200" aria-label="Title" autocomplete="off">
     <textarea id="neText" placeholder="Note" aria-label="Note text"></textarea>
     <div id="neList" hidden></div>
   </div>
-  <div class="nepanel" id="nePanel" hidden></div>
-  <div class="netool">
-    <button id="neCheck" aria-label="Checklist"></button><button id="neColor" aria-label="Colour"></button><button id="neLabel" aria-label="Labels"></button>
-    <span class="sp"></span><span id="neEdited"></span>
-  </div>
+  <div class="netool"><span class="sp"></span><span id="neEdited"></span></div>
 </div>
 
 <!-- Long-press menu for notes and labels -->
