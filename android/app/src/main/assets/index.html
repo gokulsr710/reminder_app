@@ -902,7 +902,8 @@ const LS = "daybell-v1";
 function loadLocal() {
   try {
     const r = JSON.parse(localStorage.getItem(LS) || "null");
-    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; S.notes = (r.notes || []).map(n => { delete n.archived; delete n.reminder; delete n.reminderDone; return n; }); S.myFoods = r.myFoods || {}; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
+    if (r) { S.tasks = r.tasks || []; S.meals = r.meals || []; S.money = r.money || []; S.water = r.water || {}; S.body = r.body || { entries: [] }; if (r.settings && !r.settings.noteLayoutV2) { r.settings.noteLayout = "list"; r.settings.noteLayoutV2 = true; }
+    S.notes = (r.notes || []).map(n => { delete n.archived; delete n.reminder; delete n.reminderDone; return n; }); S.myFoods = r.myFoods || {}; S.noteLabels = r.noteLabels || []; Object.assign(S.settings, r.settings || {}); }
   } catch (e) {}
 }
 const NATIVE = window.DaybellNative || null;
@@ -1750,7 +1751,7 @@ function renderNotes() {
   if (noteFilter === "reminders") noteFilter = "notes";
   const chips = [["notes", "Notes"], ...labels.map(l => ["label:" + l, l]), ["trash", "Trash"]];
   $("#noteChips").innerHTML = chips.map(([k, l]) => `<button class="nchip ${noteFilter === k ? "on" : ""}" data-nfilter="${esc(k)}">${k.startsWith("label:") ? ICON.label : ""}${esc(l)}</button>`).join("");
-  const grid = (S.settings.noteLayout || "grid") === "grid";
+  const grid = (S.settings.noteLayout || "list") === "grid";
   $("#noteLayout").innerHTML = grid ? ICON.list : ICON.grid;
   $("#noteLayout").setAttribute("aria-label", grid ? "Show as list" : "Show as grid");
   if (noteFilter === "archive") noteFilter = "notes";
@@ -1963,7 +1964,7 @@ $("#noteEditor").addEventListener("submit", e => {
 
 /* List events */
 $("#noteSearch").addEventListener("input", e => { noteQuery = e.target.value; renderNotes(); });
-$("#noteLayout").onclick = () => { S.settings.noteLayout = (S.settings.noteLayout || "grid") === "grid" ? "list" : "grid"; saveLocal(); renderNotes(); };
+$("#noteLayout").onclick = () => { S.settings.noteLayout = (S.settings.noteLayout || "list") === "grid" ? "list" : "grid"; saveLocal(); renderNotes(); };
 
 /* Long press: a note opens Pin / Make a copy / Delete; a label chip opens Delete label. */
 let menuFor = null, pressT = null, pressXY = null, suppressClick = false;
